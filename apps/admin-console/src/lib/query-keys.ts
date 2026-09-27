@@ -1,0 +1,314 @@
+/**
+ * Query Key Factory — centralized, type-safe cache keys for TanStack Query.
+ * Rules:
+ * - All keys live here; no hardcoded strings in hooks/pages.
+ * - Lists use objects for filters: ['users', { params }]
+ * - Detail keys are predictable: ['users', id]
+ * - Invalidations target parent scopes (e.g. invalidate 'users' clears list + detail)
+ */
+
+export const queryKeys = {
+	users: {
+		all: (tenantId: string) => ['users', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['users', 'list', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['users', tenantId, id] as const,
+		activeSessions: (tenantId: string) => ['active-sessions', tenantId] as const,
+		passwordStatus: (tenantId: string, id: string) =>
+			['users', tenantId, id, 'password-status'] as const,
+		userRoles: (tenantId: string, id: string) => ['users', tenantId, id, 'roles'] as const,
+		userPermissions: (tenantId: string, id: string) =>
+			['users', tenantId, id, 'permissions'] as const,
+	},
+	roles: {
+		all: (tenantId: string) => ['roles', tenantId] as const,
+		detail: (tenantId: string, id: string) => ['roles', tenantId, id] as const,
+		permissions: (tenantId: string, roleId: string) =>
+			['roles', tenantId, roleId, 'permissions'] as const,
+		children: (tenantId: string, roleId: string) =>
+			['roles', tenantId, roleId, 'children'] as const,
+		parents: (tenantId: string, roleId: string) => ['roles', tenantId, roleId, 'parents'] as const,
+		effectivePermissions: (tenantId: string, roleId: string) =>
+			['roles', tenantId, roleId, 'effective-permissions'] as const,
+	},
+	permissions: {
+		all: (tenantId: string) => ['permissions', tenantId] as const,
+	},
+	secrets: {
+		all: (tenantId: string) => ['secrets', tenantId] as const,
+		list: (tenantId: string, params?: unknown) =>
+			['secrets', 'list', tenantId, { params }] as const,
+		detail: (tenantId: string, key: string) => ['secrets', tenantId, 'detail', key] as const,
+		versions: (tenantId: string, key: string) => ['secrets', tenantId, 'versions', key] as const,
+		encryptionKeys: (tenantId: string) => ['secrets', tenantId, 'encryption-keys'] as const,
+	},
+	tenants: {
+		all: ['tenants'] as const,
+		detail: (id: string) => ['tenants', id] as const,
+	},
+	departments: {
+		all: (tenantId: string) => ['departments', tenantId] as const,
+	},
+	members: {
+		all: (tenantId: string) => ['members', tenantId] as const,
+		pending: (tenantId: string) => ['members', 'pending', tenantId] as const,
+	},
+	featureGates: (tenantId: string) => ['feature-gates', tenantId] as const,
+	applications: {
+		all: (tenantId: string) => ['applications', tenantId] as const,
+	},
+	webhooks: {
+		all: (tenantId: string) => ['webhooks', tenantId] as const,
+	},
+	branding: {
+		all: (tenantId: string) => ['branding', tenantId] as const,
+	},
+	sessions: {
+		all: (tenantId: string) => ['sessions', tenantId] as const,
+		activeCount: (tenantId: string) => ['sessions', 'active-count', tenantId] as const,
+	},
+	auditLogs: {
+		all: (tenantId: string, params?: unknown) => ['audit-logs', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['audit-logs', tenantId, id] as const,
+		stats: (tenantId: string) => ['audit-stats', tenantId] as const,
+	},
+	auditAlerts: {
+		all: (tenantId: string, params?: unknown) => ['audit-alerts', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['audit-alerts', tenantId, id] as const,
+	},
+	auditAnomalies: {
+		all: (tenantId: string, params?: unknown) => ['audit-anomalies', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['audit-anomalies', tenantId, id] as const,
+		timeline: (tenantId: string, id: string) =>
+			['audit-anomalies', tenantId, id, 'timeline'] as const,
+		related: (tenantId: string, id: string) =>
+			['audit-anomalies', tenantId, id, 'related'] as const,
+	},
+	siemConnectors: {
+		all: (params?: unknown) => ['siem-connectors', { params }] as const,
+	},
+	retentionPolicy: ['audit-retention-policy'] as const,
+	identityProviders: {
+		all: ['identity-providers'] as const,
+	},
+	ldap: {
+		health: ['ldap', 'health'] as const,
+	},
+	notifications: {
+		all: ['notification-templates'] as const,
+		stats: ['notification-stats'] as const,
+		trend: (days: number) => ['notification-trend', days] as const,
+		eventMappings: ['event-mappings'] as const,
+		globalVariables: ['global-variables'] as const,
+		readReport: ['notifications', 'read-report'] as const,
+	},
+	platform: {
+		communicationStats: ['platform-communication-stats'] as const,
+		notificationStats: ['platform-notification-stats'] as const,
+	},
+	communication: {
+		dashboard: ['communication-dashboard'] as const,
+		logs: ['message-logs'] as const,
+		stats: ['channel-stats'] as const,
+		providers: ['communication', 'providers'] as const,
+		templates: (params?: unknown) => ['communication', 'templates', { params }] as const,
+		templateStats: ['communication', 'template-stats'] as const,
+	},
+	announcements: {
+		all: ['announcements'] as const,
+	},
+	settings: {
+		all: ['settings'] as const,
+	},
+	points: {
+		rules: ['point-rules'] as const,
+		accounts: ['point-accounts'] as const,
+		transactions: (userId: string) => ['point-transactions', userId] as const,
+		riskScore: (userId: string) => ['point-risk-score', userId] as const,
+		config: ['point-tenant-config'] as const,
+	},
+	wallets: {
+		all: (tenantId?: string) =>
+			tenantId ? (['wallets', tenantId] as const) : (['wallets'] as const),
+		summary: (tenantId: string) => ['wallets', 'summary', tenantId] as const,
+		transactions: (tenantId: string, params?: unknown) =>
+			['wallets', 'transactions', tenantId, { params }] as const,
+		disputes: (tenantId: string) => ['wallets', 'disputes', tenantId] as const,
+		coupons: ['wallets', 'coupons'] as const,
+		fraudRules: ['wallets', 'fraud-rules'] as const,
+		reconciliation: (params?: unknown) => ['wallets', 'reconciliation', { params }] as const,
+	},
+	storage: {
+		files: (params?: unknown) => ['files', { params }] as const,
+		quota: ['storage', 'quota'] as const,
+		stats: ['storage', 'stats'] as const,
+		trash: ['storage', 'trash'] as const,
+	},
+	billing: {
+		all: (tenantId: string) => ['billing', tenantId] as const,
+		subscription: (tenantId: string) => ['billing', 'subscription', tenantId] as const,
+		usage: (tenantId: string) => ['billing', 'usage', tenantId] as const,
+		statistics: (tenantId: string) => ['billing', 'statistics', tenantId] as const,
+		records: (tenantId: string) => ['billing', 'records', tenantId] as const,
+		plans: ['billing', 'plans'] as const,
+		paymentGateways: ['billing', 'payment-gateways'] as const,
+		refundApprovals: ['billing', 'refund-approvals'] as const,
+		dunningSettings: (tenantId: string) => ['billing', 'dunning-settings', tenantId] as const,
+	},
+	compliance: {
+		status: ['compliance', 'status'] as const,
+		dsars: ['compliance', 'dsars'] as const,
+		retentionPolicies: ['compliance', 'retention-policies'] as const,
+		sodRules: ['compliance', 'sod-rules'] as const,
+		isoControls: ['compliance', 'iso-controls'] as const,
+		consents: ['compliance', 'consents'] as const,
+	},
+	ops: {
+		status: ['ops', 'status'] as const,
+		health: ['ops', 'health'] as const,
+		metrics: (serviceName?: string) =>
+			serviceName ? (['ops', 'metrics', serviceName] as const) : (['ops', 'metrics'] as const),
+	},
+	security: {
+		passwordPolicy: ['security', 'password-policy'] as const,
+		mfaPolicy: ['security', 'mfa-policy'] as const,
+		riskConfig: ['security', 'risk-config'] as const,
+		tenantPolicy: (tenantId: string) => ['security', 'policy', tenantId] as const,
+		authConfig: ['security', 'auth-config'] as const,
+		dataClassification: (tenantId: string) =>
+			['security', 'data-classification', tenantId] as const,
+	},
+	pay: {
+		all: ['pay'] as const,
+		channels: (tenantId: string) => ['pay', 'channels', tenantId] as const,
+		payments: (params?: unknown) => ['pay', 'payments', { params }] as const,
+		paymentDetail: (id: string) => ['pay', 'payments', id] as const,
+		refunds: (params?: unknown) => ['pay', 'refunds', { params }] as const,
+		reconciliation: (tenantId: string, params?: unknown) =>
+			['pay', 'reconciliation', tenantId, { params }] as const,
+	},
+	walletAdmin: {
+		all: ['wallet-admin'] as const,
+		list: (params?: unknown) => ['wallet-admin', 'list', { params }] as const,
+		coupons: ['wallet-admin', 'coupons'] as const,
+		fraudRules: ['wallet-admin', 'fraud-rules'] as const,
+		withdrawals: (params?: unknown) => ['wallet-admin', 'withdrawals', { params }] as const,
+		policy: (tenantId: string, appId: string) =>
+			['wallet-admin', 'policy', tenantId, appId] as const,
+	},
+	billingAdmin: {
+		all: ['billing-admin'] as const,
+		plans: ['billing-admin', 'plans'] as const,
+		subscriptions: (params?: unknown) => ['billing-admin', 'subscriptions', { params }] as const,
+		refunds: (params?: unknown) => ['billing-admin', 'refunds', { params }] as const,
+		revenue: (params?: unknown) => ['billing-admin', 'revenue', { params }] as const,
+		dunning: (tenantId: string) => ['billing-admin', 'dunning', tenantId] as const,
+		taxExport: (params?: unknown) => ['billing-admin', 'tax-export', { params }] as const,
+		alerts: (params?: unknown) => ['billing-admin', 'alerts', { params }] as const,
+		creditNote: (number: string) => ['billing-admin', 'credit-notes', number] as const,
+		creditNotes: ['billing-admin', 'credit-notes'] as const,
+		creditBalance: (tenantId: string) => ['billing-admin', 'credit-balance', tenantId] as const,
+		creditTransactions: (tenantId: string, params?: unknown) =>
+			['billing-admin', 'credit-transactions', tenantId, { params }] as const,
+	},
+	status: {
+		incidents: {
+			all: ['status', 'incidents'] as const,
+			detail: (id: string) => ['status', 'incidents', id] as const,
+		},
+		maintenances: {
+			all: ['status', 'maintenances'] as const,
+			detail: (id: string) => ['status', 'maintenances', id] as const,
+		},
+		overview: ['status', 'overview'] as const,
+		subscribers: ['status', 'subscribers'] as const,
+	},
+	abacPolicies: {
+		all: (tenantId: string) => ['abac-policies', tenantId] as const,
+	},
+	roleActivations: {
+		all: ['role-activations'] as const,
+	},
+	approvalRequests: {
+		all: (tenantId: string) => ['approval-requests', tenantId] as const,
+	},
+	agents: {
+		all: (tenantId: string) => ['agents', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['agents', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['agents', tenantId, id] as const,
+		credentials: (tenantId: string, id: string) => ['agents', tenantId, id, 'credentials'] as const,
+		activity: (tenantId: string, id: string) => ['agents', tenantId, id, 'activity'] as const,
+		permissions: (tenantId: string, id: string) => ['agents', tenantId, id, 'permissions'] as const,
+	},
+	robots: {
+		all: (tenantId: string) => ['robots', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['robots', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['robots', tenantId, id] as const,
+	},
+	devices: {
+		all: (tenantId: string) => ['devices', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['devices', tenantId, { params }] as const,
+		detail: (tenantId: string, id: string) => ['devices', tenantId, id] as const,
+	},
+	nhiPolicy: {
+		all: ['nhi-policy'] as const,
+	},
+	serverLogs: {
+		all: (params?: unknown) => ['server-logs', { params }] as const,
+		services: ['server-logs', 'services'] as const,
+	},
+	secretsInventory: {
+		all: (tenantId: string) => ['secrets-inventory', tenantId] as const,
+		kv: (tenantId: string) => ['secrets-inventory', tenantId, 'kv'] as const,
+		encryptionKeys: (tenantId: string) =>
+			['secrets-inventory', tenantId, 'encryption-keys'] as const,
+		jwtKeys: (tenantId: string) => ['secrets-inventory', tenantId, 'jwt-keys'] as const,
+		infrastructure: (tenantId: string) =>
+			['secrets-inventory', tenantId, 'infrastructure'] as const,
+		apiKeys: (tenantId: string) => ['secrets-inventory', tenantId, 'api-keys'] as const,
+		oauth: (tenantId: string) => ['secrets-inventory', tenantId, 'oauth'] as const,
+	},
+	systemOverview: {
+		all: ['system-overview'] as const,
+	},
+	conflictPairs: {
+		all: ['conflict-pairs'] as const,
+	},
+	defaultRoles: {
+		all: ['default-roles'] as const,
+	},
+	batchOperations: {
+		all: ['batch-operations'] as const,
+	},
+	reverseLookup: {
+		roleUsers: (roleId: string) => ['reverse-lookup', 'roles', roleId, 'users'] as const,
+		permissionUsers: (permissionId: string) =>
+			['reverse-lookup', 'permissions', permissionId, 'users'] as const,
+		permissionRoles: (permissionId: string) =>
+			['reverse-lookup', 'permissions', permissionId, 'roles'] as const,
+	},
+	// ============ developer-portal merge ============
+	oauthClients: {
+		all: (params?: unknown) => ['oauth-clients', { params }] as const,
+		detail: (id: string) => ['oauth-clients', id] as const,
+		secrets: (clientId: string) => ['oauth-clients', clientId, 'secrets'] as const,
+		stats: (clientId: string) => ['oauth-clients', clientId, 'stats'] as const,
+	},
+	apiKeys: {
+		all: (params?: unknown) => ['api-keys', { params }] as const,
+		detail: (id: string) => ['api-keys', id] as const,
+	},
+	usage: {
+		current: ['usage', 'current'] as const,
+		timeline: (days?: number) => ['usage', 'timeline', { days }] as const,
+		endpoints: (appId?: string) => ['usage', 'endpoints', { appId }] as const,
+	},
+	mySessions: {
+		all: ['my-sessions'] as const,
+	},
+	myDevices: {
+		all: ['my-devices'] as const,
+	},
+	myAuditLogs: {
+		all: (params?: unknown) => ['my-audit-logs', { params }] as const,
+	},
+} as const;

@@ -1,0 +1,196 @@
+'use client';
+
+import React, { useState, useMemo, useCallback } from 'react';
+import { Tree, Input, Drawer, Descriptions, Tag, Spin, Empty, Button, Space } from 'antd';
+import { ApartmentOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { extractList } from '@autional-cn/shared';
+import { useRoles } from '@/hooks/use-roles';
+import { useRoleChildren, useRoleParents } from '@/hooks/use-role-hierarchy';
+import type { RoleRecord } from '@/hooks/use-roles';
+import type { DataNode, EventDataNode } from 'antd/es/tree';
+
+function buildTreeNode(role: RoleRecord): DataNode {
+	return {
+		title: `${role.name} (${role.code})`,
+		key: role.id,
+		isLeaf: false,
+	} as DataNode;
+}
+
+export function RoleHierarchyTree() {
+	const { data: roles = [], isLoading, refetch: refetchRoles } = useRoles();
+	const { t } = useTranslation();
+	const [searchText, setSearchText] = useState('');
+	const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
+	const [loadedChildren, setLoadedChildren] = useState<Set<string>>(new Set());
+	const [drawerRoleId, setDrawerRoleId] = useState<string | null>(null);
+
+	const { data: drawerChildren = [], isLoading: drawerChildrenLoading } = useRoleChildren(
+		drawerRoleId || '',
+	);
+	const { data: drawerParents = [], isLoading: drawerParentsLoading } = useRoleParents(
+		drawerRoleId || '',
+	);
+
+	const filteredRoles = useMemo(() => {
+		if (!searchText) return roles;
+		const lower = searchText.toLowerCase();
+		return roles.filter(
+			(r: RoleRecord) =>
+				r.name.toLowerCase().includes(lower) || r.code.toLowerCase().includes(lower),
+		);
+	}, [roles, searchText]);
+
+	const handleLoadData = useCallback(
+		async (node: EventDataNode<DataNode>) => {
+			const roleId = node.key as string;
+			if (loadedChildren.has(roleId)) return;
+
+			const response = await import('@/lib/api.generated').then((m) => m.getRoleChildren(roleId));
+			const children: Array<{ id: string; name: string; code: string }> = extractList(response);
+			setLoadedChildren((prev) => new Set(prev).add(roleId));
+
+			const childNodes: DataNode[] = children.map((child) => ({
+				title: `${child.name} (${child.code})`,
+				key: child.id,
+				isLeaf: false,
+			}));
+
+			const mutableNode = node as unknown as { children?: DataNode[] };
+			if (mutableNode.children) {
+				mutableNode.children = [...mutableNode.children, ...childNodes];
+			}
+		},
+		[loadedChildren],
+	);
+
+	const treeData = useMemo(() => {
+		return filteredRoles.map((r: RoleRecord) => buildTreeNode(r));
+	}, [filteredRoles]);
+
+	const onSelect = useCallback((selectedKeys: React.Key[]) => {
+		if (selectedKeys.length > 0) {
+			setDrawerRoleId(selectedKeys[0] as string);
+		}
+	}, []);
+
+	const drawerRole = drawerRoleId ? roles.find((r: RoleRecord) => r.id === drawerRoleId) : null;
+
+	return (
+		<div>
+			<div className="flex items-center justify-between mb-4 gap-4">
+				<Input
+					placeholder={t('roleHierarchy.searchPlaceholder')}
+					prefix={<SearchOutlined />}
+					value={searchText}
+					onChange={(e) => setSearchText(e.target.value)}
+					allowClear
+					className="max-w-sm"
+				/>
+				<Button icon={<ReloadOutlined />} onClick={() => refetchRoles()}>
+					{t('common.refresh')}
+				</Button>
+			</div>
+
+			{isLoading ? (
+				<div className="flex justify-center py-12">
+					<Spin size="large" />
+				</div>
+			) : treeData.length === 0 ? (
+				<Empty description={searchText ? t('roleHierarchy.noMatch') : t('roleHierarchy.noData')} />
+			) : (
+				<Tree
+					showLine={{ showLeafIcon: false }}
+					showIcon
+					icon={<ApartmentOutlined />}
+					loadData={handleLoadData}
+					treeData={treeData}
+					expandedKeys={expandedKeys}
+					onExpand={(keys) => setExpandedKeys(keys)}
+					onSelect={onSelect}
+					className="bg-white rounded-lg p-4"
+				/>
+			)}
+
+			<Drawer
+				title={
+					drawerRole
+						? t('roleHierarchy.detailWithName', { name: drawerRole.name })
+						: t('roleHierarchy.detail')
+				}
+				open={!!drawerRoleId}
+				onClose={() => setDrawerRoleId(null)}
+				width={480}
+			>
+				{drawerRole && (
+					<Space direction="vertical" className="w-full" size="large">
+						<Descriptions bordered column={1} size="small">
+							<Descriptions.Item label={t('roleHierarchy.roleCode')}>
+								<Tag>{drawerRole.code}</Tag>
+							</Descriptions.Item>
+							<Descriptions.Item label={t('roleHierarchy.roleName')}>
+								{drawerRole.name}
+							</Descriptions.Item>
+							<Descriptions.Item label={t('common.description')}>
+								{drawerRole.description || '-'}
+							</Descriptions.Item>
+						</Descriptions>
+
+						<div>
+							<div className="font-medium mb-2">
+								{t('roleHierarchy.parentRoles')}
+								{drawerParentsLoading && <Spin size="small" className="ml-2" />}
+							</div>
+							{drawerParents.length === 0 ? (
+								<Empty
+									description={t('roleHierarchy.noParent')}
+									image={Empty.PRESENTED_IMAGE_SIMPLE}
+								/>
+							) : (
+								<Space wrap>
+									{drawerParents.map((p: { id: string; name: string; code: string }) => (
+										<Tag
+											key={p.id}
+											color="blue"
+											className="cursor-pointer"
+											onClick={() => setDrawerRoleId(p.id)}
+										>
+											{p.name} ({p.code})
+										</Tag>
+									))}
+								</Space>
+							)}
+						</div>
+
+						<div>
+							<div className="font-medium mb-2">
+								{t('roleHierarchy.childRoles')}
+								{drawerChildrenLoading && <Spin size="small" className="ml-2" />}
+							</div>
+							{drawerChildren.length === 0 ? (
+								<Empty
+									description={t('roleHierarchy.noChildren')}
+									image={Empty.PRESENTED_IMAGE_SIMPLE}
+								/>
+							) : (
+								<Space wrap>
+									{drawerChildren.map((c: { id: string; name: string; code: string }) => (
+										<Tag
+											key={c.id}
+											color="green"
+											className="cursor-pointer"
+											onClick={() => setDrawerRoleId(c.id)}
+										>
+											{c.name} ({c.code})
+										</Tag>
+									))}
+								</Space>
+							)}
+						</div>
+					</Space>
+				)}
+			</Drawer>
+		</div>
+	);
+}

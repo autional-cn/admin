@@ -1,0 +1,448 @@
+'use client';
+// @generated-api-exempt: 4 key(s) [COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, COMPLIANCE.ADMIN_LEGAL_DOCUMENT, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_PUBLISH, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_ARCHIVE] lack generated func
+
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import {
+	Alert,
+	Button,
+	DatePicker,
+	Empty,
+	Form,
+	Input,
+	Modal,
+	Select,
+	Space,
+	Table,
+	Tag,
+} from 'antd';
+import type { TableProps } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { message, modal } from '@/lib/antd-app';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+import { useTenantIdOr } from '@/hooks/use-tenant';
+import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+import dayjs from 'dayjs';
+
+interface LegalDocumentItem {
+	id: string;
+	doc_type: string;
+	version: string;
+	title: string;
+	lang: string;
+	status: string;
+	content: string;
+	effective_at: string | null;
+}
+
+interface LegalDocumentFormValues {
+	doc_type?: string;
+	version?: string;
+	title: string;
+	lang: string;
+	content: string;
+	effective_at?: dayjs.Dayjs | null;
+}
+
+/** 客户端分页每页条数（ADR-001：全量拉取后前端翻页） */
+const PAGE_SIZE = 20;
+
+/** 服务端 List 接口单次最大拉取量（超量时展示守卫 banner） */
+// ADM-009: 200 超后端 PageSize max（校验错误 10000005），保守降至 50
+const FETCH_LIMIT = 50;
+
+export default function LegalDocumentsPage() {
+	const { t } = useTranslation();
+	const tenantId = useTenantIdOr('default-tenant');
+
+	/** status → Tag 颜色映射（AC-004） */
+	const STATUS_COLORS: Record<string, string> = {
+		draft: 'gold',
+		published: 'green',
+		archived: 'red',
+	};
+
+	/** lang 值（zh-CN/en-US）→ i18n 短 key 后缀映射 */
+	const LANG_KEY_MAP: Record<string, string> = {
+		'zh-CN': 'zh',
+		'en-US': 'en',
+	};
+
+	const DOC_TYPE_OPTIONS = [
+		{ value: 'terms', label: t('legalDocuments.docType.terms') },
+		{ value: 'privacy', label: t('legalDocuments.docType.privacy') },
+	];
+
+	const LANG_OPTIONS = [
+		{ value: 'zh-CN', label: t('legalDocuments.lang.zh') },
+		{ value: 'en-US', label: t('legalDocuments.lang.en') },
+	];
+
+	const [items, setItems] = useState<LegalDocumentItem[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+	const [docTypeFilter, setDocTypeFilter] = useState('');
+	const [langFilter, setLangFilter] = useState('');
+	const [page, setPage] = useState(1);
+	const [serverTotal, setServerTotal] = useState(0);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [editingDoc, setEditingDoc] = useState<LegalDocumentItem | null>(null);
+	const [saving, setSaving] = useState(false);
+	const [form] = Form.useForm<LegalDocumentFormValues>();
+
+	/** 请求序号守卫（P2-1）：doc_type 快速变化时丢弃过期响应，防止旧数据覆盖新数据 */
+	const requestSeqRef = useRef(0);
+
+	/**
+	 * 拉取条款列表（ADR-003：useEffect + apiClient + API_PATHS，不引入 useQuery）。
+	 * doc_type 变化时经 useCallback 依赖自动重新请求（AC-010 服务端透传）。
+	 */
+	const fetchData = useCallback(async () => {
+		const seq = ++requestSeqRef.current;
+		setLoading(true);
+		setError(null);
+		try {
+			const res = await apiClient.get(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, {
+				params: { doc_type: docTypeFilter || undefined, page_size: FETCH_LIMIT },
+			});
+			// 过期响应直接丢弃（新请求已发出，旧结果不覆盖新数据）
+			if (seq !== requestSeqRef.current) return;
+			// res.data.data -> { items, total, page, page_size }
+			const data = extractItem(res.data);
+			const { items: listItems = [], total = 0 } = data || {};
+			setItems(listItems);
+			setServerTotal(total);
+			// 列表刷新后回到第 1 页（客户端分页语义）
+			setPage(1);
+		} catch {
+			// 过期错误同样丢弃，避免旧请求的失败态覆盖新请求
+			if (seq !== requestSeqRef.current) return;
+			setError(t('legalDocuments.loadFailed'));
+		} finally {
+			// 仅最新请求有权关闭 loading（旧请求先返回时不清新请求的 loading）
+			if (seq === requestSeqRef.current) setLoading(false);
+		}
+	}, [docTypeFilter, t]);
+
+	useEffect(() => {
+		fetchData();
+	}, [fetchData]);
+
+	/** lang 筛选为前端内存过滤（ADR-001 方案 A：不改变请求参数） */
+	const filteredItems = items.filter((i) => !langFilter || i.lang === langFilter);
+
+	const openCreateModal = () => {
+		setEditingDoc(null);
+		form.resetFields();
+		setModalOpen(true);
+	};
+
+	const openEditModal = (record: LegalDocumentItem) => {
+		setEditingDoc(record);
+		form.setFieldsValue({
+			doc_type: record.doc_type,
+			version: record.version,
+			title: record.title,
+			lang: record.lang,
+			content: record.content,
+			effective_at: record.effective_at ? dayjs(record.effective_at) : null,
+		});
+		setModalOpen(true);
+	};
+
+	const closeModal = () => {
+		setModalOpen(false);
+		setEditingDoc(null);
+		form.resetFields();
+	};
+
+	const handleCreate = async (values: LegalDocumentFormValues) => {
+		setSaving(true);
+		try {
+			await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, {
+				doc_type: values.doc_type,
+				version: values.version,
+				title: values.title,
+				lang: values.lang,
+				content: values.content,
+				effective_at: values.effective_at?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
+				tenant_id: tenantId,
+			});
+			message.success(t('legalDocuments.createSuccess'));
+			closeModal();
+			fetchData();
+		} catch (err) {
+			handleApiError(err, t('legalDocuments.createFailed'));
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	/**
+	 * 编辑提交（AC-008 关键守门）：
+	 * PUT body 仅 4 字段 { title, lang, content, effective_at }，
+	 * 绝不含 doc_type / version / status（后端 Update 契约不可变）。
+	 */
+	const handleUpdate = async (values: LegalDocumentFormValues) => {
+		if (!editingDoc) return;
+		setSaving(true);
+		try {
+			await apiClient.put(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENT(editingDoc.id), {
+				title: values.title,
+				lang: values.lang,
+				content: values.content,
+				effective_at: values.effective_at?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
+			});
+			message.success(t('legalDocuments.updateSuccess'));
+			closeModal();
+			fetchData();
+		} catch (err) {
+			handleApiError(err, t('legalDocuments.updateFailed'));
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	const handlePublish = async (id: string) => {
+		try {
+			await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENT_PUBLISH(id));
+			message.success(t('legalDocuments.publishSuccess'));
+			fetchData();
+		} catch (err) {
+			handleApiError(err, t('legalDocuments.publishFailed'));
+		}
+	};
+
+	const handleArchive = async (id: string) => {
+		try {
+			await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENT_ARCHIVE(id));
+			message.success(t('legalDocuments.archiveSuccess'));
+			fetchData();
+		} catch (err) {
+			handleApiError(err, t('legalDocuments.archiveFailed'));
+		}
+	};
+
+	/** 发布确认（AC-009：仅 draft 行可触发） */
+	const confirmPublish = (record: LegalDocumentItem) => {
+		modal.confirm({
+			title: t('legalDocuments.publishConfirmTitle'),
+			content: t('legalDocuments.publishConfirmContent'),
+			okText: t('legalDocuments.publish'),
+			onOk: () => handlePublish(record.id),
+		});
+	};
+
+	/** 归档确认（AC-009：仅 published 行可触发） */
+	const confirmArchive = (record: LegalDocumentItem) => {
+		modal.confirm({
+			title: t('legalDocuments.archiveConfirmTitle'),
+			content: t('legalDocuments.archiveConfirmContent'),
+			okText: t('legalDocuments.archive'),
+			onOk: () => handleArchive(record.id),
+		});
+	};
+
+	const columns: TableProps<LegalDocumentItem>['columns'] = [
+		{
+			title: t('legalDocuments.column.docType'),
+			dataIndex: 'doc_type',
+			key: 'doc_type',
+			width: 120,
+			render: (v: string) => t(`legalDocuments.docType.${v}`, { defaultValue: v }),
+		},
+		{
+			title: t('legalDocuments.column.version'),
+			dataIndex: 'version',
+			key: 'version',
+			width: 100,
+		},
+		{
+			title: t('legalDocuments.column.title'),
+			dataIndex: 'title',
+			key: 'title',
+			ellipsis: true,
+		},
+		{
+			title: t('legalDocuments.column.lang'),
+			dataIndex: 'lang',
+			key: 'lang',
+			width: 120,
+			render: (v: string) => t(`legalDocuments.lang.${LANG_KEY_MAP[v] || v}`, { defaultValue: v }),
+		},
+		{
+			title: t('legalDocuments.column.status'),
+			dataIndex: 'status',
+			key: 'status',
+			width: 110,
+			render: (v: string) => (
+				<Tag color={STATUS_COLORS[v] || 'default'}>
+					{t(`legalDocuments.status.${v}`, { defaultValue: v })}
+				</Tag>
+			),
+		},
+		{
+			title: t('legalDocuments.column.effectiveAt'),
+			dataIndex: 'effective_at',
+			key: 'effective_at',
+			width: 190,
+			render: (v: string | null) => v || '\u2014',
+		},
+		{
+			title: t('legalDocuments.column.actions'),
+			key: 'actions',
+			width: 210,
+			render: (_: unknown, record: LegalDocumentItem) => (
+				<Space size="small" wrap>
+					<Button type="link" size="small" onClick={() => openEditModal(record)}>
+						{t('legalDocuments.edit')}
+					</Button>
+					{record.status === 'draft' && (
+						<Button type="link" size="small" onClick={() => confirmPublish(record)}>
+							{t('legalDocuments.publish')}
+						</Button>
+					)}
+					{record.status === 'published' && (
+						<Button type="link" size="small" danger onClick={() => confirmArchive(record)}>
+							{t('legalDocuments.archive')}
+						</Button>
+					)}
+				</Space>
+			),
+		},
+	];
+
+	return (
+		<div className="space-y-4">
+			<div className="flex flex-wrap items-center justify-between gap-3">
+				<div>
+					<h2 className="mb-1">{t('legalDocuments.title')}</h2>
+					<p className="text-sm text-gray-500">{t('legalDocuments.subtitle')}</p>
+				</div>
+				<Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
+					{t('legalDocuments.create')}
+				</Button>
+			</div>
+
+			<Space wrap>
+				{/* doc_type 筛选：服务端透传（AC-010） */}
+				<Select
+					style={{ width: 200 }}
+					value={docTypeFilter}
+					placeholder={t('legalDocuments.filter.docType')}
+					options={[{ value: '', label: t('legalDocuments.filter.all') }, ...DOC_TYPE_OPTIONS]}
+					onChange={(v: string) => {
+						setDocTypeFilter(v);
+						setPage(1);
+					}}
+				/>
+				{/* lang 筛选：前端内存过滤（ADR-001，不改变请求参数） */}
+				<Select
+					style={{ width: 200 }}
+					value={langFilter}
+					placeholder={t('legalDocuments.filter.lang')}
+					options={[{ value: '', label: t('legalDocuments.filter.all') }, ...LANG_OPTIONS]}
+					onChange={(v: string) => {
+						setLangFilter(v);
+						setPage(1);
+					}}
+				/>
+			</Space>
+
+			{error ? (
+				<PageError message={t('legalDocuments.loadFailed')} retry={fetchData} />
+			) : (
+				<>
+					{/* 守卫 banner（ADR-001）：服务端总数超拉取上限时提示使用筛选 */}
+					{serverTotal > FETCH_LIMIT && (
+						<Alert type="warning" showIcon message={t('legalDocuments.loadSubsetWarning')} />
+					)}
+					<Table<LegalDocumentItem>
+						columns={columns}
+						dataSource={filteredItems}
+						rowKey="id"
+						loading={loading}
+						pagination={{
+							current: page,
+							pageSize: PAGE_SIZE,
+							total: filteredItems.length,
+							showSizeChanger: false,
+							showTotal: (total) => t('paginationTotal', { total }),
+							onChange: (currentPage: number) => setPage(currentPage),
+						}}
+						scroll={{ x: 900 }}
+						locale={{
+							emptyText: (
+								<Empty
+									description={
+										langFilter || docTypeFilter
+											? t('legalDocuments.filterHint')
+											: t('legalDocuments.empty')
+									}
+								/>
+							),
+						}}
+					/>
+				</>
+			)}
+
+			<Modal
+				title={editingDoc ? t('legalDocuments.edit') : t('legalDocuments.create')}
+				open={modalOpen}
+				onCancel={closeModal}
+				onOk={() => form.submit()}
+				confirmLoading={saving}
+				width={720}
+			>
+				<Form form={form} layout="vertical" onFinish={editingDoc ? handleUpdate : handleCreate}>
+					<Form.Item
+						name="doc_type"
+						label={t('legalDocuments.column.docType')}
+						rules={[{ required: true }]}
+					>
+						{/* 编辑时只读（AC-008）：doc_type 参与唯一键，禁止修改 */}
+						<Select
+							options={DOC_TYPE_OPTIONS}
+							disabled={!!editingDoc}
+							placeholder={t('legalDocuments.filter.docType')}
+						/>
+					</Form.Item>
+					<Form.Item
+						name="version"
+						label={t('legalDocuments.column.version')}
+						rules={[{ required: true }, { max: 20 }]}
+					>
+						{/* 编辑时只读（AC-008）：version 参与版本语义，禁止修改 */}
+						<Input disabled={!!editingDoc} maxLength={20} placeholder="1.0" />
+					</Form.Item>
+					<Form.Item
+						name="title"
+						label={t('legalDocuments.column.title')}
+						rules={[{ required: true }, { max: 255 }]}
+					>
+						<Input maxLength={255} showCount />
+					</Form.Item>
+					<Form.Item
+						name="lang"
+						label={t('legalDocuments.column.lang')}
+						rules={[{ required: true }]}
+					>
+						<Select options={LANG_OPTIONS} placeholder={t('legalDocuments.filter.lang')} />
+					</Form.Item>
+					<Form.Item
+						name="content"
+						label={t('legalDocuments.column.content')}
+						rules={[{ required: true }, { max: 100000 }]}
+					>
+						{/* content 为纯文本 TextArea（防 XSS，禁富文本渲染器） */}
+						<Input.TextArea rows={10} maxLength={100000} showCount />
+					</Form.Item>
+					<Form.Item name="effective_at" label={t('legalDocuments.column.effectiveAt')}>
+						<DatePicker showTime className="w-full" />
+					</Form.Item>
+				</Form>
+			</Modal>
+		</div>
+	);
+}

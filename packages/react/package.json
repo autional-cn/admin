@@ -1,0 +1,52 @@
+{
+  "name": "@autional-cn/react",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Autional React SDK — React hooks and components for Autional authentication",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --external react --external react-dom",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external react-dom",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "prepublishOnly": "pnpm build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/authms-web.git",
+    "directory": "packages/react"
+  },
+  "keywords": [
+    "auth",
+    "authentication",
+    "react",
+    "sdk",
+    "oauth",
+    "pkce"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@autional-cn/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.5.1",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

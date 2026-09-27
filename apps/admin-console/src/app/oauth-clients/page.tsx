@@ -1,0 +1,461 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+	Table,
+	Button,
+	Space,
+	Tag,
+	Modal,
+	Form,
+	Input,
+	Select,
+	Drawer,
+	Descriptions,
+	Popconfirm,
+	Empty,
+	Spin,
+	Tabs,
+	Statistic,
+	Card,
+	Row,
+	Col,
+	Typography,
+} from 'antd';
+import { message } from '@/lib/antd-app';
+import {
+	PlusOutlined,
+	EditOutlined,
+	DeleteOutlined,
+	KeyOutlined,
+	ReloadOutlined,
+	EyeOutlined,
+	StopOutlined,
+	CopyOutlined,
+} from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import {
+	useOAuthClients,
+	useCreateOAuthClient,
+	useUpdateOAuthClient,
+	useDeleteOAuthClient,
+	useRotateOAuthClientSecret,
+	useOAuthClientSecrets,
+	useCreateOAuthClientSecret,
+	useDeleteOAuthClientSecret,
+	useDeactivateOAuthClientSecret,
+	useOAuthClientStats,
+} from '@/hooks/use-oauth-clients';
+import type {
+	OAuthClientRecord,
+	OAuthClientSecretRecord,
+	OAuthClientStats,
+} from '@/hooks/use-oauth-clients';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+
+const { Option } = Select;
+const { Text } = Typography;
+
+export default function OAuthClientsPage() {
+	const { t } = useTranslation();
+	const [modalVisible, setModalVisible] = useState(false);
+	const [editing, setEditing] = useState<OAuthClientRecord | null>(null);
+	const [detailClient, setDetailClient] = useState<OAuthClientRecord | null>(null);
+	const [secretDrawerClient, setSecretDrawerClient] = useState<OAuthClientRecord | null>(null);
+	const [form] = Form.useForm();
+
+	const { data = [], isLoading, error, refetch } = useOAuthClients();
+	const createMut = useCreateOAuthClient();
+	const updateMut = useUpdateOAuthClient();
+	const deleteMut = useDeleteOAuthClient();
+	const rotateMut = useRotateOAuthClientSecret();
+
+	const { data: secrets = [], isLoading: secretsLoading } = useOAuthClientSecrets(
+		secretDrawerClient?.clientId || '',
+	);
+	const createSecretMut = useCreateOAuthClientSecret();
+	const deleteSecretMut = useDeleteOAuthClientSecret();
+	const deactivateSecretMut = useDeactivateOAuthClientSecret();
+	const { data: stats } = useOAuthClientStats(detailClient?.clientId || '');
+
+	const handleSave = async (values: any) => {
+		try {
+			if (editing) {
+				await updateMut.mutateAsync({ id: editing.clientId, data: values });
+				message.success(t('oauthClients.updateSuccess'));
+			} else {
+				await createMut.mutateAsync(values);
+				message.success(t('oauthClients.createSuccess'));
+			}
+			setModalVisible(false);
+			setEditing(null);
+			form.resetFields();
+		} catch (err) {
+			handleApiError(err, t('oauthClients.saveFailed'));
+		}
+	};
+
+	const handleDelete = async (clientId: string) => {
+		try {
+			await deleteMut.mutateAsync(clientId);
+			message.success(t('oauthClients.deleteSuccess'));
+		} catch (err) {
+			handleApiError(err, t('oauthClients.deleteFailed'));
+		}
+	};
+
+	const handleCreateSecret = async () => {
+		if (!secretDrawerClient) return;
+		try {
+			const res = await createSecretMut.mutateAsync(secretDrawerClient.clientId);
+			const result = res as any;
+			const secretValue =
+				result?.data?.secretValue || result?.secretValue || result?.data?.secret || result?.secret;
+			if (secretValue) {
+				message.success(t('oauthClients.secretCreated'));
+				message.info(`${t('oauthClients.copySecretHint')}: ${secretValue}`);
+			} else {
+				message.success(t('oauthClients.secretCreated'));
+			}
+		} catch (err) {
+			handleApiError(err, t('oauthClients.secretCreateFailed'));
+		}
+	};
+
+	const handleRotateSecret = async () => {
+		if (!secretDrawerClient) return;
+		try {
+			const res = await rotateMut.mutateAsync(secretDrawerClient.clientId);
+			const result = res as any;
+			const secretValue =
+				result?.data?.secretValue || result?.secretValue || result?.data?.secret || result?.secret;
+			if (secretValue) {
+				message.success(t('oauthClients.secretRotated'));
+				message.info(`${t('oauthClients.copySecretHint')}: ${secretValue}`);
+			} else {
+				message.success(t('oauthClients.secretRotated'));
+			}
+		} catch (err) {
+			handleApiError(err, t('oauthClients.secretRotateFailed'));
+		}
+	};
+
+	const columns = [
+		{ title: t('oauthClients.column.clientName'), dataIndex: 'clientName', key: 'clientName' },
+		{
+			title: t('oauthClients.column.clientId'),
+			dataIndex: 'clientId',
+			key: 'clientId',
+			render: (v: string) => (
+				<Space size="small">
+					<code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{v}</code>
+					<Button
+						type="text"
+						size="small"
+						icon={<CopyOutlined />}
+						onClick={() => {
+							navigator.clipboard.writeText(v);
+							message.success(t('oauthClients.copied'));
+						}}
+					/>
+				</Space>
+			),
+		},
+		{
+			title: t('oauthClients.column.grantTypes'),
+			dataIndex: 'grantTypes',
+			key: 'grantTypes',
+			render: (types: string[]) => (types || []).map((t) => <Tag key={t}>{t}</Tag>),
+		},
+		{
+			title: t('common.status'),
+			dataIndex: 'status',
+			key: 'status',
+			render: (status: string) => (
+				<Tag color={status === 'active' ? 'success' : 'default'}>{status}</Tag>
+			),
+		},
+		{
+			title: t('common.actions'),
+			key: 'action',
+			render: (_: any, record: OAuthClientRecord) => (
+				<Space size="small">
+					<Button
+						type="text"
+						size="small"
+						icon={<KeyOutlined />}
+						onClick={() => setSecretDrawerClient(record)}
+					>
+						{t('oauthClients.manageSecrets')}
+					</Button>
+					<Button
+						type="text"
+						size="small"
+						icon={<EyeOutlined />}
+						onClick={() => setDetailClient(record)}
+					>
+						{t('oauthClients.detail')}
+					</Button>
+					<Button
+						type="text"
+						size="small"
+						icon={<EditOutlined />}
+						onClick={() => {
+							setEditing(record);
+							form.setFieldsValue({
+								clientName: record.clientName,
+								redirectUris: record.redirectUris?.join('\n') || '',
+								grantTypes: record.grantTypes || [],
+							});
+							setModalVisible(true);
+						}}
+					/>
+					<Popconfirm
+						title={t('oauthClients.confirmDelete')}
+						onConfirm={() => handleDelete(record.clientId)}
+					>
+						<Button type="text" size="small" danger icon={<DeleteOutlined />} />
+					</Popconfirm>
+				</Space>
+			),
+		},
+	];
+
+	return (
+		<div>
+			{error && (
+				<PageError message={t('oauthClients.loadError')} retry={refetch} className="mb-4" />
+			)}
+
+			<div className="flex items-center justify-between mb-6">
+				<h1 className="text-xl font-semibold">{t('oauthClients.title')}</h1>
+				<Button
+					type="primary"
+					icon={<PlusOutlined />}
+					onClick={() => {
+						setEditing(null);
+						form.resetFields();
+						setModalVisible(true);
+					}}
+				>
+					{t('oauthClients.createBtn')}
+				</Button>
+			</div>
+
+			{isLoading ? (
+				<Spin className="flex justify-center py-12" />
+			) : data.length === 0 ? (
+				<Empty description={t('oauthClients.noData')} />
+			) : (
+				<Table
+					rowKey="clientId"
+					columns={columns}
+					dataSource={data}
+					pagination={{ pageSize: 10 }}
+					scroll={{ x: 900 }}
+				/>
+			)}
+
+			{/* Create/Edit Modal */}
+			<Modal
+				title={editing ? t('oauthClients.editApp') : t('oauthClients.createApp')}
+				open={modalVisible}
+				onCancel={() => {
+					setModalVisible(false);
+					setEditing(null);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				destroyOnClose
+				width={560}
+			>
+				<Form form={form} layout="vertical" onFinish={handleSave}>
+					<Form.Item
+						name="clientName"
+						label={t('oauthClients.form.clientName')}
+						rules={[{ required: true }]}
+					>
+						<Input placeholder={t('oauthClients.form.clientNamePlaceholder')} />
+					</Form.Item>
+					<Form.Item
+						name="redirectUris"
+						label={t('oauthClients.form.redirectUris')}
+						extra={t('oauthClients.form.redirectUrisExtra')}
+					>
+						<Input.TextArea rows={3} placeholder={t('oauthClients.form.redirectUrisPlaceholder')} />
+					</Form.Item>
+					<Form.Item
+						name="grantTypes"
+						label={t('oauthClients.form.grantTypes')}
+						rules={[{ required: true }]}
+					>
+						<Select mode="multiple" placeholder={t('oauthClients.form.grantTypesPlaceholder')}>
+							<Option value="authorization_code">authorization_code</Option>
+							<Option value="client_credentials">client_credentials</Option>
+							<Option value="refresh_token">refresh_token</Option>
+							<Option value="implicit">implicit</Option>
+						</Select>
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			{/* Detail Drawer */}
+			<Drawer
+				title={t('oauthClients.detail')}
+				open={!!detailClient}
+				onClose={() => setDetailClient(null)}
+				width={480}
+			>
+				{detailClient && (
+					<Space direction="vertical" style={{ width: '100%' }} size="large">
+						<Descriptions column={1} bordered size="small">
+							<Descriptions.Item label={t('oauthClients.column.clientName')}>
+								{detailClient.clientName}
+							</Descriptions.Item>
+							<Descriptions.Item label={t('oauthClients.column.clientId')}>
+								<Space>
+									<code className="text-xs">{detailClient.clientId}</code>
+									<Button
+										type="text"
+										size="small"
+										icon={<CopyOutlined />}
+										onClick={() => {
+											navigator.clipboard.writeText(detailClient.clientId);
+											message.success(t('oauthClients.copied'));
+										}}
+									/>
+								</Space>
+							</Descriptions.Item>
+							<Descriptions.Item label={t('common.status')}>
+								<Tag color={detailClient.status === 'active' ? 'success' : 'default'}>
+									{detailClient.status}
+								</Tag>
+							</Descriptions.Item>
+							<Descriptions.Item label={t('oauthClients.column.grantTypes')}>
+								{(detailClient.grantTypes || []).join(', ')}
+							</Descriptions.Item>
+							<Descriptions.Item label={t('oauthClients.form.redirectUris')}>
+								{(detailClient.redirectUris || []).join(', ') || '-'}
+							</Descriptions.Item>
+						</Descriptions>
+
+						{stats && (
+							<Card size="small" title={t('oauthClients.stats')}>
+								<Row gutter={16}>
+									<Col span={8}>
+										<Statistic
+											title={t('oauthClients.statsActiveTokens')}
+											value={(stats as any)?.activeTokens || 0}
+										/>
+									</Col>
+									<Col span={8}>
+										<Statistic
+											title={t('oauthClients.statsRefreshTokens')}
+											value={(stats as any)?.activeRefreshTokens || 0}
+										/>
+									</Col>
+								</Row>
+							</Card>
+						)}
+					</Space>
+				)}
+			</Drawer>
+
+			{/* Secrets Drawer */}
+			<Drawer
+				title={t('oauthClients.manageSecrets')}
+				open={!!secretDrawerClient}
+				onClose={() => setSecretDrawerClient(null)}
+				width={480}
+				extra={
+					<Space>
+						<Button icon={<ReloadOutlined />} onClick={handleRotateSecret}>
+							{t('oauthClients.rotateSecret')}
+						</Button>
+						<Button type="primary" icon={<PlusOutlined />} onClick={handleCreateSecret}>
+							{t('oauthClients.addSecret')}
+						</Button>
+					</Space>
+				}
+			>
+				{secretDrawerClient && (
+					<>
+						<Descriptions column={1} bordered size="small" className="mb-4">
+							<Descriptions.Item label={t('oauthClients.column.clientName')}>
+								{secretDrawerClient.clientName}
+							</Descriptions.Item>
+							<Descriptions.Item label={t('oauthClients.column.clientId')}>
+								<code className="text-xs">{secretDrawerClient.clientId}</code>
+							</Descriptions.Item>
+						</Descriptions>
+
+						{secretsLoading ? (
+							<Spin className="flex justify-center py-8" />
+						) : secrets.length === 0 ? (
+							<Empty description={t('oauthClients.noSecrets')} />
+						) : (
+							<Table
+								rowKey="id"
+								dataSource={secrets}
+								pagination={false}
+								columns={[
+									{
+										title: t('oauthClients.secretLabel'),
+										dataIndex: 'label',
+										key: 'label',
+										render: (v: string) => v || '-',
+									},
+									{
+										title: t('common.status'),
+										dataIndex: 'status',
+										key: 'status',
+										render: (s: string) => (
+											<Tag color={s === 'active' ? 'success' : 'default'}>{s}</Tag>
+										),
+									},
+									{
+										title: t('oauthClients.secretCreatedAt'),
+										dataIndex: 'createdAt',
+										key: 'createdAt',
+										render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
+									},
+									{
+										title: t('common.actions'),
+										key: 'action',
+										render: (_: any, record: OAuthClientSecretRecord) => (
+											<Space size="small">
+												<Popconfirm
+													title={t('oauthClients.confirmDeactivateSecret')}
+													onConfirm={() =>
+														deactivateSecretMut.mutate({
+															clientId: secretDrawerClient.clientId,
+															secretId: record.id,
+														})
+													}
+												>
+													<Button type="text" size="small" icon={<StopOutlined />} />
+												</Popconfirm>
+												<Popconfirm
+													title={t('oauthClients.confirmDeleteSecret')}
+													onConfirm={() =>
+														deleteSecretMut.mutate({
+															clientId: secretDrawerClient.clientId,
+															secretId: record.id,
+														})
+													}
+												>
+													<Button type="text" size="small" danger icon={<DeleteOutlined />} />
+												</Popconfirm>
+											</Space>
+										),
+									},
+								]}
+							/>
+						)}
+					</>
+				)}
+			</Drawer>
+		</div>
+	);
+}

@@ -1,0 +1,236 @@
+'use client';
+
+import React, { useState, useMemo } from 'react';
+import { Table, Button, Space, Tag, Modal, Form, Input, Select } from 'antd';
+import { message, modal } from '@/lib/antd-app';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import {
+	usePermissions,
+	useCreatePermission,
+	useUpdatePermission,
+	useDeletePermission,
+} from '@/hooks/use-permissions';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+
+interface PermissionRecord {
+	id: string;
+	code: string;
+	name: string;
+	description: string;
+	category: string;
+}
+
+export default function PermissionsPage() {
+	const { t } = useTranslation();
+	const [modalVisible, setModalVisible] = useState(false);
+	const [editing, setEditing] = useState<PermissionRecord | null>(null);
+	const [categoryFilter, setCategoryFilter] = useState<string>('all');
+	const [keyword, setKeyword] = useState('');
+	const [form] = Form.useForm();
+
+	const { data = [], isLoading, error, refetch } = usePermissions();
+	const createMut = useCreatePermission();
+	const updateMut = useUpdatePermission();
+	const deleteMut = useDeletePermission();
+
+	const filteredData = useMemo(() => {
+		let result = data as PermissionRecord[];
+		if (categoryFilter !== 'all') {
+			result = result.filter((p) => p.category === categoryFilter);
+		}
+		if (keyword) {
+			const k = keyword.toLowerCase();
+			result = result.filter(
+				(p) =>
+					p.code.toLowerCase().includes(k) ||
+					p.name.toLowerCase().includes(k) ||
+					p.description.toLowerCase().includes(k),
+			);
+		}
+		return result;
+	}, [categoryFilter, keyword, data]);
+
+	const categories = Array.from(
+		new Set((data as PermissionRecord[]).map((p) => p.category).filter(Boolean)),
+	);
+
+	// 分类显示名：优先取 i18n 映射（permissions.category.{code}），无映射时回退 raw 值（专项 D）
+	const categoryLabel = (code: string) => {
+		const key = `permissions.category.${code}`;
+		const translated = t(key);
+		return translated === key ? code : translated;
+	};
+
+	const handleSave = async (values: any) => {
+		try {
+			if (editing) {
+				await updateMut.mutateAsync({ id: editing.id, data: values });
+				message.success(t('permissions.updateSuccess'));
+			} else {
+				await createMut.mutateAsync(values);
+				message.success(t('permissions.createSuccess'));
+			}
+			setModalVisible(false);
+			setEditing(null);
+			form.resetFields();
+		} catch (err) {
+			handleApiError(err, t('permissions.saveFailed'));
+		}
+	};
+
+	const handleDelete = (id: string) => {
+		modal.confirm({
+			title: t('permissions.confirmDelete'),
+			content: t('permissions.deleteWarning'),
+			okText: t('common.delete'),
+			okButtonProps: { danger: true },
+			onOk: async () => {
+				try {
+					await deleteMut.mutateAsync(id);
+					message.success(t('permissions.deleteSuccess'));
+				} catch (err) {
+					handleApiError(err, t('permissions.deleteError'));
+				}
+			},
+		});
+	};
+
+	const columns = [
+		{
+			title: t('permissions.column.code'),
+			dataIndex: 'code',
+			key: 'code',
+			render: (v: string) => <Tag>{v}</Tag>,
+		},
+		{ title: t('common.name'), dataIndex: 'name', key: 'name' },
+		{
+			title: t('permissions.column.description'),
+			dataIndex: 'description',
+			key: 'description',
+			ellipsis: true,
+		},
+		{
+			title: t('permissions.column.category'),
+			dataIndex: 'category',
+			key: 'category',
+			render: (v: string) => <Tag color="blue">{categoryLabel(v)}</Tag>,
+		},
+		{
+			title: t('common.actions'),
+			key: 'action',
+			render: (_: any, record: PermissionRecord) => (
+				<Space size="small">
+					<Button
+						type="link"
+						icon={<EditOutlined />}
+						onClick={() => {
+							setEditing(record);
+							form.setFieldsValue(record);
+							setModalVisible(true);
+						}}
+					>
+						{t('common.edit')}
+					</Button>
+					<Button
+						type="link"
+						danger
+						icon={<DeleteOutlined />}
+						onClick={() => handleDelete(record.id)}
+					>
+						{t('common.delete')}
+					</Button>
+				</Space>
+			),
+		},
+	];
+
+	return (
+		<div>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+				<h1 className="text-xl font-semibold">{t('nav.permissions')}</h1>
+				<Button
+					type="primary"
+					icon={<PlusOutlined />}
+					onClick={() => {
+						setEditing(null);
+						form.resetFields();
+						setModalVisible(true);
+					}}
+				>
+					{t('permissions.createPermission')}
+				</Button>
+			</div>
+
+			{error && <PageError message={t('permissions.loadError')} retry={refetch} className="mb-4" />}
+			<div className="flex gap-4 mb-4 flex-wrap">
+				<Input.Search
+					placeholder={t('permissions.searchPlaceholder')}
+					allowClear
+					value={keyword}
+					onChange={(e) => setKeyword(e.target.value)}
+					className="max-w-md"
+				/>
+				<Select
+					placeholder={t('permissions.categoryFilter')}
+					value={categoryFilter}
+					onChange={setCategoryFilter}
+					options={[
+						{ label: t('permissions.allCategories'), value: 'all' },
+						...categories.map((c) => ({ label: categoryLabel(c), value: c })),
+					]}
+					className="w-48"
+				/>
+			</div>
+
+			<Table
+				rowKey="id"
+				columns={columns}
+				dataSource={filteredData}
+				loading={isLoading}
+				pagination={{ pageSize: 10 }}
+			/>
+
+			<Modal
+				title={editing ? t('permissions.editPermission') : t('permissions.createPermission')}
+				open={modalVisible}
+				onCancel={() => {
+					setModalVisible(false);
+					setEditing(null);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				destroyOnHidden
+				className="w-full max-w-[560px]"
+			>
+				<Form form={form} layout="vertical" onFinish={handleSave}>
+					<Form.Item
+						name="code"
+						label={t('permissions.column.code')}
+						rules={[{ required: true, message: t('permissions.codeRequired') }]}
+					>
+						<Input placeholder={t('permissions.codePlaceholder')} disabled={!!editing} />
+					</Form.Item>
+					<Form.Item
+						name="name"
+						label={t('common.name')}
+						rules={[{ required: true, message: t('permissions.nameRequired') }]}
+					>
+						<Input placeholder={t('permissions.namePlaceholder')} />
+					</Form.Item>
+					<Form.Item name="description" label={t('permissions.column.description')}>
+						<Input.TextArea rows={3} placeholder={t('permissions.descriptionPlaceholder')} />
+					</Form.Item>
+					<Form.Item
+						name="category"
+						label={t('permissions.column.category')}
+						rules={[{ required: true, message: t('permissions.categoryRequired') }]}
+					>
+						<Input placeholder={t('permissions.categoryPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+		</div>
+	);
+}

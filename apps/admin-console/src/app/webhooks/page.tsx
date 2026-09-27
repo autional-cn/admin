@@ -1,0 +1,349 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+	Table,
+	Button,
+	Space,
+	Tag,
+	Modal,
+	Form,
+	Input,
+	Select,
+	Switch,
+	Drawer,
+	Timeline,
+	Popconfirm,
+	Spin,
+	Empty,
+} from 'antd';
+import { message } from '@/lib/antd-app';
+import {
+	PlusOutlined,
+	EditOutlined,
+	DeleteOutlined,
+	SendOutlined,
+	FileTextOutlined,
+} from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import {
+	useWebhooks,
+	useCreateWebhook,
+	useUpdateWebhook,
+	useDeleteWebhook,
+	useTestWebhook,
+	useWebhookDeliveryLogs,
+} from '@/hooks/use-webhooks';
+import type { WebhookRecord, DeliveryLog } from '@/hooks/use-webhooks';
+import { useTenantIdOr } from '@/hooks/use-tenant';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+import { createWebhookSchema } from '@/lib/validators';
+
+const { Option } = Select;
+
+const EVENT_OPTIONS = [
+	'user.created',
+	'user.deleted',
+	'user.updated',
+	'session.revoked',
+	'session.created',
+	'tenant.suspended',
+	'tenant.activated',
+	'mfa.enabled',
+	'mfa.disabled',
+];
+
+export default function WebhooksPage() {
+	const { t } = useTranslation();
+	const [modalVisible, setModalVisible] = useState(false);
+	const [logDrawerVisible, setLogDrawerVisible] = useState(false);
+	const [editing, setEditing] = useState<WebhookRecord | null>(null);
+	const [selectedHookId, setSelectedHookId] = useState<string>('');
+	const [form] = Form.useForm();
+	const tenantId = useTenantIdOr('default-tenant');
+
+	const { data = [], isLoading, error, refetch } = useWebhooks(tenantId);
+	const createMut = useCreateWebhook();
+	const updateMut = useUpdateWebhook();
+	const deleteMut = useDeleteWebhook();
+	const testMut = useTestWebhook();
+	const { data: deliveryLogs = [], isLoading: logsLoading } = useWebhookDeliveryLogs(
+		selectedHookId ? tenantId : '',
+		selectedHookId,
+	);
+
+	const handleSave = async (values: any) => {
+		try {
+			const result = createWebhookSchema.safeParse(values);
+			if (!result.success) {
+				result.error.issues.forEach((i) => message.error(i.message));
+				return;
+			}
+			const payload = {
+				name: result.data.name,
+				url: result.data.url,
+				secret: result.data.secret,
+				events: result.data.events,
+				status: result.data.status ? 'active' : 'inactive',
+				retryPolicy: {
+					maxRetries: result.data.maxRetries || 3,
+					backoff: result.data.backoff || '1s',
+				},
+			};
+			if (editing) {
+				await updateMut.mutateAsync({ tenantId, id: editing.id, data: payload });
+				message.success(t('webhooks.updateSuccess'));
+			} else {
+				await createMut.mutateAsync({ tenantId, data: payload });
+				message.success(t('webhooks.createSuccess'));
+			}
+			setModalVisible(false);
+			setEditing(null);
+			form.resetFields();
+		} catch (err) {
+			handleApiError(err, t('webhooks.saveFailed'));
+		}
+	};
+
+	const handleDelete = async (id: string) => {
+		try {
+			await deleteMut.mutateAsync({ tenantId, id });
+			message.success(t('webhooks.deleteSuccess'));
+		} catch (err) {
+			handleApiError(err, t('webhooks.deleteError'));
+		}
+	};
+
+	const handleTest = async (record: WebhookRecord) => {
+		try {
+			await testMut.mutateAsync({ tenantId, id: record.id });
+			message.success(t('webhooks.testSuccess'));
+		} catch (err) {
+			handleApiError(err, t('webhooks.testError'));
+		}
+	};
+
+	const openLogs = (record: WebhookRecord) => {
+		setSelectedHookId(record.id);
+		setLogDrawerVisible(true);
+	};
+
+	const columns = [
+		{ title: t('common.name'), dataIndex: 'name', key: 'name' },
+		{
+			title: t('webhooks.column.url'),
+			dataIndex: 'url',
+			key: 'url',
+			ellipsis: true,
+			render: (v: string) => <span title={v}>{v}</span>,
+		},
+		{
+			title: t('webhooks.column.events'),
+			dataIndex: 'events',
+			key: 'events',
+			render: (events: string[]) => (
+				<Space size="small" wrap>
+					{events?.map((e) => (
+						<Tag key={e}>{e}</Tag>
+					))}
+				</Space>
+			),
+		},
+		{
+			title: t('common.status'),
+			dataIndex: 'status',
+			key: 'status',
+			render: (status: string) => (
+				<Tag color={status === 'active' ? 'success' : 'default'}>
+					{status === 'active' ? t('common.enable') : t('common.disable')}
+				</Tag>
+			),
+		},
+		{
+			title: t('webhooks.column.lastDelivery'),
+			key: 'lastDelivery',
+			render: (_: any, record: WebhookRecord) => (
+				<div>
+					{record.lastDeliveryStatus && (
+						<Tag color={record.lastDeliveryStatus === 'success' ? 'success' : 'error'}>
+							{record.lastDeliveryStatus}
+						</Tag>
+					)}
+					{record.lastDeliveryAt && (
+						<div className="text-xs text-gray-400">{record.lastDeliveryAt}</div>
+					)}
+				</div>
+			),
+		},
+		{
+			title: t('common.actions'),
+			key: 'action',
+			render: (_: any, record: WebhookRecord) => (
+				<Space size="small">
+					<Button
+						type="text"
+						size="small"
+						icon={<EditOutlined />}
+						onClick={() => {
+							setEditing(record);
+							form.setFieldsValue({
+								name: record.name,
+								url: record.url,
+								secret: record.secret,
+								events: record.events,
+								status: record.status === 'active',
+								maxRetries: record.retryPolicy?.maxRetries || 3,
+								backoff: record.retryPolicy?.backoff || '1s',
+							});
+							setModalVisible(true);
+						}}
+					>
+						{t('common.edit')}
+					</Button>
+					<Button
+						type="text"
+						size="small"
+						icon={<SendOutlined />}
+						onClick={() => handleTest(record)}
+					>
+						{t('webhooks.test')}
+					</Button>
+					<Button
+						type="text"
+						size="small"
+						icon={<FileTextOutlined />}
+						onClick={() => openLogs(record)}
+					>
+						{t('webhooks.logs')}
+					</Button>
+					<Popconfirm title={t('webhooks.deleteConfirm')} onConfirm={() => handleDelete(record.id)}>
+						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+							{t('common.delete')}
+						</Button>
+					</Popconfirm>
+				</Space>
+			),
+		},
+	];
+
+	return (
+		<div>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+				<h1 className="text-xl font-semibold">{t('webhooks.title')}</h1>
+				<Button
+					type="primary"
+					icon={<PlusOutlined />}
+					onClick={() => {
+						setEditing(null);
+						form.resetFields();
+						setModalVisible(true);
+					}}
+				>
+					{t('webhooks.createWebhook')}
+				</Button>
+			</div>
+
+			{error && <PageError message={t('webhooks.loadError')} retry={refetch} className="mb-4" />}
+			<Table
+				rowKey="id"
+				columns={columns}
+				dataSource={data}
+				loading={isLoading}
+				pagination={{ pageSize: 10 }}
+				locale={{ emptyText: <Empty description={t('webhooks.noWebhooks')} /> }}
+				scroll={{ x: 800 }}
+			/>
+
+			<Modal
+				title={editing ? t('webhooks.editWebhook') : t('webhooks.createWebhook')}
+				open={modalVisible}
+				onCancel={() => {
+					setModalVisible(false);
+					setEditing(null);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				width={640}
+				className="w-full max-w-[640px]"
+				destroyOnHidden
+			>
+				<Form form={form} layout="vertical" onFinish={handleSave}>
+					<Form.Item name="name" label={t('common.name')} rules={[{ required: true }]}>
+						<Input placeholder={t('webhooks.namePlaceholder')} />
+					</Form.Item>
+					<Form.Item name="url" label={t('webhooks.column.url')} rules={[{ required: true }]}>
+						<Input placeholder={t('webhooks.urlPlaceholder')} />
+					</Form.Item>
+					<Form.Item name="secret" label={t('webhooks.column.secret')}>
+						<Input.Password placeholder={t('webhooks.secretPlaceholder')} />
+					</Form.Item>
+					<Form.Item name="events" label={t('webhooks.column.events')} rules={[{ required: true }]}>
+						<Select mode="multiple" placeholder={t('webhooks.eventsPlaceholder')}>
+							{EVENT_OPTIONS.map((e) => (
+								<Option key={e} value={e}>
+									{e}
+								</Option>
+							))}
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="status"
+						label={t('webhooks.statusLabel')}
+						valuePropName="checked"
+						initialValue={true}
+					>
+						<Switch checkedChildren={t('common.enable')} unCheckedChildren={t('common.disable')} />
+					</Form.Item>
+					<Form.Item name="maxRetries" label={t('webhooks.maxRetries')} initialValue={3}>
+						<Input type="number" min={0} max={10} />
+					</Form.Item>
+					<Form.Item name="backoff" label={t('webhooks.backoff')} initialValue="1s">
+						<Input placeholder={t('webhooks.backoffPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			<Drawer
+				title={t('webhooks.deliveryLogs')}
+				size={600}
+				open={logDrawerVisible}
+				onClose={() => setLogDrawerVisible(false)}
+				className="!w-full sm:!w-[480px]"
+			>
+				{logsLoading ? (
+					<Spin className="flex justify-center py-16" />
+				) : deliveryLogs.length === 0 ? (
+					<Empty description={t('webhooks.noDeliveryLogs')} />
+				) : (
+					<Timeline mode="left">
+						{deliveryLogs.map((log: any) => (
+							<Timeline.Item
+								key={log.id}
+								color={log.status === 'success' ? 'green' : 'red'}
+								label={log.timestamp ? new Date(log.timestamp).toLocaleString() : '-'}
+							>
+								<div className="text-sm">
+									<Tag color={log.status === 'success' ? 'success' : 'error'}>{log.status}</Tag>
+									<span className="text-gray-500 ml-2">{log.durationMs}ms</span>
+								</div>
+								<div className="mt-2 bg-gray-50 p-2 rounded text-xs">
+									<div className="font-medium">{t('webhooks.request')}</div>
+									<pre className="whitespace-pre-wrap break-all">
+										{log.requestBody ? JSON.stringify(log.requestBody) : '-'}
+									</pre>
+								</div>
+								<div className="mt-2 bg-gray-50 p-2 rounded text-xs">
+									<div className="font-medium">{t('webhooks.response')}</div>
+									<pre className="whitespace-pre-wrap break-all">
+										{log.responseBody ? JSON.stringify(log.responseBody) : '-'}
+									</pre>
+								</div>
+							</Timeline.Item>
+						))}
+					</Timeline>
+				)}
+			</Drawer>
+		</div>
+	);
+}

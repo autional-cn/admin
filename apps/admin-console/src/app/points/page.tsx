@@ -1,0 +1,1052 @@
+'use client';
+
+import React, { useState } from 'react';
+import {
+	Tabs,
+	Card,
+	Tag,
+	Button,
+	Table,
+	Space,
+	Modal,
+	Form,
+	Input,
+	Select,
+	InputNumber,
+	Popconfirm,
+} from 'antd';
+import { message, modal } from '@/lib/antd-app';
+import {
+	PlusOutlined,
+	EditOutlined,
+	DeleteOutlined,
+	CalculatorOutlined,
+	GiftOutlined,
+	LockOutlined,
+	UnlockOutlined,
+	ClockCircleOutlined,
+	SwapOutlined,
+	SyncOutlined,
+} from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import {
+	usePointRules,
+	useCreatePointRule,
+	useUpdatePointRule,
+	useDeletePointRule,
+	usePointAccounts,
+	useBatchEarnPoints,
+	useTestPointRule,
+	usePointTransactions,
+	usePointRiskScore,
+	useTenantConfig,
+	useUpdateTenantConfig,
+	useFreezePoints,
+	useUnfreezePoints,
+	useExpirePoints,
+	useTransferPoints,
+	useExchangePoints,
+} from '@/hooks/use-points';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+
+interface PointRule {
+	id: string;
+	name: string;
+	triggerCondition: string;
+	points: number;
+	status: string;
+}
+
+interface PointAccount {
+	id: string;
+	userId: string;
+	userName?: string;
+	balance: number;
+	totalEarned: number;
+	totalSpent: number;
+}
+
+interface PointTestResult {
+	points?: number;
+	ruleId?: string;
+	matchResult?: Record<string, unknown>;
+}
+
+interface PointRiskScoreData {
+	riskLevel?: string;
+	riskScore?: number;
+}
+
+export default function PointsPage() {
+	const { t } = useTranslation();
+	const [activeTab, setActiveTab] = useState('rules');
+
+	const [ruleModal, setRuleModal] = useState(false);
+	const [ruleForm] = Form.useForm();
+	const [editingRule, setEditingRule] = useState<PointRule | null>(null);
+
+	const [testModal, setTestModal] = useState(false);
+	const [testForm] = Form.useForm();
+	const [testResult, setTestResult] = useState<PointTestResult | null>(null);
+
+	const [batchModal, setBatchModal] = useState(false);
+	const [batchForm] = Form.useForm();
+
+	const [txModalUserId, setTxModalUserId] = useState<string>('');
+	const [configForm] = Form.useForm();
+
+	const [freezeModal, setFreezeModal] = useState(false);
+	const [freezeForm] = Form.useForm();
+	const [actionUserId, setActionUserId] = useState<string>('');
+	const [actionUserName, setActionUserName] = useState<string>('');
+	const [actionType, setActionType] = useState<'freeze' | 'unfreeze' | 'expire'>('freeze');
+
+	const [transferModal, setTransferModal] = useState(false);
+	const [transferForm] = Form.useForm();
+	const [transferMode, setTransferMode] = useState<'standalone' | 'account'>('standalone');
+
+	const [exchangeModal, setExchangeModal] = useState(false);
+	const [exchangeForm] = Form.useForm();
+
+	const { data: rules = [], isLoading: rulesLoading, error, refetch } = usePointRules();
+	const { data: accounts = [], isLoading: accountsLoading } = usePointAccounts();
+	const { data: transactions = [], isLoading: txsLoading } = usePointTransactions(txModalUserId);
+	const { data: tenantConfig, isLoading: configLoading } = useTenantConfig();
+	const updateConfigMut = useUpdateTenantConfig();
+	const createMut = useCreatePointRule();
+	const updateMut = useUpdatePointRule();
+	const deleteMut = useDeletePointRule();
+	const batchMut = useBatchEarnPoints();
+	const testMut = useTestPointRule();
+	const freezeMut = useFreezePoints();
+	const unfreezeMut = useUnfreezePoints();
+	const expireMut = useExpirePoints();
+	const transferMut = useTransferPoints();
+	const exchangeMut = useExchangePoints();
+
+	const handleSaveRule = async (values: any) => {
+		try {
+			if (editingRule) {
+				await updateMut.mutateAsync({ id: editingRule.id, data: values });
+				message.success(t('points.ruleUpdateSuccess'));
+			} else {
+				await createMut.mutateAsync(values);
+				message.success(t('points.ruleCreateSuccess'));
+			}
+			setRuleModal(false);
+			ruleForm.resetFields();
+			setEditingRule(null);
+		} catch (err) {
+			handleApiError(err, t('points.saveFailed'));
+		}
+	};
+
+	const handleDeleteRule = async (id: string) => {
+		modal.confirm({
+			title: t('points.confirmDelete'),
+			content: t('points.deleteConfirm'),
+			okText: t('points.delete'),
+			okButtonProps: { danger: true },
+			onOk: async () => {
+				try {
+					await deleteMut.mutateAsync(id);
+					message.success(t('points.deleteSuccess'));
+				} catch (err) {
+					handleApiError(err, t('points.saveFailed'));
+				}
+			},
+		});
+	};
+
+	const handleTestRule = async (values: { ruleId: string; context: string }) => {
+		try {
+			const result = await testMut.mutateAsync({
+				id: values.ruleId,
+				data: { eventType: values.context || '' },
+			});
+			setTestResult(result as PointTestResult);
+			message.success(t('points.testComplete'));
+		} catch (err) {
+			handleApiError(err, t('points.testFailed'));
+		}
+	};
+
+	const handleUpdateConfig = async () => {
+		try {
+			const values = configForm.getFieldsValue();
+			await updateConfigMut.mutateAsync(values);
+			message.success(t('points.configSaved'));
+		} catch (err) {
+			handleApiError(err, t('points.configSaveFailed'));
+		}
+	};
+
+	const handleBatchEarn = async (values: {
+		userIds?: string;
+		userGroup?: string;
+		points: number;
+		reason: string;
+	}) => {
+		try {
+			const payload: any = { points: values.points, reason: values.reason };
+			if (values.userIds) {
+				payload.userIds = values.userIds.split(',').map((s) => s.trim());
+			}
+			if (values.userGroup) {
+				payload.userGroup = values.userGroup;
+			}
+			await batchMut.mutateAsync(payload);
+			message.success(t('points.batchEarnSuccess'));
+			setBatchModal(false);
+			batchForm.resetFields();
+		} catch (err) {
+			handleApiError(err, t('points.batchEarnFailed'));
+		}
+	};
+
+	const openActionModal = (record: PointAccount, type: 'freeze' | 'unfreeze' | 'expire') => {
+		setActionUserId(record.userId);
+		setActionUserName(record.userName || record.userId);
+		setActionType(type);
+		freezeForm.resetFields();
+		setFreezeModal(true);
+	};
+
+	const handleAccountAction = async (values: { amount: number; reason: string }) => {
+		try {
+			const data = { amount: values.amount, reason: values.reason };
+			switch (actionType) {
+				case 'freeze':
+					await freezeMut.mutateAsync({ userId: actionUserId, data });
+					message.success(t('points.freezeSuccess'));
+					break;
+				case 'unfreeze':
+					await unfreezeMut.mutateAsync({ userId: actionUserId, data });
+					message.success(t('points.unfreezeSuccess'));
+					break;
+				case 'expire':
+					await expireMut.mutateAsync({ userId: actionUserId, data });
+					message.success(t('points.expireSuccess'));
+					break;
+			}
+			setFreezeModal(false);
+			freezeForm.resetFields();
+		} catch (err) {
+			handleApiError(err, t('points.operationFailed'));
+		}
+	};
+
+	const openTransferModal = (record?: PointAccount) => {
+		if (record) {
+			setTransferMode('account');
+			transferForm.resetFields();
+			transferForm.setFieldsValue({ from_user_id: record.userId });
+			setTransferModal(true);
+		} else {
+			setTransferMode('standalone');
+			transferForm.resetFields();
+			setTransferModal(true);
+		}
+	};
+
+	const handleTransfer = async (values: {
+		from_user_id: string;
+		to_user_id: string;
+		amount: number;
+		reason: string;
+		description: string;
+	}) => {
+		try {
+			await transferMut.mutateAsync({
+				userId: values.from_user_id,
+				data: {
+					to_user_id: values.to_user_id,
+					amount: values.amount,
+					reason: values.reason,
+					description: values.description,
+				},
+			});
+			message.success(t('points.transferSuccess'));
+			setTransferModal(false);
+			transferForm.resetFields();
+		} catch (err) {
+			handleApiError(err, t('points.transferFailed'));
+		}
+	};
+
+	const openExchangeModal = (record: PointAccount) => {
+		exchangeForm.resetFields();
+		exchangeForm.setFieldsValue({ from_user_id: record.userId });
+		setExchangeModal(true);
+	};
+
+	const handleExchange = async (values: {
+		from_user_id: string;
+		amount: number;
+		exchange_type: string;
+		description: string;
+		source: string;
+	}) => {
+		try {
+			await exchangeMut.mutateAsync({
+				userId: values.from_user_id,
+				data: {
+					amount: values.amount,
+					exchange_type: values.exchange_type,
+					description: values.description,
+					source: values.source,
+				},
+			});
+			message.success(t('points.exchangeSuccess'));
+			setExchangeModal(false);
+			exchangeForm.resetFields();
+		} catch (err) {
+			handleApiError(err, t('points.exchangeFailed'));
+		}
+	};
+
+	const actionTitleMap: Record<string, string> = {
+		freeze: t('points.freezePoints'),
+		unfreeze: t('points.unfreezePoints'),
+		expire: t('points.expireProcess'),
+	};
+
+	const ruleColumns = [
+		{ title: t('points.ruleName'), dataIndex: 'name', key: 'name' },
+		{
+			title: t('points.triggerCondition'),
+			dataIndex: 'triggerCondition',
+			key: 'triggerCondition',
+			ellipsis: true,
+		},
+		{ title: t('points.pointsValue'), dataIndex: 'points', key: 'points' },
+		{
+			title: t('points.status'),
+			dataIndex: 'status',
+			key: 'status',
+			render: (v: string) => <Tag color={v === 'active' ? 'success' : 'default'}>{v}</Tag>,
+		},
+		{
+			title: t('points.actions'),
+			key: 'action',
+			render: (_: any, record: PointRule) => (
+				<Space size="small">
+					<Button
+						type="link"
+						icon={<EditOutlined />}
+						onClick={() => {
+							setEditingRule(record);
+							ruleForm.setFieldsValue(record);
+							setRuleModal(true);
+						}}
+					>
+						{t('points.edit')}
+					</Button>
+					<Button
+						type="link"
+						icon={<CalculatorOutlined />}
+						onClick={() => {
+							testForm.setFieldsValue({ ruleId: record.id });
+							setTestResult(null);
+							setTestModal(true);
+						}}
+					>
+						{t('points.test')}
+					</Button>
+					<Button
+						type="link"
+						danger
+						icon={<DeleteOutlined />}
+						onClick={() => handleDeleteRule(record.id)}
+					>
+						{t('points.delete')}
+					</Button>
+				</Space>
+			),
+		},
+	];
+
+	const accountColumns = [
+		{ title: t('points.userId'), dataIndex: 'userId', key: 'userId', ellipsis: true },
+		{
+			title: t('points.userName'),
+			dataIndex: 'userName',
+			key: 'userName',
+			render: (_: any, r: PointAccount) => r.userName || '-',
+		},
+		{ title: t('points.balance'), dataIndex: 'balance', key: 'balance' },
+		{ title: t('points.totalEarned'), dataIndex: 'totalEarned', key: 'totalEarned' },
+		{ title: t('points.totalSpent'), dataIndex: 'totalSpent', key: 'totalSpent' },
+		{
+			title: t('points.riskScore'),
+			dataIndex: 'userId',
+			key: 'riskScore',
+			width: 110,
+			render: (userId: string) => <RiskScoreCell userId={userId} />,
+		},
+		{
+			title: t('points.actions'),
+			key: 'action',
+			width: 380,
+			render: (_: any, record: PointAccount) => (
+				<Space size="small" wrap>
+					<Popconfirm
+						title={t('points.confirmFreeze')}
+						description={t('points.freezeUserMsg', { user: record.userName || record.userId })}
+						onConfirm={() => openActionModal(record, 'freeze')}
+						okText={t('points.confirm')}
+						cancelText={t('points.cancel')}
+					>
+						<Button size="small" icon={<LockOutlined />} type="link" danger>
+							{t('points.freeze')}
+						</Button>
+					</Popconfirm>
+					<Button
+						size="small"
+						icon={<UnlockOutlined />}
+						type="link"
+						onClick={() => openActionModal(record, 'unfreeze')}
+					>
+						{t('points.unfreeze')}
+					</Button>
+					<Button
+						size="small"
+						icon={<ClockCircleOutlined />}
+						type="link"
+						onClick={() => openActionModal(record, 'expire')}
+					>
+						{t('points.expire')}
+					</Button>
+					<Button
+						size="small"
+						icon={<SwapOutlined />}
+						type="link"
+						onClick={() => openTransferModal(record)}
+					>
+						{t('points.transfer')}
+					</Button>
+					<Button
+						size="small"
+						icon={<SyncOutlined />}
+						type="link"
+						onClick={() => openExchangeModal(record)}
+					>
+						{t('points.exchange')}
+					</Button>
+				</Space>
+			),
+		},
+	];
+
+	const txColumns = [
+		{ title: t('points.userId'), dataIndex: 'userId', key: 'userId', ellipsis: true, width: 160 },
+		{
+			title: t('points.txType'),
+			dataIndex: 'type',
+			key: 'type',
+			width: 100,
+			render: (v: string) => {
+				const m: Record<string, string> = {
+					earn: t('points.txEarn'),
+					spend: t('points.txSpend'),
+					refund: t('points.txRefund'),
+					adjust: t('points.txAdjust'),
+					freeze: t('points.freeze'),
+					unfreeze: t('points.unfreeze'),
+					expire: t('points.expire'),
+					confirm_deduction: t('points.txConfirmDeduct'),
+				};
+				const colors: Record<string, string> = {
+					earn: 'green',
+					spend: 'red',
+					refund: 'blue',
+					adjust: 'orange',
+					freeze: 'orange',
+					unfreeze: 'cyan',
+					expire: 'default',
+				};
+				return <Tag color={colors[v] || 'default'}>{m[v] ?? v}</Tag>;
+			},
+		},
+		{
+			title: t('points.amount'),
+			dataIndex: 'amount',
+			key: 'amount',
+			width: 100,
+			render: (v: number) => (
+				<span className={v > 0 ? 'text-green-600' : 'text-red-600'}>{v?.toLocaleString()}</span>
+			),
+		},
+		{ title: t('points.source'), dataIndex: 'source', key: 'source', width: 100 },
+		{
+			title: t('points.txTime'),
+			dataIndex: 'createdAt',
+			key: 'createdAt',
+			width: 170,
+			render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
+		},
+	];
+
+	return (
+		<div>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+				<h1 className="text-xl font-semibold">{t('points.title')}</h1>
+			</div>
+
+			<Tabs
+				activeKey={activeTab}
+				onChange={setActiveTab}
+				items={[
+					{
+						key: 'rules',
+						label: t('points.rules'),
+						children: (
+							<>
+								<div className="flex justify-end mb-4">
+									<Button
+										type="primary"
+										icon={<PlusOutlined />}
+										onClick={() => {
+											setEditingRule(null);
+											ruleForm.resetFields();
+											setRuleModal(true);
+										}}
+									>
+										{t('points.newRule')}
+									</Button>
+								</div>
+								{error && (
+									<PageError
+										message={t('points.loadRulesError')}
+										retry={refetch}
+										className="mb-4"
+									/>
+								)}
+								<Table
+									rowKey="id"
+									columns={ruleColumns}
+									dataSource={rules}
+									loading={rulesLoading}
+									pagination={{ pageSize: 10 }}
+									scroll={{ x: 800 }}
+								/>
+							</>
+						),
+					},
+					{
+						key: 'accounts',
+						label: t('points.accounts'),
+						children: (
+							<>
+								<div className="flex justify-end mb-4">
+									<Button
+										type="primary"
+										icon={<GiftOutlined />}
+										onClick={() => {
+											batchForm.resetFields();
+											setBatchModal(true);
+										}}
+									>
+										{t('points.batchEarn')}
+									</Button>
+								</div>
+								<Table
+									rowKey="userId"
+									columns={accountColumns}
+									dataSource={accounts}
+									loading={accountsLoading}
+									pagination={{ pageSize: 10 }}
+									scroll={{ x: 800 }}
+								/>
+							</>
+						),
+					},
+					{
+						key: 'transactions',
+						label: t('points.transactions'),
+						children: (
+							<div>
+								<div className="mb-4">
+									<Input.Search
+										placeholder={t('points.searchUserTx')}
+										onSearch={(val) => setTxModalUserId(val)}
+										enterButton
+										className="max-w-[400px]"
+									/>
+								</div>
+								{txModalUserId ? (
+									<Table
+										rowKey="id"
+										columns={txColumns}
+										dataSource={transactions}
+										loading={txsLoading}
+										pagination={{ pageSize: 10 }}
+										size="small"
+										scroll={{ x: 800 }}
+									/>
+								) : (
+									<div className="text-center text-gray-400 py-12">
+										{t('points.enterUserIdForTx')}
+									</div>
+								)}
+							</div>
+						),
+					},
+					{
+						key: 'config',
+						label: t('points.config'),
+						children: (
+							<div className="max-w-lg">
+								<Form
+									form={configForm}
+									layout="vertical"
+									initialValues={tenantConfig}
+									onFinish={handleUpdateConfig}
+								>
+									<Form.Item name="pointsType" label={t('points.config.pointsType')}>
+										<Select
+											options={[
+												{ value: 'cash_equivalent', label: t('points.config.cashEquivalent') },
+												{ value: 'expirable', label: t('points.config.expirable') },
+												{ value: 'tier_points', label: t('points.config.tierPoints') },
+											]}
+										/>
+									</Form.Item>
+									<Form.Item name="exchangeRate" label={t('points.config.exchangeRateLabel')}>
+										<InputNumber className="w-full" />
+									</Form.Item>
+									<Form.Item
+										name="defaultExpiryDays"
+										label={t('points.config.defaultExpiryDaysLabel')}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+									<Form.Item name="expiryMode" label={t('points.config.expiryMode')}>
+										<Select
+											options={[
+												{ value: 'rolling', label: t('points.config.rolling') },
+												{ value: 'fixed_date', label: t('points.config.fixedDate') },
+												{ value: 'never', label: t('points.config.never') },
+											]}
+										/>
+									</Form.Item>
+									<div className="grid grid-cols-2 gap-3">
+										<Form.Item name="maxBalance" label={t('points.config.maxBalance')}>
+											<InputNumber
+												className="w-full"
+												min={0}
+												placeholder={t('points.config.unlimited')}
+											/>
+										</Form.Item>
+										<Form.Item name="minSpendPoints" label={t('points.config.minSpendPoints')}>
+											<InputNumber className="w-full" min={0} />
+										</Form.Item>
+										<Form.Item name="maxEarnPerDay" label={t('points.config.maxEarnPerDay')}>
+											<InputNumber
+												className="w-full"
+												min={0}
+												placeholder={t('points.config.unlimited')}
+											/>
+										</Form.Item>
+										<Form.Item name="maxSpendPerDay" label={t('points.config.maxSpendPerDay')}>
+											<InputNumber
+												className="w-full"
+												min={0}
+												placeholder={t('points.config.unlimited')}
+											/>
+										</Form.Item>
+									</div>
+									<Form.Item
+										name="exchangeEnabled"
+										label={t('points.config.exchangeEnabled')}
+										valuePropName="checked"
+									>
+										<Select
+											options={[
+												{ value: true, label: t('points.activeStatus') },
+												{ value: false, label: t('points.disabled') },
+											]}
+										/>
+									</Form.Item>
+									<Form.Item name="metadata" label={t('points.config.metadata')}>
+										<Input.TextArea rows={3} placeholder='{"key": "value"}' />
+									</Form.Item>
+									<div className="grid grid-cols-2 gap-3">
+										<Form.Item
+											name="earnEnabled"
+											label={t('points.config.earnEnabled')}
+											valuePropName="checked"
+										>
+											<Select
+												options={[
+													{ value: true, label: t('points.activeStatus') },
+													{ value: false, label: t('points.disabled') },
+												]}
+											/>
+										</Form.Item>
+										<Form.Item
+											name="spendEnabled"
+											label={t('points.config.spendEnabled')}
+											valuePropName="checked"
+										>
+											<Select
+												options={[
+													{ value: true, label: t('points.activeStatus') },
+													{ value: false, label: t('points.disabled') },
+												]}
+											/>
+										</Form.Item>
+										<Form.Item
+											name="expireEnabled"
+											label={t('points.config.expireEnabled')}
+											valuePropName="checked"
+										>
+											<Select
+												options={[
+													{ value: true, label: t('points.activeStatus') },
+													{ value: false, label: t('points.disabled') },
+												]}
+											/>
+										</Form.Item>
+										<Form.Item
+											name="transferEnabled"
+											label={t('points.config.transferEnabled')}
+											valuePropName="checked"
+										>
+											<Select
+												options={[
+													{ value: true, label: t('points.activeStatus') },
+													{ value: false, label: t('points.disabled') },
+												]}
+											/>
+										</Form.Item>
+									</div>
+									<Button type="primary" htmlType="submit" loading={updateConfigMut.isPending}>
+										{t('points.saveConfig')}
+									</Button>
+								</Form>
+							</div>
+						),
+					},
+					{
+						key: 'transfer',
+						label: t('points.transfer'),
+						children: (
+							<div className="max-w-lg">
+								<Card title={t('points.transferPoints')}>
+									<Form form={transferForm} layout="vertical" onFinish={handleTransfer}>
+										<Form.Item
+											name="from_user_id"
+											label={t('points.transfer.fromUserId')}
+											rules={[{ required: true, message: t('points.transfer.fromUserIdRequired') }]}
+										>
+											<Input placeholder={t('points.transfer.userIdPlaceholder')} />
+										</Form.Item>
+										<Form.Item
+											name="to_user_id"
+											label={t('points.transfer.toUserId')}
+											rules={[{ required: true, message: t('points.transfer.toUserIdRequired') }]}
+										>
+											<Input placeholder={t('points.transfer.toUserIdPlaceholder')} />
+										</Form.Item>
+										<Form.Item
+											name="amount"
+											label={t('points.transfer.amount')}
+											rules={[{ required: true, message: t('points.transfer.amountRequired') }]}
+										>
+											<InputNumber
+												className="w-full"
+												min={1}
+												placeholder={t('points.transfer.amountPlaceholder')}
+											/>
+										</Form.Item>
+										<Form.Item
+											name="reason"
+											label={t('points.transfer.reason')}
+											rules={[{ required: true, message: t('points.transfer.reasonRequired') }]}
+										>
+											<Input.TextArea
+												rows={2}
+												placeholder={t('points.transfer.reasonPlaceholder')}
+												maxLength={200}
+												showCount
+											/>
+										</Form.Item>
+										<Form.Item name="description" label={t('points.transfer.description')}>
+											<Input.TextArea
+												rows={2}
+												placeholder={t('points.transfer.descriptionPlaceholder')}
+											/>
+										</Form.Item>
+										<Button
+											type="primary"
+											htmlType="submit"
+											loading={transferMut.isPending}
+											icon={<SwapOutlined />}
+										>
+											{t('points.transfer.confirm')}
+										</Button>
+									</Form>
+								</Card>
+							</div>
+						),
+					},
+				]}
+			/>
+
+			<Modal
+				title={editingRule ? t('points.editRule') : t('points.createRule')}
+				open={ruleModal}
+				onCancel={() => {
+					setRuleModal(false);
+					setEditingRule(null);
+					ruleForm.resetFields();
+				}}
+				onOk={() => ruleForm.submit()}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={ruleForm} layout="vertical" onFinish={handleSaveRule}>
+					<Form.Item name="name" label={t('points.ruleName')} rules={[{ required: true }]}>
+						<Input placeholder={t('points.ruleNamePlaceholder')} />
+					</Form.Item>
+					<Form.Item
+						name="triggerCondition"
+						label={t('points.triggerCondition')}
+						rules={[{ required: true }]}
+					>
+						<Input placeholder={t('points.triggerConditionPlaceholder')} />
+					</Form.Item>
+					<Form.Item name="points" label={t('points.pointsValue')} rules={[{ required: true }]}>
+						<InputNumber className="w-full" placeholder="100" />
+					</Form.Item>
+					<Form.Item name="status" label={t('points.status')} initialValue="active">
+						<Select
+							options={[
+								{ value: 'active', label: t('points.activeStatus') },
+								{ value: 'inactive', label: t('points.disabled') },
+							]}
+						/>
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			<Modal
+				title={t('points.testRule')}
+				open={testModal}
+				onCancel={() => {
+					setTestModal(false);
+					testForm.resetFields();
+					setTestResult(null);
+				}}
+				onOk={() => testForm.submit()}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={testForm} layout="vertical" onFinish={handleTestRule}>
+					<Form.Item name="ruleId" label={t('points.test.ruleId')} rules={[{ required: true }]}>
+						<Input disabled />
+					</Form.Item>
+					<Form.Item name="context" label={t('points.test.context')}>
+						<Input.TextArea rows={3} placeholder='{"amount": 100}' />
+					</Form.Item>
+				</Form>
+				{testResult && (
+					<Card size="small" className="mt-4 bg-green-50">
+						<div className="text-green-700 font-medium">
+							{t('points.testResultCalc')}
+							{testResult.points} {t('points.pointsUnit')}
+						</div>
+					</Card>
+				)}
+			</Modal>
+
+			<Modal
+				title={t('points.batchEarnTitle')}
+				open={batchModal}
+				onCancel={() => {
+					setBatchModal(false);
+					batchForm.resetFields();
+				}}
+				onOk={() => batchForm.submit()}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={batchForm} layout="vertical" onFinish={handleBatchEarn}>
+					<Form.Item name="userIds" label={t('points.batch.userIds')}>
+						<Input placeholder="user-1, user-2, user-3" />
+					</Form.Item>
+					<Form.Item name="userGroup" label={t('points.batch.orSelectGroup')}>
+						<Select
+							allowClear
+							placeholder={t('points.batch.selectGroup')}
+							options={[
+								{ value: 'all', label: t('points.batch.allUsers') },
+								{ value: 'vip', label: t('points.batch.vipUsers') },
+								{ value: 'new', label: t('points.batch.newUsers') },
+							]}
+						/>
+					</Form.Item>
+					<Form.Item name="points" label={t('points.pointsValue')} rules={[{ required: true }]}>
+						<InputNumber className="w-full" placeholder="100" />
+					</Form.Item>
+					<Form.Item name="reason" label={t('points.batch.reason')} rules={[{ required: true }]}>
+						<Input.TextArea rows={3} placeholder={t('points.batch.reasonPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			<Modal
+				title={`${actionTitleMap[actionType]} - ${actionUserName}`}
+				open={freezeModal}
+				onCancel={() => {
+					setFreezeModal(false);
+					freezeForm.resetFields();
+				}}
+				onOk={() => freezeForm.submit()}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={freezeForm} layout="vertical" onFinish={handleAccountAction}>
+					<Form.Item name="amount" label={t('points.pointsAmount')} rules={[{ required: true }]}>
+						<InputNumber
+							className="w-full"
+							min={1}
+							placeholder={t('points.transfer.amountPlaceholder')}
+						/>
+					</Form.Item>
+					<Form.Item name="reason" label={t('points.actionReason')} rules={[{ required: true }]}>
+						<Input.TextArea rows={3} placeholder={t('points.actionReasonPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			<Modal
+				title={t('points.transferPoints')}
+				open={transferModal}
+				onCancel={() => {
+					setTransferModal(false);
+					transferForm.resetFields();
+				}}
+				onOk={() => transferForm.submit()}
+				confirmLoading={transferMut.isPending}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={transferForm} layout="vertical" onFinish={handleTransfer}>
+					<Form.Item
+						name="from_user_id"
+						label={t('points.transfer.fromUserId')}
+						rules={[{ required: true }]}
+					>
+						<Input
+							placeholder={t('points.transfer.userIdPlaceholder')}
+							disabled={transferMode === 'account'}
+						/>
+					</Form.Item>
+					<Form.Item
+						name="to_user_id"
+						label={t('points.transfer.toUserId')}
+						rules={[{ required: true, message: t('points.transfer.toUserIdRequired') }]}
+					>
+						<Input placeholder={t('points.transfer.toUserIdPlaceholder')} />
+					</Form.Item>
+					<Form.Item
+						name="amount"
+						label={t('points.transfer.amount')}
+						rules={[{ required: true, message: t('points.transfer.amountRequired') }]}
+					>
+						<InputNumber
+							className="w-full"
+							min={1}
+							placeholder={t('points.transfer.amountPlaceholder')}
+						/>
+					</Form.Item>
+					<Form.Item
+						name="reason"
+						label={t('points.transfer.reason')}
+						rules={[{ required: true, message: t('points.transfer.reasonRequired') }]}
+					>
+						<Input.TextArea
+							rows={2}
+							placeholder={t('points.transfer.reasonPlaceholder')}
+							maxLength={200}
+							showCount
+						/>
+					</Form.Item>
+					<Form.Item name="description" label={t('points.transfer.description')}>
+						<Input.TextArea rows={2} placeholder={t('points.transfer.descriptionPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+
+			<Modal
+				title={t('points.exchangeTitle')}
+				open={exchangeModal}
+				onCancel={() => {
+					setExchangeModal(false);
+					exchangeForm.resetFields();
+				}}
+				onOk={() => exchangeForm.submit()}
+				confirmLoading={exchangeMut.isPending}
+				className="w-full max-w-[560px]"
+			>
+				<Form form={exchangeForm} layout="vertical" onFinish={handleExchange}>
+					<Form.Item name="from_user_id" label={t('points.userId')} rules={[{ required: true }]}>
+						<Input disabled />
+					</Form.Item>
+					<Form.Item
+						name="amount"
+						label={t('points.exchange.amount')}
+						rules={[{ required: true, message: t('points.exchange.amountRequired') }]}
+					>
+						<InputNumber
+							className="w-full"
+							min={1}
+							placeholder={t('points.transfer.amountPlaceholder')}
+						/>
+					</Form.Item>
+					<Form.Item
+						name="exchange_type"
+						label={t('points.exchange.type')}
+						rules={[{ required: true, message: t('points.exchange.typeRequired') }]}
+					>
+						<Select
+							placeholder={t('points.exchange.selectType')}
+							options={[
+								{ value: 'coupon', label: t('points.exchange.coupon') },
+								{ value: 'discount', label: t('points.exchange.discount') },
+								{ value: 'cash', label: t('points.exchange.cash') },
+								{ value: 'gift_card', label: t('points.exchange.giftCard') },
+								{ value: 'vip', label: t('points.exchange.vip') },
+							]}
+						/>
+					</Form.Item>
+					<Form.Item name="source" label={t('points.exchange.source')}>
+						<Input placeholder={t('points.exchange.sourcePlaceholder')} />
+					</Form.Item>
+					<Form.Item name="description" label={t('points.transfer.description')}>
+						<Input.TextArea rows={2} placeholder={t('points.transfer.descriptionPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+		</div>
+	);
+}
+
+function RiskScoreCell({ userId }: { userId: string }) {
+	const { t } = useTranslation();
+	const { data, isLoading } = usePointRiskScore(userId);
+	if (isLoading) return <span className="text-gray-300">...</span>;
+	if (!data) return <span className="text-gray-400">-</span>;
+	const riskData = data as PointRiskScoreData | undefined;
+	const riskLevel = riskData?.riskLevel || 'low';
+	const riskScore = riskData?.riskScore;
+	const colorMap: Record<string, string> = { high: 'red', medium: 'orange', low: 'green' };
+	const labelMap: Record<string, string> = {
+		high: t('points.riskHigh'),
+		medium: t('points.riskMedium'),
+		low: t('points.riskLow'),
+	};
+	return (
+		<Tag color={colorMap[riskLevel] || 'default'}>
+			{labelMap[riskLevel] || riskLevel} {riskScore != null ? `(${riskScore})` : ''}
+		</Tag>
+	);
+}

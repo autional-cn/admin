@@ -1,0 +1,221 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Table, Tag, DatePicker, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
+import { RetweetOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useTenantId } from '@/hooks/use-tenant';
+import {
+	usePayReconciliation,
+	useRunPayReconciliation,
+	type ReconciliationRecord,
+} from '@/hooks/use-pay';
+import { PageError } from '@/components/ui/page-status';
+
+const { RangePicker } = DatePicker;
+
+export default function PayReconciliationPage() {
+	const { t } = useTranslation();
+	const tenantId = useTenantId();
+	const [filters, setFilters] = useState<Record<string, unknown>>({});
+
+	const params: Record<string, unknown> = {};
+	if (filters.channel) params.channel = filters.channel;
+	if (filters.startDate) params.start_date = filters.startDate;
+	if (filters.endDate) params.end_date = filters.endDate;
+
+	const { data: records = [], isLoading, error, refetch } = usePayReconciliation(tenantId, params);
+	const { mutate: runReconciliation, isPending: isRunning } = useRunPayReconciliation();
+
+	const handleRunReconciliation = () => {
+		runReconciliation(params, {
+			onSuccess: () => refetch(),
+		});
+	};
+
+	const stats = {
+		total: records.length,
+		matched: records.filter((r) => r.status === 'matched').length,
+		mismatched: records.filter((r) => r.status === 'mismatched').length,
+		missing: records.filter((r) => r.status === 'missing').length,
+	};
+
+	const channelLabels: Record<string, string> = {
+		wechat: t('payReconciliation.channel.wechat'),
+		alipay: t('payReconciliation.channel.alipay'),
+		stripe: t('payReconciliation.channel.stripe'),
+	};
+
+	const columns = [
+		{ title: t('payReconciliation.id'), dataIndex: 'id', key: 'id', ellipsis: true, width: 160 },
+		{
+			title: t('payReconciliation.channel'),
+			dataIndex: 'channel',
+			key: 'channel',
+			width: 100,
+			render: (v: string) => channelLabels[v] ?? v,
+		},
+		{
+			title: t('payReconciliation.gatewayRef'),
+			dataIndex: 'gatewayRef',
+			key: 'gatewayRef',
+			width: 140,
+		},
+		{
+			title: t('payReconciliation.gatewayAmount'),
+			dataIndex: 'gatewayAmount',
+			key: 'gatewayAmount',
+			width: 120,
+			render: (v: string) => parseFloat(v).toFixed(2),
+		},
+		{
+			title: t('payReconciliation.internalRef'),
+			dataIndex: 'internalRef',
+			key: 'internalRef',
+			ellipsis: true,
+			width: 140,
+		},
+		{
+			title: t('payReconciliation.internalAmount'),
+			dataIndex: 'internalAmount',
+			key: 'internalAmount',
+			width: 120,
+			render: (v: string) => parseFloat(v).toFixed(2),
+		},
+		{
+			title: t('payReconciliation.diffAmount'),
+			dataIndex: 'diffAmount',
+			key: 'diffAmount',
+			width: 120,
+			render: (v: string) => {
+				const diff = parseFloat(v);
+				return (
+					<span className={diff !== 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+						{diff.toFixed(2)}
+					</span>
+				);
+			},
+		},
+		{
+			title: t('payReconciliation.status'),
+			dataIndex: 'status',
+			key: 'status',
+			width: 100,
+			render: (v: string) => {
+				const colorMap: Record<string, string> = {
+					matched: 'success',
+					mismatched: 'error',
+					missing: 'warning',
+				};
+				const labelMap: Record<string, string> = {
+					matched: t('payReconciliation.status.matched'),
+					mismatched: t('payReconciliation.status.mismatched'),
+					missing: t('payReconciliation.status.missing'),
+				};
+				return <Tag color={colorMap[v] ?? 'default'}>{labelMap[v] ?? v}</Tag>;
+			},
+		},
+		{
+			title: t('payReconciliation.reconciledAt'),
+			dataIndex: 'reconciledAt',
+			key: 'reconciledAt',
+			width: 160,
+			render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
+		},
+	];
+
+	return (
+		<div>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+				<h1 className="text-xl font-semibold">{t('payReconciliation.title')}</h1>
+			</div>
+
+			{error && (
+				<PageError message={t('payReconciliation.loadError')} retry={refetch} className="mb-4" />
+			)}
+
+			<Row gutter={16} className="mb-4">
+				<Col xs={12} sm={6}>
+					<Card size="small">
+						<Statistic title={t('payReconciliation.stats.total')} value={stats.total} />
+					</Card>
+				</Col>
+				<Col xs={12} sm={6}>
+					<Card size="small">
+						<Statistic
+							title={t('payReconciliation.stats.matched')}
+							value={stats.matched}
+							valueStyle={{ color: 'var(--color-success-light)' }}
+						/>
+					</Card>
+				</Col>
+				<Col xs={12} sm={6}>
+					<Card size="small">
+						<Statistic
+							title={t('payReconciliation.stats.mismatched')}
+							value={stats.mismatched}
+							valueStyle={{ color: 'var(--color-error-light)' }}
+						/>
+					</Card>
+				</Col>
+				<Col xs={12} sm={6}>
+					<Card size="small">
+						<Statistic
+							title={t('payReconciliation.stats.missing')}
+							value={stats.missing}
+							valueStyle={{ color: 'var(--color-warning-light)' }}
+						/>
+					</Card>
+				</Col>
+			</Row>
+
+			<Card size="small" className="mb-4">
+				<Space wrap>
+					<Select
+						placeholder={t('payReconciliation.channel')}
+						allowClear
+						className="w-30"
+						value={filters.channel}
+						onChange={(v) => setFilters({ ...filters, channel: v })}
+						options={[
+							{ value: 'wechat', label: t('payReconciliation.channel.wechat') },
+							{ value: 'alipay', label: t('payReconciliation.channel.alipay') },
+							{ value: 'stripe', label: t('payReconciliation.channel.stripe') },
+						]}
+					/>
+					<RangePicker
+						onChange={(dates) => {
+							if (dates) {
+								setFilters({
+									...filters,
+									startDate: dates[0]?.format('YYYY-MM-DD'),
+									endDate: dates[1]?.format('YYYY-MM-DD'),
+								});
+							} else {
+								const { startDate, endDate, ...rest } = filters;
+								setFilters(rest);
+							}
+						}}
+					/>
+					<Button
+						type="primary"
+						icon={<RetweetOutlined />}
+						loading={isRunning}
+						onClick={handleRunReconciliation}
+					>
+						{t('payReconciliation.runReconciliation')}
+					</Button>
+				</Space>
+			</Card>
+
+			<Table
+				rowKey="id"
+				columns={columns}
+				dataSource={records}
+				loading={isLoading}
+				pagination={{ pageSize: 10 }}
+				scroll={{ x: 1100 }}
+			/>
+		</div>
+	);
+}

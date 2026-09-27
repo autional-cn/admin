@@ -1,0 +1,47 @@
+{
+  "name": "@autional-cn/admin-console",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Admin Console - Tenant Management Dashboard (Vite + React Router + Ant Design 6)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 13102",
+    "build": "tsc && vite build --base /",
+    "preview": "vite preview --port 13102",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@ant-design/icons": "6.2.2",
+    "@autional-cn/react": "workspace:*",
+    "@autional-cn/shared": "workspace:*",
+    "@autional-cn/tailwind-preset": "workspace:*",
+    "@autional-cn/ui": "workspace:*",
+    "@tanstack/react-query": "5.100.9",
+    "antd": "6.5.0",
+    "axios": "1.16.0",
+    "dayjs": "1.11.20",
+    "i18next": "26.0.10",
+    "i18next-browser-languagedetector": "8.2.1",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "react-i18next": "17.0.7",
+    "react-router": "7.15.0",
+    "recharts": "3.8.1",
+    "zod": "3.23.8",
+    "zustand": "5.0.13"
+  },
+  "devDependencies": {
+    "@autional-cn/tsconfig": "workspace:*",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "4.4.0",
+    "autoprefixer": "10.5.0",
+    "postcss": "8.5.14",
+    "tailwindcss": "3.4.19",
+    "typescript": "5.8.3",
+    "vite": "6.4.2"
+  }
+}

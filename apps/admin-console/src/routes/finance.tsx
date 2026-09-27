@@ -1,0 +1,259 @@
+import { Route, Navigate } from 'react-router';
+import { RequireAuth } from '@autional-cn/shared';
+import { ErrorBoundary } from '@autional-cn/ui';
+import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
+
+import StoragePage from '../app/storage/page';
+import BillingPage from '../app/billing/page';
+import WalletsPage from '../app/wallets/page';
+import PointsPage from '../app/points/page';
+
+import PayChannelsPage from '../app/pay/channels/page';
+import PayPaymentsPage from '../app/pay/payments/page';
+import PayPaymentDetailPage from '../app/pay/payments/[id]/page';
+import PayReconciliationPage from '../app/pay/reconciliation/page';
+import PayRefundsPage from '../app/pay/refunds/page';
+
+import WalletListPage from '../app/wallet/list/page';
+import WalletAdjustPage from '../app/wallet/adjust/page';
+import WalletWithdrawalsPage from '../app/wallet/withdrawals/page';
+import WalletDisputesPage from '../app/wallet/disputes/page';
+import WalletCouponsPage from '../app/wallet/coupons/page';
+import WalletPolicyPage from '../app/wallet/policy/page';
+import WalletFraudRulesPage from '../app/wallet/fraud-rules/page';
+import WalletEventsPage from '../app/wallet/events/page';
+
+import BillingPlansPage from '../app/billing/plans/page';
+import BillingSubscriptionsPage from '../app/billing/subscriptions/page';
+import BillingRefundsPage from '../app/billing/refunds/page';
+import BillingRevenuePage from '../app/billing/revenue/page';
+import BillingDunningPage from '../app/billing/dunning/page';
+import BillingTaxExportPage from '../app/billing/tax-export/page';
+import BillingAlertsPage from '../app/billing/alerts/page';
+import BillingCreditNotesPage from '../app/billing/credit-notes/page';
+import BillingCreditBalancePage from '../app/billing/credit-balance/page';
+
+const Admin = ['super_admin', 'admin'] as const;
+const Forbidden = <Navigate to="/403" replace />;
+
+export const FinanceRoutes = (
+	<>
+		<Route
+			path="storage"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
+						<StoragePage />
+					</ErrorBoundary>
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
+						<BillingPage />
+					</ErrorBoundary>
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallets"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="points"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
+						<PointsPage />
+					</ErrorBoundary>
+				</RequireAuth>
+			}
+		/>
+
+		<Route
+			path="pay/channels"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<PayChannelsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="pay/payments"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<PayPaymentsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="pay/payments/:id"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<PayPaymentDetailPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="pay/reconciliation"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<PayReconciliationPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="pay/refunds"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<PayRefundsPage />
+				</RequireAuth>
+			}
+		/>
+
+		<Route
+			path="wallet/list"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletListPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/adjust"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletAdjustPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/withdrawals"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletWithdrawalsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/disputes"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletDisputesPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/coupons"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletCouponsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/policy"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletPolicyPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/fraud-rules"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletFraudRulesPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="wallet/events"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<WalletEventsPage />
+				</RequireAuth>
+			}
+		/>
+
+		<Route
+			path="billing/plans"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingPlansPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/subscriptions"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingSubscriptionsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/refunds"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingRefundsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/revenue"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingRevenuePage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/dunning"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingDunningPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/tax-export"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingTaxExportPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/alerts"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingAlertsPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/credit-notes"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingCreditNotesPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="billing/credit-balance"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<BillingCreditBalancePage />
+				</RequireAuth>
+			}
+		/>
+	</>
+);

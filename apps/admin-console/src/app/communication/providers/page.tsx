@@ -1,0 +1,253 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Table, Button, Space, Tag, Modal, Form, Input, Select, Popconfirm } from 'antd';
+import { message } from '@/lib/antd-app';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import {
+	useCommunicationProvidersList,
+	useCreateCommunicationProvider,
+	useUpdateCommunicationProvider,
+	useDeleteCommunicationProvider,
+} from '@/hooks/use-communication';
+import { handleApiError } from '@/lib/error-handler';
+import { PageError } from '@/components/ui/page-status';
+
+const { Option } = Select;
+const { TextArea } = Input;
+
+interface ProviderRecord {
+	id?: string;
+	channel?: string;
+	provider?: string;
+	apiKey?: string;
+	config?: Record<string, unknown>;
+	isActive?: boolean;
+	updatedAt?: string;
+}
+
+const CHANNEL_COLORS: Record<string, string> = { sms: 'orange', email: 'green', push: 'purple' };
+const PROVIDER_COLORS: Record<string, string> = {
+	aliyun: 'blue',
+	tencent: 'cyan',
+	sendgrid: 'green',
+	fcm: 'orange',
+	apns: 'purple',
+};
+
+export default function CommunicationProvidersPage() {
+	const { t } = useTranslation();
+	const [modalVisible, setModalVisible] = useState(false);
+	const [editing, setEditing] = useState<ProviderRecord | null>(null);
+	const [form] = Form.useForm();
+
+	const { data = [], isLoading, error, refetch } = useCommunicationProvidersList();
+	const createMut = useCreateCommunicationProvider();
+	const updateMut = useUpdateCommunicationProvider();
+	const deleteMut = useDeleteCommunicationProvider();
+
+	const CHANNEL_OPTIONS = [
+		{ value: 'sms', label: t('communication.channel.sms') },
+		{ value: 'email', label: t('communication.channel.email') },
+		{ value: 'push', label: t('communication.channel.push') },
+	];
+
+	const providerOptions = [
+		{ value: 'aliyun', label: t('communication.providers.provider.aliyun') },
+		{ value: 'tencent', label: t('communication.providers.provider.tencent') },
+		{ value: 'sendgrid', label: t('communication.providers.provider.sendgrid') },
+		{ value: 'fcm', label: t('communication.providers.provider.fcm') },
+		{ value: 'apns', label: t('communication.providers.provider.apns') },
+	];
+
+	const handleSave = async (values: any) => {
+		try {
+			const payload = {
+				channel: values.channel,
+				provider: values.provider,
+				config: values.config ? JSON.parse(values.config) : {},
+				isActive: values.isActive !== false,
+			};
+			if (editing?.id) {
+				await updateMut.mutateAsync({ id: editing.id, data: payload });
+				message.success(t('communication.providers.updateSuccess'));
+			} else {
+				await createMut.mutateAsync(payload);
+				message.success(t('communication.providers.createSuccess'));
+			}
+			setModalVisible(false);
+			setEditing(null);
+			form.resetFields();
+		} catch (err) {
+			handleApiError(err, t('communication.providers.saveFailed'));
+		}
+	};
+
+	const handleDelete = async (id: string) => {
+		try {
+			await deleteMut.mutateAsync(id);
+			message.success(t('communication.providers.deleteSuccess'));
+		} catch (err) {
+			handleApiError(err, t('communication.providers.deleteFailed'));
+		}
+	};
+
+	const columns = [
+		{
+			title: t('communication.providers.channel'),
+			dataIndex: 'channel',
+			key: 'channel',
+			render: (v: string) => <Tag color={CHANNEL_COLORS[v] || 'default'}>{v?.toUpperCase()}</Tag>,
+		},
+		{
+			title: t('communication.providers.provider'),
+			dataIndex: 'provider',
+			key: 'provider',
+			render: (v: string) => <Tag color={PROVIDER_COLORS[v] || 'default'}>{v || '-'}</Tag>,
+		},
+		{
+			title: t('common.status'),
+			dataIndex: 'isActive',
+			key: 'isActive',
+			render: (v: boolean) => (
+				<Tag color={v ? 'success' : 'default'}>
+					{v ? t('communication.providers.enabled') : t('communication.providers.disabled')}
+				</Tag>
+			),
+		},
+		{
+			title: t('common.updatedAt'),
+			dataIndex: 'updatedAt',
+			key: 'updatedAt',
+			render: (v?: string) => (v ? v.slice(0, 10) : '-'),
+		},
+		{
+			title: t('common.actions'),
+			key: 'action',
+			render: (_: any, record: ProviderRecord) => (
+				<Space size="small">
+					<Button
+						type="text"
+						size="small"
+						icon={<EditOutlined />}
+						onClick={() => {
+							setEditing(record);
+							form.setFieldsValue({
+								channel: record.channel,
+								provider: record.provider,
+								config: record.config ? JSON.stringify(record.config, null, 2) : '{}',
+								isActive: record.isActive,
+							});
+							setModalVisible(true);
+						}}
+					>
+						{t('common.edit')}
+					</Button>
+					<Popconfirm
+						title={t('communication.providers.confirmDelete')}
+						onConfirm={() => record.id && handleDelete(record.id)}
+					>
+						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+							{t('common.delete')}
+						</Button>
+					</Popconfirm>
+				</Space>
+			),
+		},
+	];
+
+	return (
+		<div>
+			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+				<h1 className="text-xl font-semibold">{t('communication.providers.title')}</h1>
+				<Button
+					type="primary"
+					icon={<PlusOutlined />}
+					onClick={() => {
+						setEditing(null);
+						form.resetFields();
+						setModalVisible(true);
+					}}
+				>
+					{t('communication.providers.addProvider')}
+				</Button>
+			</div>
+
+			{error && (
+				<PageError
+					message={t('communication.providers.loadError')}
+					retry={refetch}
+					className="mb-4"
+				/>
+			)}
+			<Table
+				rowKey="id"
+				columns={columns}
+				dataSource={data}
+				loading={isLoading}
+				pagination={{ pageSize: 10 }}
+				scroll={{ x: 800 }}
+			/>
+
+			<Modal
+				title={
+					editing?.id
+						? t('communication.providers.editProvider')
+						: t('communication.providers.addProvider')
+				}
+				open={modalVisible}
+				onCancel={() => {
+					setModalVisible(false);
+					setEditing(null);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				width={640}
+				className="w-full max-w-[640px]"
+				destroyOnHidden
+			>
+				<Form
+					form={form}
+					layout="vertical"
+					onFinish={handleSave}
+					initialValues={{ channel: 'email' }}
+				>
+					<Form.Item
+						name="channel"
+						label={t('communication.providers.channel')}
+						rules={[{ required: true }]}
+					>
+						<Select>
+							{CHANNEL_OPTIONS.map((c) => (
+								<Option key={c.value} value={c.value}>
+									{c.label}
+								</Option>
+							))}
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="provider"
+						label={t('communication.providers.provider')}
+						rules={[{ required: true }]}
+					>
+						<Select placeholder={t('communication.providers.selectProvider')}>
+							{providerOptions.map((p) => (
+								<Option key={p.value} value={p.value}>
+									{p.label}
+								</Option>
+							))}
+						</Select>
+					</Form.Item>
+					<Form.Item
+						name="config"
+						label={t('communication.providers.config')}
+						rules={[{ required: true }]}
+					>
+						<TextArea rows={6} placeholder={t('communication.providers.configPlaceholder')} />
+					</Form.Item>
+				</Form>
+			</Modal>
+		</div>
+	);
+}
