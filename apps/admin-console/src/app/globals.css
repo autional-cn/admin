@@ -28,16 +28,18 @@
 
 @layer base {
   :root {
-    --color-info: #1890ff;
+    /* --color-info 与 --color-chart-1 原先在这里被重定义，值与令牌完全相同（#1890ff、
+       #003153 = primary-700），属于冗余覆盖——已删除，改由 tokens.css 提供。
+       注意：--color-chart-2/3/4 也是本站点自己的值（#10b981/#8b5cf6/#ef4444），
+       与令牌的 chart-2/3/4（amber/sky/amber）**不同**，那是真正覆盖，本次未动。 */
     --color-info-light: #1677ff;
     --color-text-disabled: #bfbfbf;
-    --color-chart-1: #003153;
     --color-chart-2: #10b981;
     --color-chart-3: #8b5cf6;
     --color-chart-4: #ef4444;
-    --color-active: #52c41a;
-    --color-revoked: #ff4d4f;
-    --color-paused: #faad14;
+    --color-active: var(--color-success);
+    --color-revoked: var(--color-danger);
+    --color-paused: var(--color-warning);
     --color-pending: #fa8c16;
     --color-purple-category: #722ed1;
   }

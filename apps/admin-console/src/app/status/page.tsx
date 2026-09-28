@@ -49,9 +49,9 @@ export default function StatusPage() {
 						value={overall}
 						prefix={
 							services.length > 0 && services.every((s: any) => s.status === 'operational') ? (
-								<CheckCircleOutlined style={{ color: '#52c41a' }} />
+								<CheckCircleOutlined style={{ color: 'var(--color-success)' }} />
 							) : services.length > 0 ? (
-								<CloseCircleOutlined style={{ color: '#ff4d4f' }} />
+								<CloseCircleOutlined style={{ color: 'var(--color-danger)' }} />
 							) : null
 						}
 					/>

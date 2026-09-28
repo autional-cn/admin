@@ -27,7 +27,7 @@ export default function BrandingPage() {
 	const { t } = useTranslation();
 	const [form] = Form.useForm<BrandingData>();
 	const [values, setValues] = useState<BrandingData>({
-		primaryColor: '#003153',
+		primaryColor: 'var(--color-primary-700)',
 		backgroundColor: '#ffffff',
 		borderRadius: 8,
 		loginTitle: t('branding.defaultLoginTitle'),
@@ -60,7 +60,7 @@ export default function BrandingPage() {
 		}
 	};
 
-	const primary = values.primaryColor || '#003153';
+	const primary = values.primaryColor || 'var(--color-primary-700)';
 	const bg = values.backgroundColor || '#ffffff';
 	const radius = values.borderRadius ?? 8;
 

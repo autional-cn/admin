@@ -40,7 +40,7 @@ export default function SdkPage() {
 							]}
 						>
 							<Card.Meta
-								avatar={<CodeOutlined style={{ fontSize: 24, color: '#1890ff' }} />}
+								avatar={<CodeOutlined style={{ fontSize: 24, color: 'var(--color-info)' }} />}
 								title={sdk.name}
 								description={t(sdk.desc)}
 							/>

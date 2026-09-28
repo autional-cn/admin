@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
 	users: { label: 'users', icon: <UserOutlined />, color: '#1677ff' },
-	roles: { label: 'roles', icon: <SafetyOutlined />, color: '#52c41a' },
+	roles: { label: 'roles', icon: <SafetyOutlined />, color: 'var(--color-success)' },
 	tenants: { label: 'tenants', icon: <TeamOutlined />, color: '#fa8c16' },
 	applications: { label: 'applications', icon: <AppstoreOutlined />, color: '#722ed1' },
 };

@@ -14,7 +14,7 @@ export default function NhiSdkPage() {
 		<div>
 			<div className="mb-6">
 				<div className="flex items-center gap-2">
-					<SafetyOutlined style={{ fontSize: 24, color: '#52c41a' }} />
+					<SafetyOutlined style={{ fontSize: 24, color: 'var(--color-success)' }} />
 					<h1 className="text-xl font-semibold">{t('sdks.nhiTitle')}</h1>
 				</div>
 				<Paragraph className="mt-2 text-gray-500">{t('sdks.nhiDescription')}</Paragraph>
