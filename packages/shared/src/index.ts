@@ -166,6 +166,19 @@ export * as GeneratedTypes from '@autional-cn/api-generated/types';
 export * as ApiGenerated from '@autional-cn/api-generated';
 export * as ApiTypes from '@autional-cn/api-generated/types';
 
+// Branding（租户品牌 → CSS 变量 / favicon / customCss）
+export {
+	useBranding,
+	applyBrandColors,
+	BrandingInitializer,
+	useTenantBrandingStore,
+	extractBranding,
+	readCachedBranding,
+	writeCachedBranding,
+	BRANDING_CACHE_PREFIX,
+} from './branding';
+export type { Branding } from './branding';
+
 // Lib
 export { getVapidPublicKey, subscribeBrowserPush, unsubscribeBrowserPush } from './lib/push';
 

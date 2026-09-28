@@ -13,6 +13,8 @@ import {
 	OAuthCallbackPage,
 	TenantSlugProvider,
 	useBootstrap,
+	useBranding,
+	BrandingInitializer,
 } from '@autional-cn/shared';
 
 const Forbidden = <Navigate to="/403" replace />;
@@ -126,8 +128,11 @@ function LayoutWrapperInner() {
 }
 
 export default function App() {
+	useBranding();
+
 	return (
 		<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
+			<BrandingInitializer />
 			<Routes>
 				<Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 				<Route path="/403" element={<SlugAwareLayoutWrapper />}>

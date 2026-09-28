@@ -44,7 +44,7 @@ describe('useRoles', () => {
 		const { result } = renderHook(() => useRoles(), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(roles);
+		expect(result.current.data).toEqual(roles.map((r) => ({ ...r, permissionCount: 0 })));
 	});
 
 	it('falls back to data directly if items missing', async () => {
@@ -54,7 +54,7 @@ describe('useRoles', () => {
 		const { result } = renderHook(() => useRoles(), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(roles);
+		expect(result.current.data).toEqual(roles.map((r) => ({ ...r, permissionCount: 0 })));
 	});
 
 	it('returns empty array when no data', async () => {
