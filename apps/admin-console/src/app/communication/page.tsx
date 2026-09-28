@@ -193,7 +193,7 @@ export default function CommunicationPage() {
 							<Statistic
 								title={t('communication.failed')}
 								value={dashboard?.failed ?? 0}
-								valueStyle={{ color: (dashboard?.failed ?? 0) > 0 ? '#cf1322' : undefined }}
+								valueStyle={{ color: (dashboard?.failed ?? 0) > 0 ? 'var(--color-danger-text)' : undefined }}
 							/>
 						)}
 					</Card>
@@ -210,7 +210,7 @@ export default function CommunicationPage() {
 								}
 								suffix="%"
 								precision={1}
-								valueStyle={{ color: (dashboard?.deliveryRate ?? 0) > 0.9 ? '#3f8600' : '#cf1322' }}
+								valueStyle={{ color: (dashboard?.deliveryRate ?? 0) > 0.9 ? 'var(--color-success-text)' : 'var(--color-danger-text)' }}
 							/>
 						)}
 					</Card>

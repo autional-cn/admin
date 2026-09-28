@@ -34,7 +34,8 @@
        WCAG 1.4.11 非文本对比度 3:1，并首次有了暗色覆盖），本站改回消费令牌、不再覆盖。
        判据：两个门户画同一张图必须同色，否则就不像同一个产品。 */
     --color-info-light: #1677ff;
-    --color-text-disabled: #bfbfbf;
+    /* --color-text-disabled 原先在这里定义为 #bfbfbf（纯灰）。设计系统现已提供该令牌
+       （= neutral-400 #b0bcc8，带品牌蓝调），本站改回消费令牌、不再本地覆盖。 */
     --color-active: var(--color-success);
     --color-revoked: var(--color-danger);
     --color-paused: var(--color-warning);

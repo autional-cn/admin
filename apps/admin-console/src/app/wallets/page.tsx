@@ -512,7 +512,7 @@ export default function WalletsPage() {
 							title={t('wallets.balance')}
 							value={summary?.totalBalance ?? summary?.balance ?? 0}
 							precision={2}
-							valueStyle={{ color: '#3f8600' }}
+							valueStyle={{ color: 'var(--color-success-text)' }}
 							prefix={
 								<span>
 									<WalletOutlined /> ¥
@@ -528,7 +528,7 @@ export default function WalletsPage() {
 							value={summary?.totalFrozenBalance ?? summary?.frozenAmount ?? 0}
 							prefix="¥"
 							precision={2}
-							valueStyle={{ color: '#cf1322' }}
+							valueStyle={{ color: 'var(--color-danger-text)' }}
 						/>
 					</Card>
 				</Col>
@@ -552,7 +552,7 @@ export default function WalletsPage() {
 							title={t('wallets.totalExpense')}
 							value={summary?.totalExpense || 0}
 							precision={2}
-							valueStyle={{ color: '#cf1322' }}
+							valueStyle={{ color: 'var(--color-danger-text)' }}
 							prefix={
 								<span>
 									<ArrowDownOutlined /> ¥
