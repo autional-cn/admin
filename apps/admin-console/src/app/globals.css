@@ -28,15 +28,13 @@
 
 @layer base {
   :root {
-    /* --color-info 与 --color-chart-1 原先在这里被重定义，值与令牌完全相同（#1890ff、
-       #003153 = primary-700），属于冗余覆盖——已删除，改由 tokens.css 提供。
-       注意：--color-chart-2/3/4 也是本站点自己的值（#10b981/#8b5cf6/#ef4444），
-       与令牌的 chart-2/3/4（amber/sky/amber）**不同**，那是真正覆盖，本次未动。 */
+    /* --color-info / --color-chart-1..4 原先在这里被本站点重定义。chart-2/3/4 用的是舰队
+       自选的 #10b981/#8b5cf6/#ef4444，与设计系统的 chart-2/3/4 不是同一套——KI-014 记的
+       就是这个。设计系统侧已把图表色板定版（亮色最差色对 dE 19.8 / 暗色 14.5，8 色全部满足
+       WCAG 1.4.11 非文本对比度 3:1，并首次有了暗色覆盖），本站改回消费令牌、不再覆盖。
+       判据：两个门户画同一张图必须同色，否则就不像同一个产品。 */
     --color-info-light: #1677ff;
     --color-text-disabled: #bfbfbf;
-    --color-chart-2: #10b981;
-    --color-chart-3: #8b5cf6;
-    --color-chart-4: #ef4444;
     --color-active: var(--color-success);
     --color-revoked: var(--color-danger);
     --color-paused: var(--color-warning);
