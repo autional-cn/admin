@@ -52,7 +52,7 @@ export function Header() {
 	];
 
 	return (
-		<AntHeader className="flex items-center justify-between bg-[var(--color-bg-surface)] px-6 border-b border-[var(--color-border)]">
+		<AntHeader className="sticky top-0 z-10 flex items-center justify-between h-[var(--layout-header-height)] bg-[var(--color-bg-surface)] px-6 border-b border-[var(--color-border)]">
 			<Button
 				type="text"
 				icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
