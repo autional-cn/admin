@@ -5,28 +5,10 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
   body {
-    background-color: var(--color-bg-primary);
-    color: var(--color-text-primary);
     margin: 0;
   }
-}
-
-[data-theme="dark"] {
-  --color-bg-primary: var(--color-neutral-900);
-  --color-bg-surface: var(--color-neutral-800);
-  --color-bg-elevated: var(--color-neutral-800);
-  --color-text-primary: var(--color-neutral-0);
-  --color-text-secondary: var(--color-neutral-400);
-  --color-border: var(--color-neutral-700);
-}
-
-@layer base {
+}@layer base {
   :root {
     /* --color-info / --color-chart-1..4 原先在这里被本站点重定义。chart-2/3/4 用的是舰队
        自选的 #10b981/#8b5cf6/#ef4444，与设计系统的 chart-2/3/4 不是同一套——KI-014 记的
