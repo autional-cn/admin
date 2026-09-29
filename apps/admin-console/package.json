@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "6.2.2",
-    "@autional-cn/react": "workspace:*",
     "@autional-cn/shared": "workspace:*",
     "@autional-cn/tailwind-preset": "0.1.0-rc",
     "@autional-cn/tokens": "0.1.0-rc",

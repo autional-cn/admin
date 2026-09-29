@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Card, Descriptions, Button, Space, Alert, Popconfirm, Tag, message } from 'antd';
-import { useAuth } from '@autional-cn/react';
+import { useAuth } from '@autional-cn/shared';
 
 export default function TrialPage() {
 	const { user } = useAuth();

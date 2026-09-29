@@ -44,9 +44,6 @@ importers:
       '@ant-design/icons':
         specifier: 6.2.2
         version: 6.2.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@autional-cn/react':
-        specifier: workspace:*
-        version: link:../../packages/react
       '@autional-cn/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -126,28 +123,6 @@ importers:
       vite:
         specifier: 6.4.2
         version: 6.4.2(@types/node@26.1.2)(jiti@1.21.7)
-
-  packages/react:
-    dependencies:
-      '@autional-cn/shared':
-        specifier: workspace:*
-        version: link:../shared
-      react:
-        specifier: ^19
-        version: 19.2.5
-      react-dom:
-        specifier: ^19
-        version: 19.2.5(react@19.2.5)
-    devDependencies:
-      '@types/react':
-        specifier: 19.2.14
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: 19.2.3
-        version: 19.2.3(@types/react@19.2.14)
-      tsup:
-        specifier: 8.5.1
-        version: 8.5.1(jiti@1.21.7)(postcss@8.5.14)(typescript@5.8.3)
 
   packages/shared:
     dependencies:
