@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 // 那是 ui 仓库 KI-011 记录的问题：ui 早已生成 packages/tokens/dist/antd-theme.js，
 // 但没有站点消费它，于是令牌变更无法传导、各控制台各自漂移。
 // 注意 borderRadius 由 6 变为桥接产物里的 8（来自令牌 radius.sm），这是有意的可见变更。
-import antdTheme from '@autional-cn/tailwind-preset/antd-theme.mjs';
+import antdTheme from '@autional-cn/tokens/antd-theme';
 
 export let message: MessageInstance;
 export let modal: any;
