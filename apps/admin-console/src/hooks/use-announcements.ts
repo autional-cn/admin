@@ -1,6 +1,6 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractListResult } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,21 +15,33 @@ import {
 
 export interface AnnouncementRecord {
 	id: string;
+	tenant_id: string;
 	title: string;
-	type: 'global' | 'targeted';
-	status: 'draft' | 'published' | 'archived';
-	publishedAt?: string;
-	content?: string;
-	targets?: string[];
+	content: string;
+	status: 'draft' | 'scheduled' | 'published' | 'expired';
+	target_roles?: string[];
+	publish_at?: string;
+	expire_at?: string;
+	views: number;
+	dismissals: number;
+	created_at: string;
+	updated_at: string;
 }
 
-export function useAnnouncements() {
+export interface AnnouncementListParams {
+	page?: number;
+	page_size?: number;
+	status?: string;
+	search?: string;
+}
+
+export function useAnnouncements(params?: AnnouncementListParams) {
 	return useQuery({
-		queryKey: queryKeys.announcements.all,
+		queryKey: [...queryKeys.announcements.all, params],
 		staleTime: 300000,
 		queryFn: async () => {
-			const res = await getAnnouncements();
-			return extractList<AnnouncementRecord>(res);
+			const res = await getAnnouncements(params);
+			return extractListResult<AnnouncementRecord>(res);
 		},
 	});
 }

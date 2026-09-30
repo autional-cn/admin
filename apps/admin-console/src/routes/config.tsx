@@ -5,6 +5,7 @@ import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
 
 import BrandingPage from '../app/branding/page';
 import NotificationTemplatesPage from '../app/notifications/templates/page';
+import AnnouncementsPage from '../app/notifications/announcements/page';
 import NotificationStatsPage from '../app/notifications/stats/page';
 import EventMappingsPage from '../app/notifications/event-mappings/page';
 import GlobalVariablesPage from '../app/notifications/global-variables/page';
@@ -34,6 +35,14 @@ export const ConfigRoutes = (
 			element={
 				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
 					<NotificationTemplatesPage />
+				</RequireAuth>
+			}
+		/>
+		<Route
+			path="notifications/announcements"
+			element={
+				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+					<AnnouncementsPage />
 				</RequireAuth>
 			}
 		/>

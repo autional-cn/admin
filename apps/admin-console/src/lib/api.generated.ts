@@ -424,7 +424,9 @@ export const activateTenant = Generated.adminTenantsActivateByTenantsPost;
 export const suspendTenant = Generated.adminTenantsSuspendByTenantsPost;
 export const getTenantQuota = Generated.adminTenantsQuotaByTenants;
 export const updateTenantQuota = Generated.adminTenantsQuotaByTenantsPut;
-export const getAnnouncements = Generated.announcements;
+// U91：走 admin 受众（与 create/update/delete/publish/unpublish 同组），
+// 用户面 Generated.announcements 在 admin 平面被 entry-plane 门禁拒 403
+export const getAnnouncements = Generated.adminAnnouncements;
 export const createAnnouncement = Generated.adminAnnouncementsPost;
 export const updateAnnouncement = Generated.adminAnnouncementsByAnnouncementsPut;
 export const deleteAnnouncement = Generated.adminAnnouncementsByAnnouncementsDelete;

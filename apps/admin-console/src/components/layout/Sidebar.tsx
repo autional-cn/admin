@@ -307,6 +307,11 @@ export function Sidebar() {
 						permission: 'tenant:notification:read',
 					},
 					{
+						key: '/notifications/announcements',
+						label: t('nav.announcements'),
+						permission: 'tenant:notification:read',
+					},
+					{
 						key: '/notifications/stats',
 						label: t('nav.notificationStats'),
 						permission: 'tenant:notification:read',

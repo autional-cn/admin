@@ -50,6 +50,7 @@ export function Breadcrumb() {
 			'/data-classification': t('breadcrumb.dataClassification'),
 			'/branding': t('breadcrumb.branding'),
 			'/notifications/templates': t('breadcrumb.notificationTemplates'),
+			'/notifications/announcements': t('breadcrumb.announcements'),
 			'/notifications/stats': t('breadcrumb.notificationStats'),
 			'/notifications/event-mappings': t('breadcrumb.eventMappings'),
 			'/notifications/global-variables': t('breadcrumb.globalVariables'),

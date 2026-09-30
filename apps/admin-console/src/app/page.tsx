@@ -68,7 +68,7 @@ const DashboardPage = memo(function DashboardPage() {
 		refetch: auditLogsRefetch,
 	} = useAuditLogs({ action: 'LOGIN', pageSize: 10, page: 1, ...timeRangeParams });
 	const recentLoginItems = recentLogins?.items ?? [];
-	const { data: announcements = [], isLoading: announcementsLoading } = useAnnouncements();
+	const { data: announcements, isLoading: announcementsLoading } = useAnnouncements();
 	const summary = useTenantSummary();
 
 	const statsLoading = usersLoading || sessionsLoading || rolesLoading || auditLoading;
@@ -85,7 +85,7 @@ const DashboardPage = memo(function DashboardPage() {
 		return d >= todayStart;
 	}).length;
 
-	const announcementsData = announcements.slice(0, 5);
+	const announcementsData = (announcements?.items ?? []).slice(0, 5);
 
 	const timeRangeOptions = [
 		{ label: t('dashboard.timeToday'), value: 'today' },
@@ -290,8 +290,8 @@ const DashboardPage = memo(function DashboardPage() {
 											<span className="text-sm">{item.title}</span>
 										</div>
 										<span className="text-xs text-gray-400">
-											{item.publishedAt
-												? new Date(item.publishedAt).toLocaleDateString('zh-CN')
+											{item.publish_at
+												? new Date(item.publish_at).toLocaleDateString('zh-CN')
 												: '-'}
 										</span>
 									</div>
