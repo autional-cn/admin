@@ -15,5 +15,6 @@ window.__APP_CONFIG__ = {
     brand: { host: "brand", base: "" }
   },
   VITE_COOKIE_DOMAIN: ".autional.cn",
-  VITE_API_BASE_URL: "/bff"
+  VITE_API_BASE_URL: "/bff",
+  VITE_API_NAMESPACE: "dev"
 };
