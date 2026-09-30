@@ -31,7 +31,6 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import {
-	useComplianceStatus,
 	useDSARs,
 	useUpdateDSAR,
 	useExecuteErasure,
@@ -113,9 +112,8 @@ export default function CompliancePage() {
 	const [consentModal, setConsentModal] = useState(false);
 	const [consentForm] = Form.useForm();
 
-	const { data: status, isLoading: statusLoading, error, refetch } = useComplianceStatus();
 	const { data: dsars = [], isLoading: dsarLoading } = useDSARs();
-	const { data: policies = [], isLoading: policyLoading } = useRetentionPolicies();
+	const { data: policies = [], isLoading: policyLoading, error, refetch } = useRetentionPolicies();
 	const { data: sodRules = [], isLoading: sodLoading } = useSODRules();
 	const { data: isoControls = [], isLoading: isoLoading } = useISOControls();
 	const updateDsarMut = useUpdateDSAR();
@@ -126,7 +124,7 @@ export default function CompliancePage() {
 	const createConsentMut = useCreateConsent();
 	const revokeConsentMut = useRevokeConsent();
 
-	const loading = statusLoading || dsarLoading || policyLoading || sodLoading || isoLoading;
+	const loading = dsarLoading || policyLoading || sodLoading || isoLoading;
 
 	useEffect(() => {
 		(async () => {
@@ -413,11 +411,11 @@ export default function CompliancePage() {
 									<Card loading={loading}>
 										<Statistic
 											title={t('compliance.score')}
-											value={complianceScore ?? status?.score ?? 0}
+											value={complianceScore ?? 0}
 											suffix="/ 100"
 											valueStyle={{
 												color:
-													(complianceScore ?? status?.score ?? 0) >= 80
+													(complianceScore ?? 0) >= 80
 														? 'var(--color-success-light)'
 														: 'var(--color-error-light)',
 											}}
@@ -450,20 +448,6 @@ export default function CompliancePage() {
 											valueStyle={{
 												color:
 													pendingDsarCount > 0
-														? 'var(--color-error-light)'
-														: 'var(--color-success-light)',
-											}}
-										/>
-									</Card>
-								</Col>
-								<Col xs={24} md={6}>
-									<Card loading={loading}>
-										<Statistic
-											title={t('compliance.expiredPolicyAlerts')}
-											value={status?.expiredPolicies || 0}
-											valueStyle={{
-												color:
-													(status?.expiredPolicies || 0) > 0
 														? 'var(--color-error-light)'
 														: 'var(--color-success-light)',
 											}}

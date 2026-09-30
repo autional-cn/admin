@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Table, Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { usePayRefunds, useRefundPayment, type PaymentItem } from '@/hooks/use-pay';
+import { usePayRefunds, type PaymentItem } from '@/hooks/use-pay';
 import { PageError } from '@/components/ui/page-status';
 
 export default function PayRefundsPage() {

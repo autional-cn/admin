@@ -11,10 +11,9 @@ import {
 	deletePayChannel,
 	getPayReconciliation,
 	runPayReconciliation,
-	listPayments,
-	getPayment,
-	getPaymentReceipt,
-	refundPayment,
+	listAdminPayments,
+	getAdminPayment,
+	getAdminPaymentReceipt,
 } from '@/lib/api.generated';
 
 export interface Channel {
@@ -93,7 +92,7 @@ export function usePayPayments(params?: Record<string, unknown>) {
 	return useQuery({
 		queryKey: queryKeys.pay.payments(params),
 		queryFn: async () => {
-			const res = await listPayments(params as any);
+			const res = await listAdminPayments(params as any);
 			return extractList<PaymentItem>(res);
 		},
 	});
@@ -103,7 +102,7 @@ export function usePayPaymentDetail(id: string) {
 	return useQuery({
 		queryKey: queryKeys.pay.paymentDetail(id),
 		queryFn: async () => {
-			const res = await getPayment(id);
+			const res = await getAdminPayment(id);
 			return extractItem<PaymentItem>(res);
 		},
 		enabled: !!id,
@@ -114,7 +113,7 @@ export function usePayReceipt(id: string) {
 	return useQuery({
 		queryKey: [...queryKeys.pay.paymentDetail(id), 'receipt'] as const,
 		queryFn: async () => {
-			const res = await getPaymentReceipt(id);
+			const res = await getAdminPaymentReceipt(id);
 			return extractItem<Receipt>(res);
 		},
 		enabled: !!id,
@@ -125,7 +124,7 @@ export function usePayRefunds(params?: Record<string, unknown>) {
 	return useQuery({
 		queryKey: queryKeys.pay.refunds(params),
 		queryFn: async () => {
-			const res = await listPayments({ ...params, status: 'refunded' } as any);
+			const res = await listAdminPayments({ ...params, status: 'refunded' } as any);
 			return extractList<PaymentItem>(res);
 		},
 	});
@@ -171,14 +170,6 @@ export function useDeleteChannel() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (id: string) => deletePayChannel(id),
-		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.pay.all }),
-	});
-}
-
-export function useRefundPayment() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: (data: Record<string, unknown>) => refundPayment(data as any),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.pay.all }),
 	});
 }

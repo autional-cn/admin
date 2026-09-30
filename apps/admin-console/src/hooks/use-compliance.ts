@@ -1,11 +1,10 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-	getComplianceStatus,
 	getDSARs,
 	updateDSAR,
 	executeErasure,
@@ -20,12 +19,6 @@ import type {
 	CreateConsentRequest,
 	RevokeConsentRequest,
 } from '@autional-cn/shared/generated/types';
-
-interface ComplianceStatus {
-	score?: number;
-	expiredPolicies?: number;
-	[key: string]: unknown;
-}
 
 interface DSAR {
 	id: string;
@@ -70,16 +63,6 @@ interface Consent {
 	recordedAt?: string;
 	revokedAt?: string;
 	version?: string;
-}
-
-export function useComplianceStatus() {
-	return useQuery({
-		queryKey: queryKeys.compliance.status,
-		queryFn: async () => {
-			const res = await getComplianceStatus();
-			return extractItem<ComplianceStatus>(res) ?? ({} as ComplianceStatus);
-		},
-	});
 }
 
 export function useDSARs() {

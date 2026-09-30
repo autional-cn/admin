@@ -286,7 +286,6 @@ export const getCreditBalance = Generated.billingCreditBalanceByCreditBalance;
 // Billing: Public Plans
 export const getPublicBillingPlans = Generated.billingPlans;
 
-export const getComplianceStatus = Generated.complianceStatus;
 export const getDSARs = Generated.adminComplianceGdprDsar;
 export const updateDSAR = Generated.adminComplianceGdprDsarByDsarPut;
 export const executeErasure = Generated.adminComplianceGdprRightToErasurePost;
@@ -334,11 +333,10 @@ export const getWalletAppSummary = Generated.adminWalletsTenantsAppsSummaryByTen
 export const updateWallet = Generated.adminWalletsByWalletsPut;
 export const deleteWallet = Generated.adminWalletsByWalletsDelete;
 
-// Pay: Payments (user/protected)
-export const listPayments = Generated.payments;
-export const getPayment = Generated.paymentsByPayments;
-export const getPaymentReceipt = Generated.paymentsReceiptByPayments;
-export const refundPayment = Generated.paymentsRefundPost;
+// Pay: Payments (admin plane, same body as user plane — U98)
+export const listAdminPayments = Generated.adminPayments;
+export const getAdminPayment = Generated.adminPaymentsByPayments;
+export const getAdminPaymentReceipt = Generated.adminPaymentsReceiptByPayments;
 
 // Pay: Admin Channels
 export const listPayChannels = Generated.adminPaymentsChannels;

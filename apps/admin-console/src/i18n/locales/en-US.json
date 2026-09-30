@@ -1177,7 +1177,6 @@
   "compliance.dsar.requester": "Requester",
   "compliance.dsar.updateSuccess": "DSAR status updated",
   "compliance.dsar.viewDetail": "Detail",
-  "compliance.expiredPolicyAlerts": "Expired Policy Alerts",
   "compliance.gap.compliant": "Compliant",
   "compliance.gap.nonCompliant": "Non-Compliant",
   "compliance.iso.complianceStatus": "Compliance Status",

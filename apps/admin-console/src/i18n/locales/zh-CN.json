@@ -1177,7 +1177,6 @@
   "compliance.dsar.requester": "请求人",
   "compliance.dsar.updateSuccess": "DSAR 状态更新成功",
   "compliance.dsar.viewDetail": "详情",
-  "compliance.expiredPolicyAlerts": "过期策略告警",
   "compliance.gap.compliant": "合规",
   "compliance.gap.nonCompliant": "不合规",
   "compliance.iso.complianceStatus": "合规状态",
