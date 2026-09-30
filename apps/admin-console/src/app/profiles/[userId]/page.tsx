@@ -23,13 +23,15 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PageHeader, SectionCard, LoadingScreen, ErrorState, EmptyState } from '@autional-cn/ui';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractItem, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { getProfile, archiveProfile, exportProfile } from '@/lib/api.generated';
 
 export default function ProfileDetailPage() {
 	const { t } = useTranslation();
 	const { userId } = useParams<{ userId: string }>();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const [profile, setProfile] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -225,7 +227,7 @@ export default function ProfileDetailPage() {
 				subtitle={t('profileDetail.subtitleUser', { userId })}
 			/>
 			<Space className="mb-4">
-				<Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/profiles')}>
+				<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(buildNavHref('/profiles', tenantSlug))}>
 					{t('profileDetail.action.back')}
 				</Button>
 				<Button icon={<LockOutlined />} danger onClick={handleArchive}>

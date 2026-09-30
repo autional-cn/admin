@@ -5,6 +5,8 @@ import { Table, Tag, Input, Select, DatePicker, Space, Button, Card } from 'antd
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { usePayPayments, type PaymentItem } from '@/hooks/use-pay';
 import { PageError } from '@/components/ui/page-status';
 
@@ -13,6 +15,7 @@ const { RangePicker } = DatePicker;
 export default function PayPaymentsPage() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const [filters, setFilters] = useState<Record<string, unknown>>({});
 	const [searchText, setSearchText] = useState('');
 
@@ -112,7 +115,7 @@ export default function PayPaymentsPage() {
 				<Button
 					type="link"
 					icon={<EyeOutlined />}
-					onClick={() => navigate(`/pay/payments/${record.paymentId}`)}
+					onClick={() => navigate(buildNavHref(`/pay/payments/${record.paymentId}`, tenantSlug))}
 				>
 					{t('payPayments.detail')}
 				</Button>

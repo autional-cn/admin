@@ -13,7 +13,8 @@ import {
 // icons from @ant-design/icons
 import { getUsers, getRoles, getAllTenants } from '@/lib/api.generated';
 import { getApplications } from '@/lib/api.generated';
-import { useAuthStore } from '@autional-cn/shared';
+import { useAuthStore, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 
 import { useTranslation } from 'react-i18next';
 
@@ -43,6 +44,7 @@ export function GlobalSearch() {
 	const [open, setOpen] = useState(false);
 	const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const currentTenantId = useAuthStore((s) => s.currentTenantId);
+	const tenantSlug = useTenantSlug();
 
 	const performSearch = useCallback(
 		async (q: string) => {
@@ -177,7 +179,7 @@ export function GlobalSearch() {
 	const handleSelect = (_: string, option: unknown) => {
 		const opt = option as { path?: string } | undefined;
 		if (opt?.path && opt.path !== '#') {
-			navigate(opt.path);
+			navigate(buildNavHref(opt.path, tenantSlug));
 		}
 		setOpen(false);
 	};

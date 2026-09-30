@@ -5,7 +5,8 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Button, Tag, Modal, Form, Input, Select, Skeleton, Table, Descriptions } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { PageHeader, StatusBadge, SectionCard, EmptyState, ErrorState } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
@@ -146,6 +147,7 @@ export default function AgentDetailPage() {
 	const { t } = useTranslation();
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const queryClient = useQueryClient();
 	const tenantId = useTenantId();
 	const [editVisible, setEditVisible] = useState(false);
@@ -299,7 +301,7 @@ export default function AgentDetailPage() {
 				<Button
 					type="text"
 					icon={<ArrowLeftOutlined />}
-					onClick={() => navigate('/agents')}
+					onClick={() => navigate(buildNavHref('/agents', tenantSlug))}
 					className="mb-4 pl-0"
 				>
 					{t('agents.backToAgents')}

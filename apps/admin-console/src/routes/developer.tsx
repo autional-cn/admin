@@ -1,9 +1,10 @@
 'use client';
 
-import { Route, Navigate } from 'react-router';
+import { Route } from 'react-router';
 import { RequireAuth } from '@autional-cn/shared';
 import { ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
+import { ForbiddenRedirect } from '../components/common/ForbiddenRedirect';
 
 import OAuthClientsPage from '../app/oauth-clients/page';
 import ApiKeysPage from '../app/api-keys/page';
@@ -18,14 +19,13 @@ import StatusPage from '../app/status/page';
 import ApiDocsPage from '../app/api-docs/page';
 
 const Admin = ['super_admin', 'admin'] as const;
-const Forbidden = <Navigate to="/403" replace />;
 
 export const DeveloperRoutes = (
 	<>
 		<Route
 			path="oauth-clients"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<OAuthClientsPage />
 					</ErrorBoundary>
@@ -35,7 +35,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="api-keys"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<ApiKeysPage />
 					</ErrorBoundary>
@@ -45,7 +45,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="usage"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<UsagePage />
 					</ErrorBoundary>
@@ -55,7 +55,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="logs"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<LogsPage />
 					</ErrorBoundary>
@@ -65,7 +65,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="traces"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<TracesPage />
 					</ErrorBoundary>
@@ -75,7 +75,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="request-logs"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<RequestLogsPage />
 					</ErrorBoundary>
@@ -85,7 +85,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="sdks"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<SdkPage />
 					</ErrorBoundary>
@@ -95,7 +95,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="sdks/nhi"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<NhiSdkPage />
 					</ErrorBoundary>
@@ -105,7 +105,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="team"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<TeamPage />
 					</ErrorBoundary>
@@ -115,7 +115,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="status"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<StatusPage />
 					</ErrorBoundary>
@@ -125,7 +125,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="api-docs"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<ApiDocsPage />
 					</ErrorBoundary>

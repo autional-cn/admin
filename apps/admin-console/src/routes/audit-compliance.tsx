@@ -1,7 +1,8 @@
-import { Route, Navigate } from 'react-router';
+import { Route } from 'react-router';
 import { RequireAuth } from '@autional-cn/shared';
 import { ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
+import { ForbiddenRedirect } from '../components/common/ForbiddenRedirect';
 
 import AuditLogsPage from '../app/audit-logs/page';
 import AlertsPage from '../app/audit/alerts/page';
@@ -24,7 +25,6 @@ const AuditRead = ['super_admin', 'security_admin', 'auditor'] as const;
 const SecurityAdminOnly = ['super_admin', 'security_admin'] as const;
 // Admin: 管理配置（不含 security_admin 和 auditor）
 const Admin = ['super_admin', 'admin'] as const;
-const Forbidden = <Navigate to="/403" replace />;
 
 export const AuditComplianceRoutes = (
 	<>
@@ -32,7 +32,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit-logs"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<AuditLogsPage />
 					</ErrorBoundary>
@@ -42,7 +42,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/alerts"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<AlertsPage />
 				</RequireAuth>
 			}
@@ -50,7 +50,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/anomalies"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<AnomaliesPage />
 				</RequireAuth>
 			}
@@ -60,7 +60,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/retention"
 			element={
-				<RequireAuth allowedRoles={AuditRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={AuditRead} fallback={<ForbiddenRedirect />}>
 					<RetentionPage />
 				</RequireAuth>
 			}
@@ -68,7 +68,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/compliance"
 			element={
-				<RequireAuth allowedRoles={AuditRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={AuditRead} fallback={<ForbiddenRedirect />}>
 					<AuditCompliancePage />
 				</RequireAuth>
 			}
@@ -77,7 +77,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/reports"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ReportsPage />
 				</RequireAuth>
 			}
@@ -85,7 +85,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="compliance"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<CompliancePage />
 					</ErrorBoundary>
@@ -96,7 +96,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="compliance/policy"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<CompliancePolicyPage />
 				</RequireAuth>
 			}
@@ -104,7 +104,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="compliance/minors"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<MinorsProtectionPage />
 				</RequireAuth>
 			}
@@ -112,7 +112,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="compliance/legal-documents"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<LegalDocumentsPage />
 					</ErrorBoundary>
@@ -123,7 +123,7 @@ export const AuditComplianceRoutes = (
 		<Route
 			path="audit/sod"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<SodConfigPage />
 				</RequireAuth>
 			}

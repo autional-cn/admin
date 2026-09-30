@@ -2,7 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { extractList, apiClient } from '@autional-cn/shared';
+import { extractList, apiClient, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
 import {
 	Table,
@@ -53,6 +54,7 @@ const statusColorMap: Record<string, string> = {
 export default function VerificationsPage() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 
 	const statusLabelMap = useMemo<Record<string, string>>(
 		() => ({
@@ -130,7 +132,7 @@ export default function VerificationsPage() {
 			key: 'userId',
 			ellipsis: true,
 			render: (id: string) => (
-				<Button type="link" size="small" onClick={() => navigate(`/users/${id}`)}>
+				<Button type="link" size="small" onClick={() => navigate(buildNavHref(`/users/${id}`, tenantSlug))}>
 					{id}
 				</Button>
 			),
@@ -181,7 +183,7 @@ export default function VerificationsPage() {
 			width: 160,
 			render: (_: unknown, record: VerificationRecord) => (
 				<Space size="small">
-					<Button type="link" size="small" onClick={() => navigate(`/verifications/${record.id}`)}>
+					<Button type="link" size="small" onClick={() => navigate(buildNavHref(`/verifications/${record.id}`, tenantSlug))}>
 						{t('verifications.actionViewDetail')}
 					</Button>
 					<Button type="link" size="small" danger onClick={() => openOverrideModal(record)}>

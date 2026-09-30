@@ -11,9 +11,10 @@ import {
 import { Layout, Button, Avatar, Dropdown, Space, Typography, Select, Tag } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUIStore } from '@/stores/ui-store';
-import { useAuthStore, useLogout } from '@autional-cn/shared';
+import { useAuthStore, useLogout, useTenantSlug } from '@autional-cn/shared';
 import { LanguageSwitcher, ThemeToggle } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
+import { buildNavHref } from '@/lib/nav';
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -24,6 +25,7 @@ const { Text } = Typography;
  */
 export function Header() {
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const collapsed = useUIStore((s) => s.sidebarCollapsed);
 	const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
@@ -41,7 +43,7 @@ export function Header() {
 			key: 'profile',
 			icon: <UserOutlined />,
 			label: t('common.profile'),
-			onClick: () => navigate('/settings'),
+			onClick: () => navigate(buildNavHref('/settings', tenantSlug)),
 		},
 		{
 			key: 'logout',

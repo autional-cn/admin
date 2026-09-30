@@ -4,7 +4,8 @@
 import React, { useState } from 'react';
 import { Table, Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { PageHeader, StatusBadge, EmptyState, ErrorState } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
@@ -83,6 +84,7 @@ export default function DevicesPage() {
 	const { t } = useTranslation();
 	usePageTitle(t('devices.title'));
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const queryClient = useQueryClient();
 	const tenantId = useTenantId();
 	const [modalVisible, setModalVisible] = useState(false);
@@ -135,7 +137,7 @@ export default function DevicesPage() {
 			dataIndex: 'name',
 			key: 'name',
 			render: (v: string, record: DeviceRecord) => (
-				<a onClick={() => navigate(`/devices/${record.id}`)} className="font-medium">
+				<a onClick={() => navigate(buildNavHref(`/devices/${record.id}`, tenantSlug))} className="font-medium">
 					{v}
 				</a>
 			),
@@ -184,7 +186,7 @@ export default function DevicesPage() {
 						icon={<EditOutlined />}
 						onClick={(e) => {
 							e.stopPropagation();
-							navigate(`/devices/${record.id}`);
+							navigate(buildNavHref(`/devices/${record.id}`, tenantSlug));
 						}}
 					>
 						{t('common.edit')}
@@ -267,7 +269,7 @@ export default function DevicesPage() {
 					pagination={{ pageSize: 10 }}
 					scroll={{ x: 800 }}
 					onRow={(record) => ({
-						onClick: () => navigate(`/devices/${record.id}`),
+						onClick: () => navigate(buildNavHref(`/devices/${record.id}`, tenantSlug)),
 						style: { cursor: 'pointer' },
 					})}
 				/>

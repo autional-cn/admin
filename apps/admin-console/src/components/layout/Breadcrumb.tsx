@@ -5,6 +5,8 @@ import { useLocation } from 'react-router';
 import { Link } from 'react-router';
 import { Breadcrumb as AntBreadcrumb } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref, stripTenantPrefix } from '@/lib/nav';
 
 /**
  * Breadcrumb component.
@@ -12,8 +14,10 @@ import { useTranslation } from 'react-i18next';
  */
 export function Breadcrumb() {
 	const location = useLocation();
-	const pathname = location.pathname;
 	const { t } = useTranslation();
+	const tenantSlug = useTenantSlug();
+	// 剥租户段后按站内相对路径匹配 breadcrumbMap（键均为 '/users' 形态）
+	const path = stripTenantPrefix(location.pathname, tenantSlug);
 
 	const breadcrumbMap: Record<string, string> = React.useMemo(
 		() => ({
@@ -100,13 +104,13 @@ export function Breadcrumb() {
 	);
 
 	const items = React.useMemo(() => {
-		if (pathname === '/') {
+		if (path === '/') {
 			return [{ title: t('breadcrumb.dashboard') }];
 		}
 
-		const parts = pathname.split('/').filter(Boolean);
+		const parts = path.split('/').filter(Boolean);
 		const result: { title: React.ReactNode }[] = [
-			{ title: <Link to="/">{t('breadcrumb.dashboard')}</Link> },
+			{ title: <Link to={buildNavHref('/', tenantSlug)}>{t('breadcrumb.dashboard')}</Link> },
 		];
 
 		let currentPath = '';
@@ -118,7 +122,7 @@ export function Breadcrumb() {
 			if (name) {
 				const isLast = i === parts.length - 1;
 				result.push({
-					title: isLast ? name : <Link to={currentPath}>{name}</Link>,
+					title: isLast ? name : <Link to={buildNavHref(currentPath, tenantSlug)}>{name}</Link>,
 				});
 			} else if (/^[a-zA-Z0-9_-]+$/.test(part) && part.length > 8) {
 				const isLast = i === parts.length - 1;
@@ -126,14 +130,14 @@ export function Breadcrumb() {
 					title: isLast ? (
 						t('breadcrumb.detail')
 					) : (
-						<Link to={currentPath}>{t('breadcrumb.detail')}</Link>
+						<Link to={buildNavHref(currentPath, tenantSlug)}>{t('breadcrumb.detail')}</Link>
 					),
 				});
 			}
 		}
 
 		return result;
-	}, [pathname, breadcrumbMap, t]);
+	}, [path, tenantSlug, breadcrumbMap, t]);
 
 	if (items.length <= 1) return null;
 

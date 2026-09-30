@@ -19,13 +19,14 @@ import {
 } from '@ant-design/icons';
 import { Layout, Menu, Typography, Badge } from 'antd';
 import { useUIStore } from '@/stores/ui-store';
-import { usePermission } from '@autional-cn/shared';
+import { usePermission, useTenantSlug } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getPendingMembers } from '@/lib/api.generated';
 import { useTenantId } from '@/hooks/use-tenant';
 import { queryKeys } from '@/lib/query-keys';
 import { useFeatureGates } from '@/hooks/use-feature-gates';
+import { buildNavHref, stripTenantPrefix } from '@/lib/nav';
 
 const { Sider } = Layout;
 const { Text } = Typography;
@@ -88,7 +89,8 @@ function filterMenuByFeatureGate(items: MenuItem[], gates: Set<string>): MenuIte
 export function Sidebar() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const pathname = location.pathname;
+	const tenantSlug = useTenantSlug();
+	const path = stripTenantPrefix(location.pathname, tenantSlug);
 	const collapsed = useUIStore((s) => s.sidebarCollapsed);
 	const { can } = usePermission();
 	const featureGates = useFeatureGates();
@@ -521,8 +523,8 @@ export function Sidebar() {
 	const antMenuItems = convertItems(menuItems);
 
 	const routeOpenKeys = React.useMemo(() => {
-		if (pathname.startsWith('/billing/')) return ['billing-mgmt'];
-		if (pathname.startsWith('/wallet/')) return ['wallet-mgmt'];
+		if (path.startsWith('/billing/')) return ['billing-mgmt'];
+		if (path.startsWith('/wallet/')) return ['wallet-mgmt'];
 		const routeToGroup: Record<string, string> = {
 			'/users': 'user-permission',
 			'/roles': 'user-permission',
@@ -566,13 +568,13 @@ export function Sidebar() {
 			'/traces': 'logs-monitoring',
 			'/request-logs': 'logs-monitoring',
 		};
-		const exact = routeToGroup[pathname];
+		const exact = routeToGroup[path];
 		if (exact) return [exact];
 		for (const [prefix, group] of Object.entries(routeToGroup)) {
-			if (pathname.startsWith(prefix + '/')) return [group];
+			if (path.startsWith(prefix + '/')) return [group];
 		}
 		return ['user-permission'];
-	}, [pathname]);
+	}, [path]);
 
 	const [openKeys, setOpenKeys] = React.useState<string[]>(routeOpenKeys);
 	const lastOpenKeyRef = React.useRef<Set<string>>(new Set(routeOpenKeys));
@@ -611,11 +613,11 @@ export function Sidebar() {
 			</div>
 			<Menu
 				mode="inline"
-				selectedKeys={[pathname]}
+				selectedKeys={[path]}
 				openKeys={openKeys}
 				onOpenChange={handleOpenChange}
 				items={antMenuItems}
-				onClick={({ key }) => navigate(key)}
+				onClick={({ key }) => navigate(buildNavHref(key, tenantSlug))}
 				className="border-r-0"
 				role="navigation"
 				aria-label={t('common.mainNavigation', '主导航')}

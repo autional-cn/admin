@@ -22,7 +22,8 @@ import {
 	PauseCircleOutlined,
 	KeyOutlined,
 } from '@ant-design/icons';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { PageHeader, StatusBadge, SectionCard, EmptyState, ErrorState } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
@@ -103,6 +104,7 @@ export default function RobotDetailPage() {
 	];
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const queryClient = useQueryClient();
 	const tenantId = useTenantId();
 	const [editVisible, setEditVisible] = useState(false);
@@ -227,7 +229,7 @@ export default function RobotDetailPage() {
 				<Button
 					type="text"
 					icon={<ArrowLeftOutlined />}
-					onClick={() => navigate('/robots')}
+					onClick={() => navigate(buildNavHref('/robots', tenantSlug))}
 					className="mb-4 pl-0"
 				>
 					{t('robotDetail.backToList')}

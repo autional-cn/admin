@@ -1,7 +1,8 @@
-import { Route, Navigate } from 'react-router';
+import { Route } from 'react-router';
 import { RequireAuth } from '@autional-cn/shared';
 import { ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
+import { ForbiddenRedirect } from '../components/common/ForbiddenRedirect';
 
 import BrandingPage from '../app/branding/page';
 import NotificationTemplatesPage from '../app/notifications/templates/page';
@@ -18,14 +19,13 @@ import VerificationDetailPage from '../app/verifications/[id]/page';
 
 const Admin = ['super_admin', 'admin'] as const;
 const SecurityRead = ['super_admin', 'admin', 'security_admin'] as const;
-const Forbidden = <Navigate to="/403" replace />;
 
 export const ConfigRoutes = (
 	<>
 		<Route
 			path="branding"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BrandingPage />
 				</RequireAuth>
 			}
@@ -33,7 +33,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/templates"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<NotificationTemplatesPage />
 				</RequireAuth>
 			}
@@ -41,7 +41,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/announcements"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<AnnouncementsPage />
 				</RequireAuth>
 			}
@@ -49,7 +49,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/stats"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<NotificationStatsPage />
 				</RequireAuth>
 			}
@@ -57,7 +57,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/event-mappings"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<EventMappingsPage />
 				</RequireAuth>
 			}
@@ -65,7 +65,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/global-variables"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<GlobalVariablesPage />
 				</RequireAuth>
 			}
@@ -73,7 +73,7 @@ export const ConfigRoutes = (
 		<Route
 			path="communication"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<CommunicationPage />
 				</RequireAuth>
 			}
@@ -81,7 +81,7 @@ export const ConfigRoutes = (
 		<Route
 			path="communication/templates"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<CommunicationTemplatesPage />
 				</RequireAuth>
 			}
@@ -89,7 +89,7 @@ export const ConfigRoutes = (
 		<Route
 			path="communication/providers"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<CommunicationProvidersPage />
 				</RequireAuth>
 			}
@@ -97,7 +97,7 @@ export const ConfigRoutes = (
 		<Route
 			path="notifications/broadcast"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BroadcastPage />
 				</RequireAuth>
 			}
@@ -105,7 +105,7 @@ export const ConfigRoutes = (
 		<Route
 			path="verifications"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<VerificationsPage />
 					</ErrorBoundary>
@@ -115,7 +115,7 @@ export const ConfigRoutes = (
 		<Route
 			path="verifications/:id"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={Forbidden}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<VerificationDetailPage />
 				</RequireAuth>
 			}

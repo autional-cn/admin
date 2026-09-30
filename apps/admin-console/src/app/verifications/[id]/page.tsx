@@ -3,8 +3,9 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { extractItem, apiClient, API_PATHS } from '@autional-cn/shared';
+import { extractItem, apiClient, API_PATHS, useTenantSlug } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
+import { buildNavHref } from '@/lib/nav';
 import {
 	Card,
 	Tag,
@@ -122,6 +123,7 @@ export default function VerificationDetailPage() {
 	const { t } = useTranslation();
 	const params = useParams();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const id = params.id as string;
 
 	const statusLabelMap = useMemo<Record<string, string>>(
@@ -282,7 +284,7 @@ export default function VerificationDetailPage() {
 							{record.id}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('verifications.detailUserId')}>
-							<Button type="link" size="small" onClick={() => navigate(`/users/${record.userId}`)}>
+							<Button type="link" size="small" onClick={() => navigate(buildNavHref(`/users/${record.userId}`, tenantSlug))}>
 								{record.userId}
 							</Button>
 						</Descriptions.Item>

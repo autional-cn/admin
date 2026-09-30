@@ -14,12 +14,15 @@ import {
 } from '@/hooks/use-pay';
 import { PageError } from '@/components/ui/page-status';
 import { SectionCard } from '@autional-cn/ui';
+import { useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
 
 export default function PayPaymentDetailPage() {
 	const { t } = useTranslation();
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const [activeTab, setActiveTab] = useState('info');
 
 	const { data: payment, isLoading, error, refetch } = usePayPaymentDetail(id ?? '');
@@ -71,7 +74,7 @@ export default function PayPaymentDetailPage() {
 			<Button
 				type="link"
 				icon={<ArrowLeftOutlined />}
-				onClick={() => navigate('/pay/payments')}
+				onClick={() => navigate(buildNavHref('/pay/payments', tenantSlug))}
 				className="mb-4 pl-0"
 			>
 				{t('paymentDetail.backToList')}

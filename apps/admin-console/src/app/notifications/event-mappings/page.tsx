@@ -6,6 +6,8 @@ import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TagOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import { useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import {
 	useEventMappings,
 	useCreateEventMapping,
@@ -42,6 +44,7 @@ export default function EventMappingsPage() {
 	const [form] = Form.useForm();
 	const [sourceFilter, setSourceFilter] = useState<string>('all');
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 
 	const { data = [], isLoading, error, refetch } = useEventMappings();
 	const { data: templates = [] } = useNotificationTemplates();
@@ -104,7 +107,7 @@ export default function EventMappingsPage() {
 					type="link"
 					size="small"
 					icon={<TagOutlined />}
-					onClick={() => navigate('/notifications/templates')}
+					onClick={() => navigate(buildNavHref('/notifications/templates', tenantSlug))}
 					className="p-0"
 				>
 					{v}

@@ -1,71 +1,26 @@
-import { Routes, Route, Outlet, Navigate, useParams } from 'react-router';
+import { Routes, Route, Outlet, useParams } from 'react-router';
+import type { ReactNode } from 'react';
 import { Layout } from 'antd';
 import { ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from './lib/error-boundary-config';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Breadcrumb } from './components/layout/Breadcrumb';
+import { ForbiddenRedirect } from './components/common/ForbiddenRedirect';
 import {
 	AuthGuard,
 	AdminGuard,
 	UserMgmtGuard,
-	SecurityGuard,
 	OAuthCallbackPage,
+	RequireAuth,
+	TenantIndexGuard,
+	TenantRootRedirect,
 	TenantSlugProvider,
+	extractSlugFromPath,
 	useBootstrap,
 	useBranding,
 	BrandingInitializer,
 } from '@autional-cn/shared';
-
-const Forbidden = <Navigate to="/403" replace />;
-
-const KNOWN_PATHS = new Set([
-	'oauth-clients',
-	'api-keys',
-	'usage',
-	'logs',
-	'traces',
-	'request-logs',
-	'sdks',
-	'team',
-	'status',
-	'api-docs',
-	'applications',
-	'identity-providers',
-	'webhooks',
-	'users',
-	'roles',
-	'permissions',
-	'sessions',
-	'secrets',
-	'profiles',
-	'departments',
-	'members',
-	'agents',
-	'robots',
-	'devices',
-	'policies',
-	'security',
-	'data-classification',
-	'abac-policies',
-	'role-activations',
-	'abac-policies',
-	'branding',
-	'notifications',
-	'communication',
-	'audit-logs',
-	'audit',
-	'compliance',
-	'verifications',
-	'billing',
-	'storage',
-	'wallets',
-	'points',
-	'pay',
-	'wallet',
-	'settings',
-	'trial',
-]);
 
 // Pages
 import DashboardPage from './app/page';
@@ -99,31 +54,35 @@ import { DeveloperRoutes } from './routes/developer';
 
 const { Content } = Layout;
 
-function SlugAwareLayoutWrapper() {
-	const { tenantSlug } = useParams<{ tenantSlug?: string }>();
-	const effectiveSlug =
-		tenantSlug && !KNOWN_PATHS.has(tenantSlug.split('/')[0]) ? tenantSlug : undefined;
-	return (
-		<TenantSlugProvider value={effectiveSlug}>
-			<LayoutWrapperInner />
-		</TenantSlugProvider>
-	);
+/**
+ * 挂载级闸门：/:tenantSlug 交给共享 RequireAuth（含 F-W6/F-W7 未知 slug 闸门）；
+ * 首段解析不出 slug 的裸路径（/users、/403 等站内业务段）一律本地 404 ——
+ * 不进入 RequireAuth，避免其无 slug 分支的 buildLoginUrl 弹跳与 auth 侧回跳
+ * 构成无限整页往返（与 platform Shape B 同口径）。
+ */
+function AdminMountGate({ children }: { children: ReactNode }) {
+	if (typeof window === 'undefined') return null;
+	if (!extractSlugFromPath(window.location.pathname)) return <NotFoundPage />;
+	return <RequireAuth notFound={<NotFoundPage />}>{children}</RequireAuth>;
 }
 
-function LayoutWrapperInner() {
+function LayoutWrapper() {
+	const { tenantSlug } = useParams<{ tenantSlug?: string }>();
 	useBootstrap();
 	return (
-		<Layout className="h-screen overflow-hidden">
-			<Sidebar />
-			<Layout>
-				<Header />
-				<Content className="overflow-auto m-6 p-6 bg-[var(--color-bg-surface)] rounded-lg h-[calc(100vh-64px)]">
-					<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
-					<Breadcrumb />
-					<Outlet />
-				</Content>
+		<TenantSlugProvider value={tenantSlug}>
+			<Layout className="h-screen overflow-hidden">
+				<Sidebar />
+				<Layout>
+					<Header />
+					<Content className="overflow-auto m-6 p-6 bg-[var(--color-bg-surface)] rounded-lg h-[calc(100vh-64px)]">
+						<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
+						<Breadcrumb />
+						<Outlet />
+					</Content>
+				</Layout>
 			</Layout>
-		</Layout>
+		</TenantSlugProvider>
 	);
 }
 
@@ -135,20 +94,24 @@ export default function App() {
 			<BrandingInitializer />
 			<Routes>
 				<Route path="/oauth/callback" element={<OAuthCallbackPage />} />
-				<Route path="/403" element={<SlugAwareLayoutWrapper />}>
-					<Route index element={<ForbiddenPage />} />
-				</Route>
 
-				{/* Legacy no-slug routes FIRST — 显式绝对路径，确保 /users /roles 等
-				    静态路径优先于 /:tenantSlug/* 动态路由匹配（React Router specificity） */}
-				<Route path="/" element={<SlugAwareLayoutWrapper />}>
+				{/* 裸根漏斗：有会话直达 /<slug>/，否则整页跳 brand 选品牌（user/security/platform 同口径） */}
+				<Route path="/" element={<TenantRootRedirect />} />
+
+				<Route
+					path="/:tenantSlug"
+					element={
+						/* 控制台为租户段挂载应用：slug 是 OAuth client 解析与鉴权上下文的唯一来源 */
+						<AdminMountGate>
+							<LayoutWrapper />
+						</AdminMountGate>
+					}
+				>
 					{appRoutes()}
 				</Route>
 
-				{/* Multi-tenant slug routes */}
-				<Route path="/:tenantSlug/*" element={<SlugAwareLayoutWrapper />}>
-					{appRoutes()}
-				</Route>
+				{/* 无 slug 的其余路径（/users、/settings 等旧式深链）一律 404 —— 口径纯净 */}
+				<Route path="*" element={<NotFoundPage />} />
 			</Routes>
 		</ErrorBoundary>
 	);
@@ -160,16 +123,18 @@ function appRoutes() {
 			<Route
 				index
 				element={
-					<AuthGuard>
-						<DashboardPage />
-					</AuthGuard>
+					<TenantIndexGuard notFound={<NotFoundPage />}>
+						<AuthGuard>
+							<DashboardPage />
+						</AuthGuard>
+					</TenantIndexGuard>
 				}
 			/>
 
 			<Route
 				path="users"
 				element={
-					<UserMgmtGuard fallback={Forbidden}>
+					<UserMgmtGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<UsersPage />
 						</ErrorBoundary>
@@ -179,7 +144,7 @@ function appRoutes() {
 			<Route
 				path="users/:id"
 				element={
-					<UserMgmtGuard fallback={Forbidden}>
+					<UserMgmtGuard fallback={<ForbiddenRedirect />}>
 						<UserDetailPage />
 					</UserMgmtGuard>
 				}
@@ -187,7 +152,7 @@ function appRoutes() {
 			<Route
 				path="roles"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<RolesPage />
 						</ErrorBoundary>
@@ -197,7 +162,7 @@ function appRoutes() {
 			<Route
 				path="permissions"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<PermissionsPage />
 						</ErrorBoundary>
@@ -207,7 +172,7 @@ function appRoutes() {
 			<Route
 				path="abac-policies"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<AbacPoliciesPage />
 						</ErrorBoundary>
@@ -217,7 +182,7 @@ function appRoutes() {
 			<Route
 				path="role-activations"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<RoleActivationsPage />
 						</ErrorBoundary>
@@ -227,7 +192,7 @@ function appRoutes() {
 			<Route
 				path="sessions"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<SessionsPage />
 						</ErrorBoundary>
@@ -237,7 +202,7 @@ function appRoutes() {
 			<Route
 				path="secrets"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 							<SecretsPage />
 						</ErrorBoundary>
@@ -247,7 +212,7 @@ function appRoutes() {
 			<Route
 				path="secrets/policy"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<SecretPolicyPage />
 					</AdminGuard>
 				}
@@ -255,7 +220,7 @@ function appRoutes() {
 			<Route
 				path="profiles"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ProfilesPage />
 					</AdminGuard>
 				}
@@ -263,7 +228,7 @@ function appRoutes() {
 			<Route
 				path="profiles/:userId"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ProfileDetailPage />
 					</AdminGuard>
 				}
@@ -271,7 +236,7 @@ function appRoutes() {
 			<Route
 				path="profiles/policy"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ProfilePolicyPage />
 					</AdminGuard>
 				}
@@ -279,7 +244,7 @@ function appRoutes() {
 			<Route
 				path="profiles/field-schemas"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<FieldSchemaPage />
 					</AdminGuard>
 				}
@@ -287,7 +252,7 @@ function appRoutes() {
 			<Route
 				path="profiles/approval"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ProfilesApprovalPage />
 					</AdminGuard>
 				}
@@ -295,7 +260,7 @@ function appRoutes() {
 			<Route
 				path="profiles/webhook"
 				element={
-					<AdminGuard fallback={Forbidden}>
+					<AdminGuard fallback={<ForbiddenRedirect />}>
 						<ProfileWebhookPage />
 					</AdminGuard>
 				}
@@ -319,6 +284,9 @@ function appRoutes() {
 					</AuthGuard>
 				}
 			/>
+			{/* 403 与站内 404 都在租户段内（/:tenantSlug/403）；裸 /403 由 AdminMountGate 判为无 slug → 本地 404
+			    （字面量 "403" 同时供 check-non-tenant 守卫推导首段名单，勿改表达式） */}
+			<Route path="403" element={<ForbiddenPage />} />
 			<Route path="404" element={<NotFoundPage />} />
 			<Route path="*" element={<NotFoundPage />} />
 		</>

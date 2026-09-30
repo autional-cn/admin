@@ -27,6 +27,8 @@ import {
 	LockOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 import { useQuery } from '@tanstack/react-query';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from '@/hooks/use-users';
 import { getUsers } from '@/lib/api.generated';
@@ -46,6 +48,7 @@ interface UserRecord {
 export default function UsersPage() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const [keyword, setKeyword] = useState('');
 	const [searchKeyword, setSearchKeyword] = useState('');
 	const searchTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -207,7 +210,7 @@ export default function UsersPage() {
 			key: 'action',
 			render: (_: any, record: UserRecord) => (
 				<Space size="small">
-					<Button type="link" size="small" onClick={() => navigate(`/users/${record.id}`)}>
+					<Button type="link" size="small" onClick={() => navigate(buildNavHref(`/users/${record.id}`, tenantSlug))}>
 						{t('users.viewDetail')}
 					</Button>
 					<Button

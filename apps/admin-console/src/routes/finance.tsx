@@ -1,7 +1,8 @@
-import { Route, Navigate } from 'react-router';
+import { Route } from 'react-router';
 import { RequireAuth } from '@autional-cn/shared';
 import { ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from '../lib/error-boundary-config';
+import { ForbiddenRedirect } from '../components/common/ForbiddenRedirect';
 
 import StoragePage from '../app/storage/page';
 import BillingPage from '../app/billing/page';
@@ -34,14 +35,13 @@ import BillingCreditNotesPage from '../app/billing/credit-notes/page';
 import BillingCreditBalancePage from '../app/billing/credit-balance/page';
 
 const Admin = ['super_admin', 'admin'] as const;
-const Forbidden = <Navigate to="/403" replace />;
 
 export const FinanceRoutes = (
 	<>
 		<Route
 			path="storage"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<StoragePage />
 					</ErrorBoundary>
@@ -51,7 +51,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<BillingPage />
 					</ErrorBoundary>
@@ -61,7 +61,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallets"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletsPage />
 				</RequireAuth>
 			}
@@ -69,7 +69,7 @@ export const FinanceRoutes = (
 		<Route
 			path="points"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<PointsPage />
 					</ErrorBoundary>
@@ -80,7 +80,7 @@ export const FinanceRoutes = (
 		<Route
 			path="pay/channels"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<PayChannelsPage />
 				</RequireAuth>
 			}
@@ -88,7 +88,7 @@ export const FinanceRoutes = (
 		<Route
 			path="pay/payments"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<PayPaymentsPage />
 				</RequireAuth>
 			}
@@ -96,7 +96,7 @@ export const FinanceRoutes = (
 		<Route
 			path="pay/payments/:id"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<PayPaymentDetailPage />
 				</RequireAuth>
 			}
@@ -104,7 +104,7 @@ export const FinanceRoutes = (
 		<Route
 			path="pay/reconciliation"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<PayReconciliationPage />
 				</RequireAuth>
 			}
@@ -112,7 +112,7 @@ export const FinanceRoutes = (
 		<Route
 			path="pay/refunds"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<PayRefundsPage />
 				</RequireAuth>
 			}
@@ -121,7 +121,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/list"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletListPage />
 				</RequireAuth>
 			}
@@ -129,7 +129,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/adjust"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletAdjustPage />
 				</RequireAuth>
 			}
@@ -137,7 +137,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/withdrawals"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletWithdrawalsPage />
 				</RequireAuth>
 			}
@@ -145,7 +145,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/disputes"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletDisputesPage />
 				</RequireAuth>
 			}
@@ -153,7 +153,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/coupons"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletCouponsPage />
 				</RequireAuth>
 			}
@@ -161,7 +161,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/policy"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletPolicyPage />
 				</RequireAuth>
 			}
@@ -169,7 +169,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/fraud-rules"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletFraudRulesPage />
 				</RequireAuth>
 			}
@@ -177,7 +177,7 @@ export const FinanceRoutes = (
 		<Route
 			path="wallet/events"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<WalletEventsPage />
 				</RequireAuth>
 			}
@@ -186,7 +186,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/plans"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingPlansPage />
 				</RequireAuth>
 			}
@@ -194,7 +194,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/subscriptions"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingSubscriptionsPage />
 				</RequireAuth>
 			}
@@ -202,7 +202,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/refunds"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingRefundsPage />
 				</RequireAuth>
 			}
@@ -210,7 +210,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/revenue"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingRevenuePage />
 				</RequireAuth>
 			}
@@ -218,7 +218,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/dunning"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingDunningPage />
 				</RequireAuth>
 			}
@@ -226,7 +226,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/tax-export"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingTaxExportPage />
 				</RequireAuth>
 			}
@@ -234,7 +234,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/alerts"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingAlertsPage />
 				</RequireAuth>
 			}
@@ -242,7 +242,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/credit-notes"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingCreditNotesPage />
 				</RequireAuth>
 			}
@@ -250,7 +250,7 @@ export const FinanceRoutes = (
 		<Route
 			path="billing/credit-balance"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={Forbidden}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<BillingCreditBalancePage />
 				</RequireAuth>
 			}

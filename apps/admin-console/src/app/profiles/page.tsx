@@ -5,13 +5,15 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { PageHeader, SectionCard, LoadingScreen, EmptyState, StatusBadge } from '@autional-cn/ui';
 import { searchProfiles, archiveProfile, exportProfile } from '@/lib/api.generated';
-import { extractItem } from '@autional-cn/shared';
+import { extractItem, useTenantSlug } from '@autional-cn/shared';
+import { buildNavHref } from '@/lib/nav';
 
 const { Text } = Typography;
 
 export default function ProfilesPage() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
+	const tenantSlug = useTenantSlug();
 	const [keyword, setKeyword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [data, setData] = useState<any[]>([]);
@@ -108,7 +110,7 @@ export default function ProfilesPage() {
 			key: 'actions',
 			render: (_: any, r: any) => (
 				<Space>
-					<Button size="small" icon={<EyeOutlined />} onClick={() => navigate(`/profiles/${r.id}`)}>
+					<Button size="small" icon={<EyeOutlined />} onClick={() => navigate(buildNavHref(`/profiles/${r.id}`, tenantSlug))}>
 						{t('profilesList.action.view')}
 					</Button>
 					<Button size="small" icon={<LockOutlined />} onClick={() => handleArchive(r.id)} danger>
