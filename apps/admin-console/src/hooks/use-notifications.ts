@@ -92,7 +92,8 @@ export function useNotificationTrend(days: number = 30) {
 		queryKey: queryKeys.notifications.trend(days),
 		staleTime: 60000,
 		queryFn: async () => {
-			const res = await Generated.notificationsTrend({ days });
+			// U316：改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+			const res = await Generated.adminNotificationsTrend({ days });
 			const unwrapped = extractList<TrendPoint>(res);
 			return unwrapped;
 		},

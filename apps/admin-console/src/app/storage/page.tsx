@@ -40,10 +40,9 @@ import {
 	type FileRecord,
 	type TrashRecord,
 } from '@/hooks/use-storage';
-import { uploadFile } from '@/lib/api.generated';
+import { uploadFile, downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@/components/ui/page-status';
-import { API_BASE_URL } from '@autional-cn/shared';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { useTranslation } from 'react-i18next';
 
@@ -105,7 +104,8 @@ export default function StoragePage() {
 	const handleUpload = async (file: File) => {
 		const formData = new FormData();
 		formData.append('file', file);
-		if (selectedFolder) formData.append('path', selectedFolder);
+		// 服务端认 parent_id（旧 'path' 字段被忽略；不传 owner_id——非本人会被拒 403）
+		if (selectedFolder) formData.append('parent_id', selectedFolder);
 		try {
 			await uploadFile(formData);
 			message.success(t('storage.uploadSuccess'));
@@ -113,6 +113,23 @@ export default function StoragePage() {
 			handleApiError(err, t('storage.uploadFailed'));
 		}
 		return false;
+	};
+
+	const handleDownload = async (record: FileRecord) => {
+		try {
+			const res = await downloadFile(record.id);
+			const blob = res.data instanceof Blob ? res.data : new Blob([res.data]);
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = record.name || 'download';
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+		} catch (err) {
+			handleApiError(err, t('storage.downloadFailed'));
+		}
 	};
 
 	const handleCreateFolder = async (values: { name: string }) => {
@@ -216,16 +233,7 @@ export default function StoragePage() {
 			key: 'action',
 			render: (_: any, record: FileRecord) => (
 				<Space size="small">
-					<Button
-						type="link"
-						icon={<DownloadOutlined />}
-						onClick={() =>
-							window.open(
-								`${API_BASE_URL}/storage/api/v1/storage/files/${record.id}/download`,
-								'_blank',
-							)
-						}
-					>
+					<Button type="link" icon={<DownloadOutlined />} onClick={() => handleDownload(record)}>
 						{t('storage.download')}
 					</Button>
 					<Button

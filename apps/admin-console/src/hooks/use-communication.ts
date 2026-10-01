@@ -93,7 +93,8 @@ export function useCommunicationProviders() {
 		staleTime: 60000,
 		queryFn: async () => {
 			try {
-				const res = await Generated.communicationProviders();
+				// U316：改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+				const res = await Generated.adminCommunicationProviders();
 				return extractList<CommunicationProvider>(res);
 			} catch {
 				return [];

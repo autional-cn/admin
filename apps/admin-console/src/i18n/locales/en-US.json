@@ -2972,6 +2972,7 @@
   "storage.deleteFailed": "Delete failed",
   "storage.documents": "Documents",
   "storage.download": "Download",
+  "storage.downloadFailed": "Download failed",
   "storage.fileMovedToTrash": "File moved to trash",
   "storage.folderName": "Folder Name",
   "storage.folderNameRequired": "Please enter folder name",

@@ -5,6 +5,7 @@
  */
 
 import * as Generated from '@autional-cn/shared/generated/api';
+import { apiClient } from '@autional-cn/shared';
 
 export const getUsers = (params?: Record<string, unknown>, _signal?: AbortSignal) =>
 	Generated.adminUsers(params);
@@ -227,15 +228,16 @@ export const getTenantConfig = Generated.adminAuditTenantConfig;
 export const saveTenantConfig = Generated.adminAuditTenantConfigPut;
 
 // Billing: Subscription
+// U316：读取族改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
 export const getBillingSubscription = (tenantId: string, _signal?: AbortSignal) =>
-	Generated.billingSubscriptionBySubscription(tenantId);
+	Generated.adminBillingSubscriptionBySubscription(tenantId);
 export const changeBillingPlan = Generated.adminBillingSubscriptionChangePlanBySubscriptionPost;
 export const getBillingUsage = (tenantId: string, _signal?: AbortSignal) =>
-	Generated.billingUsageCurrentByUsage(tenantId);
+	Generated.adminBillingUsageCurrentByUsage(tenantId);
 export const getBillingStatistics = (tenantId: string, _signal?: AbortSignal) =>
-	Generated.billingStatisticsByStatistics(tenantId);
+	Generated.adminBillingStatisticsByStatistics(tenantId);
 export const getBillingRecords = (tenantId: string, _signal?: AbortSignal) =>
-	Generated.billingRecordsByRecords(tenantId);
+	Generated.adminBillingRecordsByRecords(tenantId);
 export const getInvoice = Generated.billingInvoiceByInvoice;
 export const exportInvoice = Generated.billingInvoiceExportByInvoice;
 
@@ -292,13 +294,24 @@ export const executeErasure = Generated.adminComplianceGdprRightToErasurePost;
 export const getRetentionPolicies = Generated.adminComplianceRetentionPolicies;
 export const getComplianceSODRules = Generated.adminComplianceSodRules;
 export const getISOControls = Generated.adminComplianceIso27001Controls;
-export const getFiles = Generated.files;
-export const uploadFile = Generated.filesUploadUrlPost;
-export const getStorageQuota = Generated.storageQuota;
+// U316：存储读写改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）。
+// 上传/下载生成函数无 multipart/blob 能力，此处自写（apiClient 直调 admin 路径）。
+export const getFiles = Generated.adminStorageFiles;
+export const uploadFile = (formData: FormData, _signal?: AbortSignal) =>
+	apiClient.post('/storage/api/v1/admin/storage/files', formData, {
+		signal: _signal,
+		headers: { 'Content-Type': 'multipart/form-data' },
+	});
+export const downloadFile = (fileId: string, _signal?: AbortSignal) =>
+	apiClient.get(`/storage/api/v1/admin/storage/files/${fileId}/download`, {
+		responseType: 'blob',
+		signal: _signal,
+	});
+export const getStorageQuota = Generated.adminStorageQuota;
 export const getStorageStats = Generated.adminStorageStats;
-export const getStorageTrash = Generated.storageTrash;
-export const restoreTrashItem = Generated.storageTrashRestoreByTrashPost;
-export const deleteTrashItem = Generated.storageTrashByTrashDelete;
+export const getStorageTrash = Generated.adminStorageTrash;
+export const restoreTrashItem = Generated.adminStorageTrashRestoreByTrashPost;
+export const deleteTrashItem = Generated.adminStorageTrashByTrashDelete;
 
 // Wallet
 export const getWalletSummary = Generated.adminWalletsTenantsSummaryByTenants;
@@ -371,33 +384,36 @@ export const freezePoints = Generated.adminPointsFreezeByPointsPost;
 export const unfreezePoints = Generated.adminPointsUnfreezeByPointsPost;
 export const updatePointAccountStatus = Generated.adminPointsStatusByPointsPut;
 
-export const getNotificationTemplates = Generated.notificationsTemplates;
+// U316：通知读取族改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+export const getNotificationTemplates = Generated.adminNotificationsTemplates;
 export const createNotificationTemplate = Generated.adminNotificationsTemplatesPost;
 export const updateNotificationTemplate = Generated.adminNotificationsTemplatesByTemplatesPut;
 export const deleteNotificationTemplate = Generated.adminNotificationsTemplatesByTemplatesDelete;
-export const testNotification = Generated.notificationsTestPost;
-export const getNotificationStats = Generated.notificationsStats;
-export const getEventMappings = Generated.notificationsEventMappings;
-export const getEventMapping = Generated.notificationsEventMappingsByEventMappings;
+export const testNotification = Generated.adminNotificationsTestPost;
+export const getNotificationStats = Generated.adminNotificationsStats;
+export const getEventMappings = Generated.adminNotificationsEventMappings;
+export const getEventMapping = Generated.adminNotificationsEventMappingsByEventMappings;
 export const createEventMapping = Generated.adminNotificationsEventMappingsPost;
 export const updateEventMapping = Generated.adminNotificationsEventMappingsByEventMappingsPut;
 export const deleteEventMapping = Generated.adminNotificationsEventMappingsByEventMappingsDelete;
-export const getGlobalVariables = Generated.notificationsGlobalVariables;
-export const getGlobalVariable = Generated.notificationsGlobalVariablesByGlobalVariables;
+export const getGlobalVariables = Generated.adminNotificationsGlobalVariables;
+export const getGlobalVariable = Generated.adminNotificationsGlobalVariablesByGlobalVariables;
 export const createGlobalVariable = Generated.adminNotificationsGlobalVariablesPost;
 export const updateGlobalVariable = Generated.adminNotificationsGlobalVariablesByGlobalVariablesPut;
 export const deleteGlobalVariable =
 	Generated.adminNotificationsGlobalVariablesByGlobalVariablesDelete;
-export const getCommunicationTemplates = Generated.communicationTemplates;
-export const getCommunicationTemplateStats = Generated.communicationTemplateStats;
+// U316：通信读取族改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+export const getCommunicationTemplates = Generated.adminCommunicationTemplates;
+export const getCommunicationTemplateStats = Generated.adminCommunicationTemplateStats;
+// 无 admin 双生端点，且当前无页面消费；若日后接入需先补上游 admin 端点（U316 扫描遗留）
 export const getCommunicationTemplatesAvailable = Generated.communicationTemplatesAvailable;
-export const getCommunicationDashboard = Generated.communicationDashboard;
-export const getCommunicationLogs = Generated.communicationLogs;
+export const getCommunicationDashboard = Generated.adminCommunicationDashboard;
+export const getCommunicationLogs = Generated.adminCommunicationLogs;
 export const getPlatformCommunicationStats = Generated.adminCommunicationPlatformStats;
 export const getPlatformNotificationStats = Generated.adminNotificationsPlatformStats;
-export const getCommunicationHealth = Generated.communicationHealthByHealth;
+export const getCommunicationHealth = Generated.adminCommunicationHealthByHealth;
 
-export const getCommunicationProviders = Generated.communicationProviders;
+export const getCommunicationProviders = Generated.adminCommunicationProviders;
 export const createCommunicationProvider = Generated.adminCommunicationProvidersPost;
 export const updateCommunicationProvider = Generated.adminCommunicationProvidersByProvidersPut;
 export const deleteCommunicationProvider = Generated.adminCommunicationProvidersByProvidersDelete;
@@ -412,7 +428,7 @@ export const publishAnnouncement = Generated.adminAnnouncementsPublishByAnnounce
 export const unpublishAnnouncement = Generated.adminAnnouncementsUnpublishByAnnouncementsPost;
 
 export const broadcastNotification = Generated.adminNotificationsBroadcastPost;
-export const getNotificationsReadReport = Generated.notificationsReadReport;
+export const getNotificationsReadReport = Generated.adminNotificationsReadReport;
 export const getAllTenants = Generated.adminTenants;
 export const getTenantDetail = Generated.adminTenantsByTenants;
 export const createTenant = Generated.adminTenantsPost;
@@ -698,9 +714,11 @@ export const updateApiKeyStatus = Generated.authApiKeysStatusByApiKeysPut;
 export const getMyAuditLogs = Generated.authMeAuditLogs;
 
 // ============ Usage Stats (developer-portal merge) ============
+// 无 admin 双生端点，且当前无页面消费（U316 扫描遗留）
 export const getAppUsageStats = Generated.billingUsageAppsCurrentByUsageByApps;
-export const getUsageTimeline = Generated.billingUsageTimelineByUsage;
-export const getUsageEndpoints = Generated.billingUsageEndpointsByUsage;
+// U316：usage 页改接 admin 面
+export const getUsageTimeline = Generated.adminBillingUsageTimelineByUsage;
+export const getUsageEndpoints = Generated.adminBillingUsageEndpointsByUsage;
 
 // ============ My Devices (developer-portal merge) ============
 export const getMyDevices = Generated.authMeDevices;

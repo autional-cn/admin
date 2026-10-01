@@ -2972,6 +2972,7 @@
   "storage.deleteFailed": "删除失败",
   "storage.documents": "文档",
   "storage.download": "下载",
+  "storage.downloadFailed": "下载失败",
   "storage.fileMovedToTrash": "文件已移至回收站",
   "storage.folderName": "文件夹名称",
   "storage.folderNameRequired": "请输入文件夹名称",

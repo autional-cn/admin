@@ -5,7 +5,7 @@ import { Card, Row, Col, Statistic, Table, Select, Spin, Empty, Button } from 'a
 import { ReloadOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient, API_PATHS } from '@autional-cn/shared';
+import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { PageError } from '@/components/ui/page-status';
 
@@ -23,20 +23,17 @@ export default function UsagePage() {
 	} = useQuery({
 		queryKey: ['usage', 'timeline', days],
 		queryFn: async () => {
-			// ADM-008: 原 fetch('/bff/billing/usage/timeline?days=7') 404，
-			// 正确端点需带 tenant_id（JWT + X-Tenant-ID 由 apiClient 自动注入）
-			const res = await apiClient.get(API_PATHS.BILLING.USAGE_TIMELINE(tenantId), {
-				params: { days },
-			});
-			return res.data;
+			// ADM-008: 需带 tenant_id；U316：改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+			const res = await getUsageTimeline(tenantId, { days });
+			return res;
 		},
 	});
 
 	const { data: endpoints, isLoading: epLoading } = useQuery({
 		queryKey: ['usage', 'endpoints'],
 		queryFn: async () => {
-			const res = await apiClient.get(API_PATHS.BILLING.USAGE_ENDPOINTS(tenantId));
-			return res.data;
+			const res = await getUsageEndpoints(tenantId);
+			return res;
 		},
 	});
 

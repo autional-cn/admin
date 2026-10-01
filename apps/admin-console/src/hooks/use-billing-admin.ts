@@ -261,11 +261,12 @@ export function useTaxExport(params?: Record<string, unknown>) {
 	});
 }
 
+// U316：用量告警读写改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
 export function useBillingAlerts(params?: Record<string, unknown>) {
 	return useQuery({
 		queryKey: queryKeys.billingAdmin.alerts(params),
 		queryFn: async () => {
-			const res = await Generated.billingAlerts(params);
+			const res = await Generated.adminBillingAlerts(params);
 			return extractList<BillingAlertItem>(res);
 		},
 	});
@@ -274,7 +275,7 @@ export function useBillingAlerts(params?: Record<string, unknown>) {
 export function useCreateBillingAlert() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: (data: Record<string, unknown>) => Generated.billingAlertsPost(data),
+		mutationFn: (data: Record<string, unknown>) => Generated.adminBillingAlertsPost(data),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ['billing-admin', 'alerts'] }),
 	});
 }
@@ -283,7 +284,7 @@ export function useUpdateBillingAlert() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-			Generated.billingAlertsByAlertsPut(id, data),
+			Generated.adminBillingAlertsByAlertsPut(id, data),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ['billing-admin', 'alerts'] }),
 	});
 }
@@ -291,7 +292,7 @@ export function useUpdateBillingAlert() {
 export function useDeleteBillingAlert() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: (id: string) => Generated.billingAlertsByAlertsDelete(id),
+		mutationFn: (id: string) => Generated.adminBillingAlertsByAlertsDelete(id),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ['billing-admin', 'alerts'] }),
 	});
 }

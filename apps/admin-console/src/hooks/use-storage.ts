@@ -116,7 +116,8 @@ export function useDeleteTrashItem() {
 export function useCreateFolder() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data: Record<string, unknown>) => Generated.storageFoldersPost(data),
+		// U316：改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
+		mutationFn: (data: Record<string, unknown>) => Generated.adminStorageFoldersPost(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['files'] });
 		},
@@ -126,7 +127,7 @@ export function useCreateFolder() {
 export function useDeleteFile() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (id: string) => Generated.filesByFilesDelete(id),
+		mutationFn: (id: string) => Generated.adminStorageFilesByFilesDelete(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['files'] });
 			queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
