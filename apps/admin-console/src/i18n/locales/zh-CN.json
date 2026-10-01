@@ -273,6 +273,7 @@
   "applications.form.order": "排序",
   "applications.platformPortals": "平台 Portal",
   "applications.platformPortalsDesc": "平台内置的系统 Portal，对所有租户可见。",
+  "applications.platformOnlyTenant": "平台内置 Portal 属平台租户数据，仅平台租户会话可查看。",
   "applications.portalsCount": "个 Portal",
   "applications.saveSuccess": "保存成功",
   "applications.statusFailed": "状态更新失败",

@@ -273,6 +273,7 @@
   "applications.form.order": "Order",
   "applications.platformPortals": "Platform Portals",
   "applications.platformPortalsDesc": "Built-in system Portals, visible to all tenants.",
+  "applications.platformOnlyTenant": "Platform built-in portals belong to the platform tenant; only visible in a platform-tenant session.",
   "applications.portalsCount": "portals",
   "applications.saveSuccess": "Saved successfully",
   "applications.statusFailed": "Failed to update status",

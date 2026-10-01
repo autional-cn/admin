@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Table, Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch } from 'antd';
+import { Table, Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch, Empty } from 'antd';
 import { getAccessToken, getPortalUrl, API_BASE_URL } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { PageError } from '@/components/ui/page-status';
+import { useTenantId } from '@/hooks/use-tenant';
 
 const PLATFORM_TENANT_ID = '01KSQCBNVMS6SX64PJS937CE33';
 
 export default function PlatformPortalsPage() {
 	const { t } = useTranslation();
 	const token = getAccessToken();
+	const tenantId = useTenantId();
+	// 平台内置 Portal 属平台租户数据：非平台租户会话隐藏并停取数（U320；语义与 U94 同轴）。
+	const isPlatformTenant = tenantId === PLATFORM_TENANT_ID;
 	const queryClient = useQueryClient();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [editingApp, setEditingApp] = useState<any>(null);
@@ -29,15 +33,18 @@ export default function PlatformPortalsPage() {
 				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications?type=portal&is_platform=true`,
 				{ headers: { Authorization: `Bearer ${token}` } },
 			).then((r) => r.json());
-			return res.code === 0 && Array.isArray(res.data) ? res.data : [];
+			if (res.code !== 0) {
+				throw new Error(res.message || 'Failed to load platform portals');
+			}
+			return Array.isArray(res.data) ? res.data : [];
 		},
-		enabled: !!token,
+		enabled: !!token && isPlatformTenant,
 		staleTime: 60000,
 	});
 
 	const updateMutation = useMutation({
-		mutationFn: async (data: { id: string; name: string; description: string; order: number }) =>
-			fetch(
+		mutationFn: async (data: { id: string; name: string; description: string; order: number }) => {
+			const res = await fetch(
 				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications/${data.id}`,
 				{
 					method: 'PUT',
@@ -48,7 +55,12 @@ export default function PlatformPortalsPage() {
 						order: data.order,
 					}),
 				},
-			).then((r) => r.json()),
+			).then((r) => r.json());
+			if (res.code !== 0) {
+				throw new Error(res.message || 'Failed to save portal');
+			}
+			return res;
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['platform-portals'] });
 			message.success(t('applications.saveSuccess', '保存成功'));
@@ -58,15 +70,20 @@ export default function PlatformPortalsPage() {
 	});
 
 	const statusMutation = useMutation({
-		mutationFn: async (data: { id: string; active: boolean }) =>
-			fetch(
+		mutationFn: async (data: { id: string; active: boolean }) => {
+			const res = await fetch(
 				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications/${data.id}/${data.active ? 'activate' : 'suspend'}`,
 				{
 					method: 'POST',
 					headers: { Authorization: `Bearer ${token}` },
 					body: JSON.stringify({ reason: data.active ? '' : 'suspended by admin' }),
 				},
-			).then((r) => r.json()),
+			).then((r) => r.json());
+			if (res.code !== 0) {
+				throw new Error(res.message || 'Failed to update portal status');
+			}
+			return res;
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['platform-portals'] });
 			message.success(t('applications.statusUpdated', '状态已更新'));
@@ -162,6 +179,24 @@ export default function PlatformPortalsPage() {
 			},
 		},
 	];
+
+	if (!isPlatformTenant) {
+		return (
+			<div>
+				<div className="mb-6">
+					<h1 className="text-xl font-semibold">
+						{t('applications.platformPortals', 'Platform Portals')}
+					</h1>
+				</div>
+				<Empty
+					description={t(
+						'applications.platformOnlyTenant',
+						'平台内置 Portal 属平台租户数据，仅平台租户会话可查看。',
+					)}
+				/>
+			</div>
+		);
+	}
 
 	if (error) {
 		return <PageError message={t('applications.loadError', '加载失败')} retry={refetch} />;
