@@ -11,6 +11,9 @@ import {
 	deletePointRule,
 	getPointAccounts,
 	batchEarnPoints,
+	getPointRiskScore,
+	transferPoints,
+	exchangePoints,
 } from '@/lib/api.generated';
 import * as Generated from '@autional-cn/shared/generated/api';
 import type {
@@ -122,7 +125,8 @@ export function usePointTransactions(userId: string) {
 		queryKey: queryKeys.points.transactions(userId),
 		staleTime: 60000,
 		queryFn: async () => {
-			const res = await Generated.pointsTransactionsByPoints(userId);
+			// U316：改接 admin 面（user 面 point 族在 admin 平面被入口平面门禁拒 403）。
+			const res = await Generated.adminPointsTransactions({ user_id: userId });
 			return extractList<PointTransaction>(res);
 		},
 		enabled: !!userId,
@@ -134,7 +138,7 @@ export function usePointRiskScore(userId: string) {
 		queryKey: queryKeys.points.riskScore(userId),
 		staleTime: 300000,
 		queryFn: async () => {
-			return await Generated.pointsRiskScoreByPoints(userId);
+			return await getPointRiskScore(userId);
 		},
 		enabled: !!userId,
 	});
@@ -243,7 +247,7 @@ export function useTransferPoints() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: TransferPointsRequest }) =>
-			Generated.pointsTransferByPointsPost(userId, data as unknown as GenTransferPointsRequest),
+			transferPoints(userId, data as unknown as GenTransferPointsRequest),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.points.accounts });
 			queryClient.invalidateQueries({ queryKey: ['point-transactions'] });
@@ -255,7 +259,7 @@ export function useExchangePoints() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: ExchangePointsRequest }) =>
-			Generated.pointsExchangeByPointsPost(userId, data as unknown as GenExchangePointsRequest),
+			exchangePoints(userId, data as unknown as GenExchangePointsRequest),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.points.accounts });
 			queryClient.invalidateQueries({ queryKey: ['point-transactions'] });

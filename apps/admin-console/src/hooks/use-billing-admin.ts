@@ -21,6 +21,7 @@ import {
 	rejectRefund,
 	executeRefund,
 	getCreditBalance,
+	getCreditTransactions,
 } from '@/lib/api.generated';
 
 export interface PlanItem {
@@ -390,7 +391,8 @@ export function useCreditTransactions(
 	return useQuery({
 		queryKey: queryKeys.billingAdmin.creditTransactions(tenantId, params),
 		queryFn: async () => {
-			const res = await Generated.billingCreditTransactionsByCreditTransactions(tenantId, {
+			// U316：改接 admin 面（user 面 credit-transactions 在 admin 平面被入口平面门禁拒 403）。
+			const res = await getCreditTransactions(tenantId, {
 				page: params?.page,
 				page_size: params?.pageSize,
 				source: params?.source,

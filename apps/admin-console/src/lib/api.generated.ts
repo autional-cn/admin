@@ -5,6 +5,7 @@
  */
 
 import * as Generated from '@autional-cn/shared/generated/api';
+import type { ExchangePointsRequest, TransferPointsRequest } from '@autional-cn/shared/generated/types';
 import { apiClient } from '@autional-cn/shared';
 
 export const getUsers = (params?: Record<string, unknown>, _signal?: AbortSignal) =>
@@ -283,7 +284,25 @@ export const configureAppPricing =
 
 // Billing: Balance/Credit
 export const getBillingBalance = Generated.billingBalance;
-export const getCreditBalance = Generated.billingCreditBalanceByCreditBalance;
+// U316：控制台改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）。
+// admin 双生端点尚未进 generated（待下轮 swagger 重生成），此处自写（apiClient 直调 admin 路径）。
+export const getCreditBalance = async (tenantId: string, _signal?: AbortSignal) => {
+	const res = await apiClient.get(`/billing/api/v1/admin/billing/credit-balance/${tenantId}`, {
+		signal: _signal,
+	});
+	return res.data;
+};
+export const getCreditTransactions = async (
+	tenantId: string,
+	params?: { page?: number; page_size?: number; source?: string },
+	_signal?: AbortSignal,
+) => {
+	const res = await apiClient.get(`/billing/api/v1/admin/billing/credit-transactions/${tenantId}`, {
+		params,
+		signal: _signal,
+	});
+	return res.data;
+};
 
 // Billing: Public Plans
 export const getPublicBillingPlans = Generated.billingPlans;
@@ -383,6 +402,36 @@ export const expirePoints = Generated.adminPointsExpireByPointsPost;
 export const freezePoints = Generated.adminPointsFreezeByPointsPost;
 export const unfreezePoints = Generated.adminPointsUnfreezeByPointsPost;
 export const updatePointAccountStatus = Generated.adminPointsStatusByPointsPut;
+
+// Points: U316 控制台改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）。
+// 交易列表复用现有 admin 生成函数 adminPointsTransactions；
+// risk-score / transfer / exchange 的 admin 双生尚未进 generated（待下轮 swagger 重生成），此处自写。
+export const getPointRiskScore = async (userId: string, _signal?: AbortSignal) => {
+	const res = await apiClient.get(`/point/api/v1/admin/points/${userId}/risk-score`, {
+		signal: _signal,
+	});
+	return res.data;
+};
+export const transferPoints = async (
+	userId: string,
+	data: TransferPointsRequest,
+	_signal?: AbortSignal,
+) => {
+	const res = await apiClient.post(`/point/api/v1/admin/points/${userId}/transfer`, data, {
+		signal: _signal,
+	});
+	return res.data;
+};
+export const exchangePoints = async (
+	userId: string,
+	data: ExchangePointsRequest,
+	_signal?: AbortSignal,
+) => {
+	const res = await apiClient.post(`/point/api/v1/admin/points/${userId}/exchange`, data, {
+		signal: _signal,
+	});
+	return res.data;
+};
 
 // U316：通知读取族改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
 export const getNotificationTemplates = Generated.adminNotificationsTemplates;
@@ -508,7 +557,12 @@ export const ops = {
 export const searchProfiles = Generated.adminProfiles;
 export const archiveProfile = Generated.adminProfilesArchiveByProfilesPost;
 export const exportProfile = Generated.adminProfilesExportByProfiles;
-export const getProfile = Generated.profilesByProfiles;
+// U316：控制台改接 admin 面（user 面 /profiles/{id} 在 admin 平面被入口平面门禁拒 403；
+// admin 双生尚未进 generated，待下轮 swagger 重生成）。
+export const getProfile = async (userId: string, _signal?: AbortSignal) => {
+	const res = await apiClient.get(`/profile/api/v1/admin/profiles/${userId}`, { signal: _signal });
+	return res.data;
+};
 export const getProfileCompleteness = Generated.profilesCompletenessByProfiles;
 export const getProfilePrivacy = Generated.profilesPrivacyByProfiles;
 export const getProfilePrivacyImpact = Generated.profilesPrivacyImpactByProfiles;
