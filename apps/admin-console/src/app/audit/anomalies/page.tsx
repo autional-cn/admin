@@ -539,7 +539,7 @@ export default function AuditAnomaliesPage() {
 								<Spin size="small" />
 							</div>
 						) : timelineQuery.isError ? (
-							<div className="text-red-500 text-sm">{t('auditAnomalies.timelineLoadError')}</div>
+							<div className="text-danger-text text-sm">{t('auditAnomalies.timelineLoadError')}</div>
 						) : timelineData ? (
 							<div>
 								{timelineData.anomaly && (
@@ -629,7 +629,7 @@ export default function AuditAnomaliesPage() {
 								<Spin size="small" />
 							</div>
 						) : relatedQuery.isError ? (
-							<div className="text-red-500 text-sm">{t('auditAnomalies.relatedLoadError')}</div>
+							<div className="text-danger-text text-sm">{t('auditAnomalies.relatedLoadError')}</div>
 						) : relatedData?.items?.length > 0 ? (
 							<div className="space-y-2">
 								{relatedData.items.map((item: any) => (

@@ -35,10 +35,10 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 const getFileIcon = (type: string) => {
-	if (type?.startsWith('image/')) return <FileImageOutlined className="text-blue-500" />;
+	if (type?.startsWith('image/')) return <FileImageOutlined className="text-info" />;
 	if (type?.includes('zip') || type?.includes('rar'))
-		return <FileZipOutlined className="text-orange-500" />;
-	if (type?.startsWith('text/')) return <FileTextOutlined className="text-green-500" />;
+		return <FileZipOutlined className="text-warning" />;
+	if (type?.startsWith('text/')) return <FileTextOutlined className="text-success" />;
 	return <FileOutlined className="text-neutral-600" />;
 };
 

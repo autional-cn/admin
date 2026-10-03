@@ -463,7 +463,7 @@ export default function PointsPage() {
 			key: 'amount',
 			width: 100,
 			render: (v: number) => (
-				<span className={v > 0 ? 'text-green-600' : 'text-red-600'}>{v?.toLocaleString()}</span>
+				<span className={v > 0 ? 'text-success-text' : 'text-danger-text'}>{v?.toLocaleString()}</span>
 			),
 		},
 		{ title: t('points.source'), dataIndex: 'source', key: 'source', width: 100 },
@@ -837,8 +837,8 @@ export default function PointsPage() {
 					</Form.Item>
 				</Form>
 				{testResult && (
-					<Card size="small" className="mt-4 bg-green-50">
-						<div className="text-green-700 font-medium">
+					<Card size="small" className="mt-4 bg-success-soft">
+						<div className="text-success-text font-medium">
 							{t('points.testResultCalc')}
 							{testResult.points} {t('points.pointsUnit')}
 						</div>

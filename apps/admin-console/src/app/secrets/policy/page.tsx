@@ -124,7 +124,7 @@ export default function SecretPolicyPage() {
 			{loading ? (
 				<Spin size="large" className="flex justify-center mt-16" />
 			) : error ? (
-				<div className="text-red-500 mt-8 text-center">{error}</div>
+				<div className="text-danger-text mt-8 text-center">{error}</div>
 			) : (
 				<Form form={form} layout="vertical" onFinish={handleSave}>
 					<SectionCard title={t('secrets.policy.title')}>

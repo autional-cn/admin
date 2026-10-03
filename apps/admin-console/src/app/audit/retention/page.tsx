@@ -172,7 +172,7 @@ export default function RetentionPolicyPage() {
 					<Descriptions column={1} size="middle">
 						<Descriptions.Item label={t('auditRetention.desc.retentionDays')}>{data?.days ?? '-'}</Descriptions.Item>
 						<Descriptions.Item label={t('auditRetention.desc.autoArchive')}>
-							<span className={data?.enabled ? 'text-green-600' : 'text-neutral-500'}>
+							<span className={data?.enabled ? 'text-success-text' : 'text-neutral-500'}>
 								{data?.enabled ? t('auditRetention.desc.enabled') : t('auditRetention.desc.disabled')}
 							</span>
 						</Descriptions.Item>

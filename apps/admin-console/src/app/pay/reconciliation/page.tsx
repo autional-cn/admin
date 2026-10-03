@@ -100,7 +100,7 @@ export default function PayReconciliationPage() {
 			render: (v: string) => {
 				const diff = parseFloat(v);
 				return (
-					<span className={diff !== 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+					<span className={diff !== 0 ? 'text-danger-text font-medium' : 'text-success-text'}>
 						{diff.toFixed(2)}
 					</span>
 				);

@@ -118,7 +118,7 @@ export default function SettingsPage() {
 						size={64}
 						icon={<UserOutlined />}
 						src={user?.avatarUrl}
-						className="!bg-blue-500"
+						className="!bg-info"
 					/>
 					<div>
 						<div className="font-medium">{user?.username || t('settings.notLoggedIn')}</div>

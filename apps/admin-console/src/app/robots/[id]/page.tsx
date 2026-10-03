@@ -248,7 +248,7 @@ export default function RobotDetailPage() {
 							{canCommission && (
 								<Button
 									icon={<PlayCircleOutlined />}
-									className="!text-green-500 !border-green-500"
+									className="!text-success-text !border-success"
 									onClick={handleCommission}
 									loading={commissionMut.isPending}
 								>

@@ -136,21 +136,21 @@ const DashboardPage = memo(function DashboardPage() {
 						<Statistic
 							title={t('dashboard.members')}
 							value={summary.memberCount}
-							prefix={<TeamOutlined className="text-blue-500" />}
+							prefix={<TeamOutlined className="text-info" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
 						<Statistic
 							title={t('dashboard.roles')}
 							value={summary.rolesCount}
-							prefix={<SafetyOutlined className="text-orange-500" />}
+							prefix={<SafetyOutlined className="text-warning" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
 						<Statistic
 							title={t('dashboard.activeSessions')}
 							value={summary.activeSessionsCount}
-							prefix={<LoginOutlined className="text-cyan-500" />}
+							prefix={<LoginOutlined className="text-info" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
@@ -164,7 +164,7 @@ const DashboardPage = memo(function DashboardPage() {
 						<Statistic
 							title={t('dashboard.secrets')}
 							value={summary.secretsCount}
-							prefix={<LockOutlined className="text-red-500" />}
+							prefix={<LockOutlined className="text-danger" />}
 						/>
 					</Col>
 				</Row>
@@ -179,7 +179,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.totalUsers')}
 								value={totalUsers}
-								prefix={<TeamOutlined className="text-blue-500" />}
+								prefix={<TeamOutlined className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -192,7 +192,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.newToday')}
 								value={newUsers}
-								prefix={<UserAddOutlined className="text-green-500" />}
+								prefix={<UserAddOutlined className="text-success" />}
 							/>
 						)}
 					</Card>
@@ -205,7 +205,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.activeSessions')}
 								value={activeSessions}
-								prefix={<LoginOutlined className="text-cyan-500" />}
+								prefix={<LoginOutlined className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -218,7 +218,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.roleCount')}
 								value={roleCount}
-								prefix={<SafetyOutlined className="text-orange-500" />}
+								prefix={<SafetyOutlined className="text-warning" />}
 							/>
 						)}
 					</Card>
@@ -234,7 +234,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.pendingAlerts')}
 								value={auditAlerts}
-								prefix={<WarningOutlined className="text-red-500" />}
+								prefix={<WarningOutlined className="text-danger" />}
 							/>
 						)}
 					</Card>

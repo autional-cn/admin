@@ -101,7 +101,7 @@ export default function NotificationStatsPage() {
 							<Statistic
 								title={t('notifications.stats.totalSent')}
 								value={stats?.totalSent ?? 0}
-								prefix={<SendOutlined className="text-blue-500" />}
+								prefix={<SendOutlined className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -114,7 +114,7 @@ export default function NotificationStatsPage() {
 							<Statistic
 								title={t('notifications.stats.totalRead')}
 								value={stats?.totalRead ?? 0}
-								prefix={<EyeOutlined className="text-green-500" />}
+								prefix={<EyeOutlined className="text-success" />}
 							/>
 						)}
 					</Card>
@@ -129,7 +129,7 @@ export default function NotificationStatsPage() {
 								value={stats?.readRate ? Math.round(stats.readRate * 10000) / 100 : 0}
 								suffix="%"
 								precision={1}
-								prefix={<ArrowUpOutlined className="text-cyan-500" />}
+								prefix={<ArrowUpOutlined className="text-info" />}
 								valueStyle={{
 									color:
 										(stats?.readRate ?? 0) > 0.4

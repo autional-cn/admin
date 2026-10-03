@@ -252,7 +252,7 @@ export default function UserDetailPage() {
 			<Card className="mb-4">
 				<div className="flex items-start justify-between flex-wrap gap-4">
 					<div className="flex items-center gap-4">
-						<Avatar size={64} icon={<UserOutlined />} className="!bg-blue-500" />
+						<Avatar size={64} icon={<UserOutlined />} className="!bg-info" />
 						<div>
 							<div className="text-xl font-semibold flex items-center gap-2">
 								{user.username}

@@ -122,7 +122,7 @@ export default function PlatformPortalsPage() {
 			render: (_: any, record: any) => {
 				const url = getPortalUrl(record.code);
 				return url ? (
-					<a href={url} target="_blank" className="text-xs text-blue-600 hover:underline">
+					<a href={url} target="_blank" className="text-xs text-info-text hover:underline">
 						{url}
 					</a>
 				) : (

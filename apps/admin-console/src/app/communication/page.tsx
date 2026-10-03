@@ -154,7 +154,7 @@ export default function CommunicationPage() {
 							<Statistic
 								title={t('communication.totalSent30d')}
 								value={dashboard?.totalSent ?? 0}
-								prefix={<SendOutlined className="text-blue-500" />}
+								prefix={<SendOutlined className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -167,7 +167,7 @@ export default function CommunicationPage() {
 							<Statistic
 								title={t('communication.delivered')}
 								value={dashboard?.delivered ?? 0}
-								prefix={<CheckCircleOutlined className="text-green-500" />}
+								prefix={<CheckCircleOutlined className="text-success" />}
 							/>
 						)}
 					</Card>

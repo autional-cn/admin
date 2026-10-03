@@ -83,13 +83,13 @@ export default function WalletEventsPage() {
 						status={result.valid ? 'success' : 'error'}
 						icon={
 							result.valid ? (
-								<CheckCircleFilled className="text-green-500 text-5xl" />
+								<CheckCircleFilled className="text-success text-5xl" />
 							) : (
-								<CloseCircleFilled className="text-red-500 text-5xl" />
+								<CloseCircleFilled className="text-danger text-5xl" />
 							)
 						}
 						title={
-							<span className={result.valid ? 'text-green-600' : 'text-red-600'}>
+							<span className={result.valid ? 'text-success-text' : 'text-danger-text'}>
 								{result.valid
 									? `✅ ${t('walletEvents.resultPass')}`
 									: `❌ ${t('walletEvents.resultFail')}`}

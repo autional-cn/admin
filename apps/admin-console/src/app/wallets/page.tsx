@@ -422,7 +422,7 @@ export default function WalletsPage() {
 			dataIndex: 'difference',
 			key: 'difference',
 			render: (v: number) => (
-				<span className={v !== 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+				<span className={v !== 0 ? 'text-danger-text font-medium' : 'text-success-text'}>
 					¥{Number(v ?? 0).toFixed(2)}
 				</span>
 			),

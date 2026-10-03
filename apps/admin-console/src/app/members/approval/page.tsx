@@ -138,7 +138,7 @@ export default function ApprovalPage() {
 					<Button
 						type="link"
 						icon={<CheckOutlined />}
-						className="!text-green-500"
+						className="!text-success-text"
 						onClick={() => openApproveModal(record)}
 					>
 						{t('approval.approve')}

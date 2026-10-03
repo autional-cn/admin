@@ -149,15 +149,15 @@ export default function SessionsPage() {
 				</Card>
 				<Card>
 					<div className="text-neutral-600 text-sm">{t('sessions.highRisk')}</div>
-					<div className="text-2xl font-bold mt-1 text-red-500">{riskDistribution.high}</div>
+					<div className="text-2xl font-bold mt-1 text-danger-text">{riskDistribution.high}</div>
 				</Card>
 				<Card>
 					<div className="text-neutral-600 text-sm">{t('sessions.mediumRisk')}</div>
-					<div className="text-2xl font-bold mt-1 text-orange-500">{riskDistribution.medium}</div>
+					<div className="text-2xl font-bold mt-1 text-warning-text">{riskDistribution.medium}</div>
 				</Card>
 				<Card>
 					<div className="text-neutral-600 text-sm">{t('sessions.lowRisk')}</div>
-					<div className="text-2xl font-bold mt-1 text-green-500">{riskDistribution.low}</div>
+					<div className="text-2xl font-bold mt-1 text-success-text">{riskDistribution.low}</div>
 				</Card>
 			</div>
 

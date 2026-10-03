@@ -126,10 +126,10 @@ export default function AuthConfigPage() {
 			{error && <PageError message={t('authConfig.loadError')} retry={refetch} className="mb-4" />}
 
 			{/* Compliance Profile Selector */}
-			<Card size="small" className="mb-4 border-blue-200 bg-blue-50">
+			<Card size="small" className="mb-4 border-info-soft bg-info-soft">
 				<div className="flex items-center gap-3">
-					<SafetyCertificateOutlined className="text-blue-600 text-lg" />
-					<span className="font-medium text-blue-900">{t('authConfig.complianceProfile')}:</span>
+					<SafetyCertificateOutlined className="text-info text-lg" />
+					<span className="font-medium text-info-text">{t('authConfig.complianceProfile')}:</span>
 					<Select
 						value={selectedProfile}
 						onChange={handleProfileChange}

@@ -70,7 +70,7 @@ export default function BillingCreditBalancePage() {
 			key: 'amount',
 			width: 120,
 			render: (v: number) => (
-				<span className={v > 0 ? 'text-green-600' : 'text-red-600'}>
+				<span className={v > 0 ? 'text-success-text' : 'text-danger-text'}>
 					{v > 0 ? '+' : ''}
 					{v?.toLocaleString() ?? '-'}
 				</span>
@@ -147,7 +147,7 @@ export default function BillingCreditBalancePage() {
 							<Card size="small">
 								<Descriptions column={1} size="small">
 									<Descriptions.Item label={t('creditBalance.availableBalance')}>
-										<span className="text-lg font-semibold text-green-600">
+										<span className="text-lg font-semibold text-success-text">
 											{balance.balance?.toLocaleString() ?? 0} {balance.currency || ''}
 										</span>
 									</Descriptions.Item>
