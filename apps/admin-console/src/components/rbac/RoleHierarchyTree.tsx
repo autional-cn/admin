@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { Tree, Input, Drawer, Descriptions, Tag, Spin, Empty, Button, Space } from 'antd';
+import { Tree, Input, Descriptions, Tag, Spin, Empty, Button, Space } from 'antd';
 import { ApartmentOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { extractList } from '@autional-cn/shared';
+import { Drawer } from '@autional-cn/ui/antd';
 import { useRoles } from '@/hooks/use-roles';
 import { useRoleChildren, useRoleParents } from '@/hooks/use-role-hierarchy';
 import type { RoleRecord } from '@/hooks/use-roles';
@@ -121,7 +122,7 @@ export function RoleHierarchyTree() {
 				}
 				open={!!drawerRoleId}
 				onClose={() => setDrawerRoleId(null)}
-				width={480}
+				size="sm"
 			>
 				{drawerRole && (
 					<Space direction="vertical" className="w-full" size="large">

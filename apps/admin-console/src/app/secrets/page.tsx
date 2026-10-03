@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Descriptions, Typography, Tooltip, Empty } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Descriptions, Typography, Tooltip, Empty } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -14,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import { createSecretSchema, updateSecretSchema } from '@/lib/validators';
 import {
 	useSecrets,
@@ -418,7 +418,7 @@ export default function SecretsPage() {
 				onClose={() => {
 					setDetailKey(null);
 				}}
-				width={640}
+				size="md"
 				loading={detailLoading}
 				className="!w-full sm:!w-[480px]"
 			>

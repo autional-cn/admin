@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Switch, Checkbox, Divider, Typography, Empty, Spin } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Checkbox, Divider, Typography, Empty, Spin } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -25,7 +25,7 @@ import { useCloneRole } from '@/hooks/use-role-hierarchy';
 import { usePermissions } from '@/hooks/use-permissions';
 import type { PermissionItem } from '@/hooks/use-permissions';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { createRoleSchema } from '@/lib/validators';
 
@@ -411,7 +411,7 @@ export default function RolesPage() {
 						? t('roles.permissionsDrawer', { name: currentRole.name })
 						: t('roles.assignPermissions')
 				}
-				size={560}
+				size="md"
 				open={drawerVisible}
 				onClose={() => setDrawerVisible(false)}
 				className="!w-full sm:!w-[480px]"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Tag, Button, Select, Space, Drawer, Row, Col, Modal, Input, Descriptions, Divider, Timeline, Empty, Spin } from 'antd';
+import { Tag, Button, Select, Space, Row, Col, Modal, Input, Descriptions, Divider, Timeline, Empty, Spin } from 'antd';
 
 import { message } from '@/lib/antd-app';
 import { SecurityScanOutlined, LinkOutlined, WarningOutlined } from '@ant-design/icons';
@@ -16,7 +16,7 @@ import {
 	useLinkAnomalyToCase,
 } from '@/hooks/use-audit-anomalies';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly, extractItem } from '@autional-cn/shared';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -396,7 +396,7 @@ export default function AuditAnomaliesPage() {
 
 			<Drawer
 				title={t('auditAnomalies.detailTitle')}
-				size="large"
+				size="lg"
 				open={drawerVisible}
 				onClose={() => setDrawerVisible(false)}
 				className="!w-full sm:!w-[480px]"

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCurrentTenantIdOr } from '@autional-cn/shared';
-import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Drawer, Timeline, Popconfirm, Spin, Empty } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Timeline, Popconfirm, Spin, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -23,7 +23,7 @@ import {
 import type { WebhookRecord, DeliveryLog } from '@/hooks/use-webhooks';
 
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { createWebhookSchema } from '@/lib/validators';
 
@@ -297,7 +297,7 @@ export default function WebhooksPage() {
 
 			<Drawer
 				title={t('webhooks.deliveryLogs')}
-				size={600}
+				size="md"
 				open={logDrawerVisible}
 				onClose={() => setLogDrawerVisible(false)}
 				className="!w-full sm:!w-[480px]"

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Descriptions, Popconfirm, Empty, Spin, Tabs, Statistic, Card, Row, Col, Typography } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Descriptions, Popconfirm, Empty, Spin, Tabs, Statistic, Card, Row, Col, Typography } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -32,7 +32,7 @@ import type {
 	OAuthClientStats,
 } from '@/hooks/use-oauth-clients';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
@@ -290,7 +290,7 @@ export default function OAuthClientsPage() {
 				title={t('oauthClients.detail')}
 				open={!!detailClient}
 				onClose={() => setDetailClient(null)}
-				width={480}
+				size="sm"
 			>
 				{detailClient && (
 					<Space direction="vertical" style={{ width: '100%' }} size="large">
@@ -352,7 +352,7 @@ export default function OAuthClientsPage() {
 				title={t('oauthClients.manageSecrets')}
 				open={!!secretDrawerClient}
 				onClose={() => setSecretDrawerClient(null)}
-				width={480}
+				size="sm"
 				extra={
 					<Space>
 						<Button icon={<ReloadOutlined />} onClick={handleRotateSecret}>

@@ -2,7 +2,7 @@
 // @generated-api-exempt: 2 key(s) [COMPLIANCE.ADMIN_TENANT_SELF_POLICY, COMPLIANCE.ADMIN_TENANT_SELF_SCORE] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, Empty, Drawer, Progress, Badge } from 'antd';
+import { Tabs, Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, Empty, Progress, Badge } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	SafetyCertificateOutlined,
@@ -26,7 +26,7 @@ import {
 	useRevokeConsent,
 } from '@/hooks/use-compliance';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, useIsAuditRestricted, AuditStatsOnly, extractItem, useTenantSlug } from '@autional-cn/shared';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { buildNavHref } from '@/lib/nav';
@@ -546,7 +546,7 @@ export default function CompliancePage() {
 
 			<Drawer
 				title={t('compliance.dsar.detailTitle')}
-				size={500}
+				size="sm"
 				open={dsarDrawer}
 				onClose={() => setDsarDrawer(false)}
 				className="!w-full sm:!w-[480px]"

@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tag, Button, Select, Space, Drawer, Row, Col, Modal, Input } from 'antd';
+import { Tag, Button, Select, Space, Row, Col, Modal, Input } from 'antd';
 
 import { message } from '@/lib/antd-app';
 import { SearchOutlined } from '@ant-design/icons';
 import { useAlerts, useUpdateAlertStatus, useAssignAlert } from '@/hooks/use-audit-alerts';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
 import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 import type * as Types from '@autional-cn/shared/generated/types';
@@ -276,7 +276,7 @@ export default function AuditAlertsPage() {
 
 			<Drawer
 				title={t('auditAlerts.detailTitle')}
-				size={600}
+				size="md"
 				open={drawerVisible}
 				onClose={() => setDrawerVisible(false)}
 				className="!w-full sm:!w-[480px]"
