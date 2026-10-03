@@ -15,6 +15,7 @@ import {
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { CreateCouponRequest } from '@autional-cn/shared/generated/types';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function WalletCouponsPage() {
 	const { t } = useTranslation();
@@ -133,20 +134,24 @@ export default function WalletCouponsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('walletCoupons.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalOpen(true);
-					}}
-				>
-					{t('walletCoupons.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('walletCoupons.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalOpen(true);
+							}}
+						>
+							{t('walletCoupons.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('walletCoupons.loadError')} retry={refetch} className="mb-4" />

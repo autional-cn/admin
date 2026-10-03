@@ -23,6 +23,7 @@ import {
 } from '@/hooks/use-announcements';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { TextArea } = Input;
 
@@ -243,12 +244,16 @@ export default function AnnouncementsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('notifications.announcements.title')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-					{t('notifications.announcements.createAnnouncement')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('notifications.announcements.title')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+							{t('notifications.announcements.createAnnouncement')}
+						</Button>
+					</>
+				}
+			/>
 
 			<div className="flex flex-col sm:flex-row gap-3 mb-4">
 				<Input.Search

@@ -9,6 +9,7 @@ import { useMembers, useInviteMember, useUpdateMember, useRemoveMember } from '@
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { inviteMemberSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 
@@ -163,19 +164,23 @@ export default function MembersPage() {
 		<div>
 			{error && <PageError message={t('members.loadError')} retry={refetch} className="mb-4" />}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('members.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						inviteForm.resetFields();
-						setInviteVisible(true);
-					}}
-				>
-					{t('members.inviteBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('members.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								inviteForm.resetFields();
+								setInviteVisible(true);
+							}}
+						>
+							{t('members.inviteBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{data.length === 0 && !isLoading ? (
 				<Empty description={t('members.noData')} className="py-12" />

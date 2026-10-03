@@ -15,6 +15,7 @@ import {
 import type { ApiKeyRecord } from '@/hooks/use-api-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 
@@ -152,19 +153,23 @@ export default function ApiKeysPage() {
 		<div>
 			{error && <PageError message={t('apiKeys.loadError')} retry={refetch} className="mb-4" />}
 
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('apiKeys.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setModalVisible(true);
-						form.resetFields();
-					}}
-				>
-					{t('apiKeys.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('apiKeys.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setModalVisible(true);
+								form.resetFields();
+							}}
+						>
+							{t('apiKeys.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{isLoading ? (
 				<Spin className="flex justify-center py-12" />

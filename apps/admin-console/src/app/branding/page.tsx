@@ -10,6 +10,7 @@ import { useBranding, useUpdateBranding } from '@/hooks/use-branding';
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 interface BrandingData {
 	logoUrl?: string;
@@ -69,12 +70,16 @@ export default function BrandingPage() {
 		<div>
 			{error && <PageError message={t('branding.loadFailed')} retry={refetch} className="mb-4" />}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('branding.title')}</h1>
-				<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
-					{t('branding.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('branding.title')}
+				actions={
+					<>
+						<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
+							{t('branding.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			<Spin spinning={isLoading}>
 				<Row gutter={[24, 24]}>

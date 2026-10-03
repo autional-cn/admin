@@ -9,6 +9,7 @@ import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { apiClient, API_PATHS } from '@autional-cn/shared';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 interface SodConfigData {
@@ -76,7 +77,7 @@ export default function SodConfigPage() {
 			<div className="flex items-center justify-between mb-6">
 				<div className="flex items-center gap-2">
 					<SafetyOutlined className="text-xl" />
-					<h1 className="text-xl font-semibold">{t('sod.title')}</h1>
+					<ConsolePageHeader title={t('sod.title')} />
 				</div>
 				<Button icon={<ReloadOutlined />} onClick={fetchConfig} loading={loading}>
 					{t('common.refresh')}

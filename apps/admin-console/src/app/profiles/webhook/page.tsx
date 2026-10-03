@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Form, Input, Select, Switch, Button, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
-import { PageHeader, SectionCard, LoadingScreen } from '@autional-cn/ui';
+import { ConsolePageHeader, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { apiClient } from '@autional-cn/shared';
 import {
 	adminProfilesWebhook,
@@ -70,7 +70,7 @@ export default function WebhookPage() {
 
 	return (
 		<div>
-			<PageHeader title={t('profileWebhook.title')} subtitle={t('profileWebhook.subtitle')} />
+			<ConsolePageHeader title={t('profileWebhook.title')} description={t('profileWebhook.subtitle')} />
 			<SectionCard>
 				<Form
 					form={form}

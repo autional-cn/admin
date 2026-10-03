@@ -5,7 +5,7 @@ import { DataTable } from '@autional-cn/ui/antd';
 import { Tabs, Button, Modal, Form, Input, Select, Space, Tag, Popconfirm, InputNumber, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
-import { PageHeader, SectionCard, LoadingScreen, EmptyState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { apiClient, API_PATHS } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -650,9 +650,9 @@ export default function CompliancePage() {
 	});
 	return (
 		<div>
-			<PageHeader
+			<ConsolePageHeader
 				title={t('compliance.audit.title')}
-				subtitle={t('compliance.audit.subtitle')}
+				description={t('compliance.audit.subtitle')}
 			/>
 			<SectionCard>
 				<Tabs

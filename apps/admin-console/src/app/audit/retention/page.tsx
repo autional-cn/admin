@@ -30,6 +30,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { apiClient, extractItem } from '@autional-cn/shared';
 import { adminAuditArchiveStatus, adminAuditArchivePost } from '@autional-cn/shared/generated/api';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function RetentionPolicyPage() {
@@ -123,14 +124,18 @@ export default function RetentionPolicyPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('auditRetention.title')}</h1>
-				{!editing && (
-					<Button icon={<EditOutlined />} onClick={startEdit}>
-						{t('auditRetention.edit')}
-					</Button>
-				)}
-			</div>
+			<ConsolePageHeader
+				title={t('auditRetention.title')}
+				actions={
+					<>
+						{!editing && (
+							<Button icon={<EditOutlined />} onClick={startEdit}>
+								{t('auditRetention.edit')}
+							</Button>
+						)}
+					</>
+				}
+			/>
 
 			{editing ? (
 				<Card>

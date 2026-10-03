@@ -17,6 +17,7 @@ import {
 } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 interface AppRole {
@@ -256,15 +257,19 @@ export default function AppRolesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('appRoles.title')}</h1>
-				<Button
-					icon={<ReloadOutlined />}
-					onClick={() => (activeTab === 'roles' ? fetchRoles() : fetchMembers())}
-				>
-					{t('appRoles.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('appRoles.title')}
+				actions={
+					<>
+						<Button
+							icon={<ReloadOutlined />}
+							onClick={() => (activeTab === 'roles' ? fetchRoles() : fetchMembers())}
+						>
+							{t('appRoles.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError

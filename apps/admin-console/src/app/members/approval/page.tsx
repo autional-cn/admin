@@ -15,6 +15,7 @@ import {
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 const { TextArea } = Input;
@@ -164,19 +165,23 @@ export default function ApprovalPage() {
 		<div>
 			{error && <PageError message={t('approval.loadError')} retry={refetch} className="mb-4" />}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('approval.title')}</h1>
-				{selectedRowKeys.length > 0 && (
-					<Button
-						type="primary"
-						icon={<CheckCircleOutlined />}
-						onClick={handleBatchApprove}
-						loading={batchApproveMut.isPending}
-					>
-						{t('approval.batchApproveCount', { count: selectedRowKeys.length })}
-					</Button>
-				)}
-			</div>
+			<ConsolePageHeader
+				title={t('approval.title')}
+				actions={
+					<>
+						{selectedRowKeys.length > 0 && (
+							<Button
+								type="primary"
+								icon={<CheckCircleOutlined />}
+								onClick={handleBatchApprove}
+								loading={batchApproveMut.isPending}
+							>
+								{t('approval.batchApproveCount', { count: selectedRowKeys.length })}
+							</Button>
+						)}
+					</>
+				}
+			/>
 
 			{isLoading ? (
 				<div className="flex justify-center py-12">

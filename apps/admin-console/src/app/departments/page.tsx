@@ -15,6 +15,7 @@ import {
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 import { createDepartmentSchema } from '@/lib/validators';
 
@@ -118,20 +119,24 @@ export default function DepartmentsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('departments.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('departments.createDepartment')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('departments.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('departments.createDepartment')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('departments.loadError')} retry={refetch} className="mb-4" />}
 			<div className="flex gap-6 flex-col md:flex-row">

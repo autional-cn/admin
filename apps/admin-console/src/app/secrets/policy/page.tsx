@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Switch, Button, Space, Spin } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PageHeader, SectionCard } from '@autional-cn/ui';
+import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
 import { apiClient, extractItem } from '@autional-cn/shared';
 import {
 	adminSecretsPolicy,
@@ -119,7 +119,7 @@ export default function SecretPolicyPage() {
 
 	return (
 		<div>
-			<PageHeader title={t('secrets.policy.title')} subtitle={t('secrets.policy.description')} />
+			<ConsolePageHeader title={t('secrets.policy.title')} description={t('secrets.policy.description')} />
 
 			{loading ? (
 				<Spin size="large" className="flex justify-center mt-16" />

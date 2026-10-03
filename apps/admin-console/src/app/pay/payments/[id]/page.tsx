@@ -13,7 +13,7 @@ import {
 	type RefundRecord,
 } from '@/hooks/use-pay';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { SectionCard } from '@autional-cn/ui';
+import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
@@ -79,9 +79,7 @@ export default function PayPaymentDetailPage() {
 			>
 				{t('paymentDetail.backToList')}
 			</Button>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('paymentDetail.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('paymentDetail.title')} />
 
 			<Tabs
 				activeKey={activeTab}

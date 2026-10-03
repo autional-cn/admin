@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-global-variables';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { TextArea } = Input;
 
@@ -125,12 +126,16 @@ export default function GlobalVariablesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('notifications.globalVariables.title')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-					{t('notifications.globalVariables.createVariable')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('notifications.globalVariables.title')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+							{t('notifications.globalVariables.createVariable')}
+						</Button>
+					</>
+				}
+			/>
 			<div className="mb-4 flex gap-2 flex-wrap">
 				<span className="text-gray-500 text-sm">
 					{t('notifications.globalVariables.predefinedKeys')}:

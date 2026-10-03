@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 function formatDateTime(v?: string) {
@@ -175,20 +176,24 @@ export default function BillingAlertsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('billingAlerts.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalOpen(true);
-					}}
-				>
-					{t('billingAlerts.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('billingAlerts.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalOpen(true);
+							}}
+						>
+							{t('billingAlerts.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('billingAlerts.loadError')} retry={refetch} className="mb-4" />

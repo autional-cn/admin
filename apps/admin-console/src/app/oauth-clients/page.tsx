@@ -33,6 +33,7 @@ import type {
 } from '@/hooks/use-oauth-clients';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -208,20 +209,24 @@ export default function OAuthClientsPage() {
 				<PageError message={t('oauthClients.loadError')} retry={refetch} className="mb-4" />
 			)}
 
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('oauthClients.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('oauthClients.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('oauthClients.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('oauthClients.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{isLoading ? (
 				<Spin className="flex justify-center py-12" />

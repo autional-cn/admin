@@ -20,6 +20,7 @@ import {
 } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { createNotificationTemplateSchema } from '@/lib/validators';
 
 const { Option } = Select;
@@ -201,20 +202,24 @@ export default function NotificationTemplatesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('notifications.templates.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('notifications.templates.createTemplate')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('notifications.templates.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('notifications.templates.createTemplate')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError

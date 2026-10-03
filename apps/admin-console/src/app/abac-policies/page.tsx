@@ -14,6 +14,7 @@ import {
 import type { ABACPolicy } from '@/hooks/use-abac-policies';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function AbacPoliciesPage() {
 	const { t } = useTranslation();
@@ -151,20 +152,24 @@ export default function AbacPoliciesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('abacPolicies.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('abacPolicies.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('abacPolicies.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('abacPolicies.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('abacPolicies.loadError')} retry={refetch} className="mb-4" />

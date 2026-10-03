@@ -30,6 +30,7 @@ import {
 import { uploadFile, downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 import { useTranslation } from 'react-i18next';
 
@@ -279,17 +280,21 @@ export default function StoragePage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('storage.title')}</h1>
-				<Space>
-					<Upload beforeUpload={handleUpload} showUploadList={false}>
-						<Button icon={<UploadOutlined />}>{t('storage.uploadFile')}</Button>
-					</Upload>
-					<Button icon={<FolderAddOutlined />} onClick={() => setNewFolderVisible(true)}>
-						{t('storage.newFolder')}
-					</Button>
-				</Space>
-			</div>
+			<ConsolePageHeader
+				title={t('storage.title')}
+				actions={
+					<>
+						<Space>
+							<Upload beforeUpload={handleUpload} showUploadList={false}>
+								<Button icon={<UploadOutlined />}>{t('storage.uploadFile')}</Button>
+							</Upload>
+							<Button icon={<FolderAddOutlined />} onClick={() => setNewFolderVisible(true)}>
+								{t('storage.newFolder')}
+							</Button>
+						</Space>
+					</>
+				}
+			/>
 
 			{filesError && (
 				<PageError message={t('storage.loadFailed')} retry={filesRefetch} className="mb-4" />

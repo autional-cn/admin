@@ -6,6 +6,7 @@ import { EyeOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { usePayRefunds, type PaymentItem } from '@/hooks/use-pay';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function PayRefundsPage() {
 	const { t } = useTranslation();
@@ -103,9 +104,7 @@ export default function PayRefundsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('payRefunds.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('payRefunds.title')} />
 
 			{error && <PageError message={t('payRefunds.loadError')} retry={refetch} className="mb-4" />}
 

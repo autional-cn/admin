@@ -6,7 +6,7 @@ import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
-import { PageHeader, StatusBadge, EmptyState, ErrorState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, extractItem } from '@autional-cn/shared';
 import {
@@ -211,22 +211,22 @@ export default function RobotsPage() {
 
 	return (
 		<div className="p-6">
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<PageHeader
-					title={t('robots.title')}
-					subtitle={t('robots.subtitle')}
-				/>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('robots.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('robots.title')}
+				description={t('robots.subtitle')}
+				actions={
+					<Button
+						type="primary"
+						icon={<PlusOutlined />}
+						onClick={() => {
+							form.resetFields();
+							setModalVisible(true);
+						}}
+					>
+						{t('robots.createBtn')}
+					</Button>
+				}
+			/>
 
 			{isLoading && (
 				<div className="space-y-3">

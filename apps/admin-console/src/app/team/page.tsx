@@ -12,6 +12,7 @@ import { extractList, useCurrentTenantIdOr } from '@autional-cn/shared';
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 
@@ -103,19 +104,23 @@ export default function TeamPage() {
 		<div>
 			{error && <PageError message={t('team.loadError')} retry={refetch} className="mb-4" />}
 
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('team.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setModalVisible(true);
-						form.resetFields();
-					}}
-				>
-					{t('team.inviteBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('team.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setModalVisible(true);
+								form.resetFields();
+							}}
+						>
+							{t('team.inviteBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{isLoading ? (
 				<Spin className="flex justify-center py-12" />

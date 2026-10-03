@@ -12,6 +12,7 @@ import {
 import { usePageTitle, useCurrentTenantIdOr } from '@autional-cn/shared';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 interface ClassificationLevel {
@@ -79,12 +80,16 @@ export default function DataClassificationPage() {
 				<PageError message={t('dataClassification.loadError')} retry={refetch} className="mb-4" />
 			)}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('dataClassification.title')}</h1>
-				<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
-					{t('dataClassification.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('dataClassification.title')}
+				actions={
+					<>
+						<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
+							{t('dataClassification.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			<Spin spinning={isLoading}>
 				<Row gutter={[24, 24]}>

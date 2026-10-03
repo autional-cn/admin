@@ -17,6 +17,7 @@ import {
 import { useNotificationTemplates } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 
@@ -187,12 +188,16 @@ export default function EventMappingsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-				<h1 className="text-xl font-semibold">{t('notifications.eventMappings.title')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-					{t('notifications.eventMappings.createMapping')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('notifications.eventMappings.title')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+							{t('notifications.eventMappings.createMapping')}
+						</Button>
+					</>
+				}
+			/>
 			<div className="mb-4">
 				<Select
 					value={sourceFilter}

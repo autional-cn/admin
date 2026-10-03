@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { handleApiError } from '@/lib/error-handler';
 import { useTranslation } from 'react-i18next';
 import {
@@ -877,25 +878,29 @@ export default function BillingPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('billing.title')}</h1>
-				<Button
-					icon={<ReloadOutlined />}
-					onClick={() => {
-						subRefetch();
-						usageRefetch();
-						statsRefetch();
-						recordsRefetch();
-						plansRefetch();
-						gatewaysRefetch();
-						refundsRefetch();
-						dunningRefetch();
-						message.success(t('billing.refreshed'));
-					}}
-				>
-					{t('common.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('billing.title')}
+				actions={
+					<>
+						<Button
+							icon={<ReloadOutlined />}
+							onClick={() => {
+								subRefetch();
+								usageRefetch();
+								statsRefetch();
+								recordsRefetch();
+								plansRefetch();
+								gatewaysRefetch();
+								refundsRefetch();
+								dunningRefetch();
+								message.success(t('billing.refreshed'));
+							}}
+						>
+							{t('common.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			<Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
 

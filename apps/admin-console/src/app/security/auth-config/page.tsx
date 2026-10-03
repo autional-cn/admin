@@ -25,6 +25,7 @@ import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 import { COMPLIANCE_PROFILES, type ProfilePreset } from '@/lib/compliance-profiles';
 
@@ -120,7 +121,7 @@ export default function AuthConfigPage() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-semibold mb-6">{t('authConfig.title')}</h1>
+			<ConsolePageHeader title={t('authConfig.title')} />
 
 			{error && <PageError message={t('authConfig.loadError')} retry={refetch} className="mb-4" />}
 

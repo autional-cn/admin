@@ -4,6 +4,7 @@ import React from 'react';
 import { Tag } from 'antd';
 import { useFraudRules, type FraudRule } from '@/hooks/use-wallet-admin';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function WalletFraudRulesPage() {
@@ -48,9 +49,7 @@ export default function WalletFraudRulesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('fraudRules.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('fraudRules.title')} />
 
 			{error && <PageError message={t('fraudRules.loadError')} retry={refetch} className="mb-4" />}
 

@@ -15,6 +15,7 @@ import {
 import { getCommunicationHealth } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 interface HealthStatus {
 	channel: string;
@@ -355,9 +356,7 @@ export default function CommunicationPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('communication.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('communication.title')} />
 
 			<Row gutter={[16, 16]} className="mb-6">
 				{CHANNELS.map((c) => {

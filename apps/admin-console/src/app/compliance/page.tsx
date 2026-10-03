@@ -28,6 +28,7 @@ import {
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, useIsAuditRestricted, AuditStatsOnly, extractItem, useTenantSlug } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { buildNavHref } from '@/lib/nav';
 import { useNavigate } from 'react-router';
 
@@ -376,9 +377,7 @@ export default function CompliancePage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('compliance.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('compliance.title')} />
 
 			<Tabs
 				activeKey={activeTab}

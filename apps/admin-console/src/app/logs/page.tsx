@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function LogsPage() {
 	const { t } = useTranslation();
@@ -36,19 +37,23 @@ export default function LogsPage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('logs.title')}</h1>
-				<Space>
-					<Input.Search
-						placeholder={t('logs.search')}
-						onSearch={(v) => setParams((p) => ({ ...p, keyword: v || undefined }))}
-						style={{ width: 240 }}
-					/>
-					<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-						{t('common.refresh')}
-					</Button>
-				</Space>
-			</div>
+			<ConsolePageHeader
+				title={t('logs.title')}
+				actions={
+					<>
+						<Space>
+							<Input.Search
+								placeholder={t('logs.search')}
+								onSearch={(v) => setParams((p) => ({ ...p, keyword: v || undefined }))}
+								style={{ width: 240 }}
+							/>
+							<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
+								{t('common.refresh')}
+							</Button>
+						</Space>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('logs.loadError')} retry={refetch} className="mb-4" />}
 

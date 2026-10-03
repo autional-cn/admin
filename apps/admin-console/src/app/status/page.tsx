@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { statusOverview } from '@autional-cn/shared/generated/api';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function StatusPage() {
 	const { t } = useTranslation();
@@ -35,12 +36,16 @@ export default function StatusPage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('status.title')}</h1>
-				<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-					{t('common.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('status.title')}
+				actions={
+					<>
+						<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
+							{t('common.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			<div className="mb-6">
 				<Card>

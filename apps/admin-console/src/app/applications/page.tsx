@@ -25,6 +25,7 @@ import type { AppRecord } from '@/hooks/use-applications';
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 import { createApplicationSchema } from '@/lib/validators';
 
@@ -238,20 +239,24 @@ export default function ApplicationsPage() {
 				<PageError message={t('applications.loadError')} retry={refetch} className="mb-4" />
 			)}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('applications.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('applications.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('applications.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('applications.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{data.length === 0 && !isLoading ? (
 				<Empty description={t('applications.noData')} className="py-12" />

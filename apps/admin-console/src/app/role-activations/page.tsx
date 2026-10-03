@@ -13,6 +13,7 @@ import {
 import type { RoleActivation } from '@/hooks/use-role-activations';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const STATUS_MAP: Record<string, { color: string; label: string }> = {
 	active: { color: 'green', label: '' },
@@ -158,9 +159,7 @@ export default function RoleActivationsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('roleActivations.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('roleActivations.title')} />
 
 			{error && (
 				<PageError message={t('roleActivations.loadError')} retry={refetch} className="mb-4" />

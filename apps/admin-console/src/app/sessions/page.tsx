@@ -8,6 +8,7 @@ import { useSessions, useActiveSessionCount, useDeleteSession } from '@/hooks/us
 import type { SessionRecord } from '@/hooks/use-sessions';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function SessionsPage() {
@@ -120,19 +121,23 @@ export default function SessionsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('sessions.title')}</h1>
-				{selectedRowKeys.length > 0 && (
-					<Popconfirm
-						title={t('sessions.batchRevokeConfirm', { count: selectedRowKeys.length })}
-						onConfirm={handleBatchDelete}
-					>
-						<Button type="primary" danger icon={<DeleteOutlined />}>
-							{t('sessions.batchRevoke', { count: selectedRowKeys.length })}
-						</Button>
-					</Popconfirm>
-				)}
-			</div>
+			<ConsolePageHeader
+				title={t('sessions.title')}
+				actions={
+					<>
+						{selectedRowKeys.length > 0 && (
+							<Popconfirm
+								title={t('sessions.batchRevokeConfirm', { count: selectedRowKeys.length })}
+								onConfirm={handleBatchDelete}
+							>
+								<Button type="primary" danger icon={<DeleteOutlined />}>
+									{t('sessions.batchRevoke', { count: selectedRowKeys.length })}
+								</Button>
+							</Popconfirm>
+						)}
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('sessions.loadError')} retry={refetch} className="mb-4" />}
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">

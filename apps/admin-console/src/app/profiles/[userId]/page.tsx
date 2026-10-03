@@ -22,7 +22,7 @@ import {
 	AuditOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { PageHeader, SectionCard, LoadingScreen, ErrorState, EmptyState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { apiClient, API_PATHS, extractItem, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { getProfile, archiveProfile, exportProfile } from '@/lib/api.generated';
@@ -217,14 +217,14 @@ export default function ProfileDetailPage() {
 
 	return (
 		<div>
-			<PageHeader
+			<ConsolePageHeader
 				title={
 					profile.displayName ||
 					profile.nickname ||
 					`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() ||
 					userId
 				}
-				subtitle={t('profileDetail.subtitleUser', { userId })}
+				description={t('profileDetail.subtitleUser', { userId })}
 			/>
 			<Space className="mb-4">
 				<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(buildNavHref('/profiles', tenantSlug))}>

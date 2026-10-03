@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function RequestLogsPage() {
 	const { t } = useTranslation();
@@ -37,12 +38,16 @@ export default function RequestLogsPage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('requestLogs.title')}</h1>
-				<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-					{t('common.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('requestLogs.title')}
+				actions={
+					<>
+						<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
+							{t('common.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('requestLogs.loadError')} retry={refetch} className="mb-4" />}
 

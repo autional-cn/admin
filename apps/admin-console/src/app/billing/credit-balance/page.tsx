@@ -6,6 +6,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingCreditBalancePage() {
@@ -95,9 +96,7 @@ export default function BillingCreditBalancePage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('creditBalance.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('creditBalance.title')} />
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<div className="flex gap-2 items-end">

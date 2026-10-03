@@ -19,6 +19,7 @@ import {
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingCreditNotesPage() {
@@ -176,12 +177,16 @@ export default function BillingCreditNotesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('creditNotes.title')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
-					{t('creditNotes.create')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('creditNotes.title')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
+							{t('creditNotes.create')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('creditNotes.queryError')} retry={refetch} className="mb-4" />

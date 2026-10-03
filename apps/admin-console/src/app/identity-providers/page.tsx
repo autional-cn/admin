@@ -21,6 +21,7 @@ import {
 } from '@/hooks/use-identity-providers';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { createIdpSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -269,12 +270,16 @@ export default function IdentityProvidersPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('idp.title')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
-					{t('idp.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('idp.title')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
+							{t('idp.createBtn')}
+						</Button>
+					</>
+				}
+			/>
 
 			{/* LDAP Health Status Section */}
 			{!ldapHealthLoading && ldapHealth.length > 0 && (

@@ -4,7 +4,7 @@ import { Input, Button, Space, Tag, message, Modal, Typography } from 'antd';
 import { SearchOutlined, DownloadOutlined, LockOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { PageHeader, SectionCard, LoadingScreen, EmptyState, StatusBadge } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, LoadingScreen, SectionCard, StatusBadge } from '@autional-cn/ui';
 import { searchProfiles, archiveProfile, exportProfile } from '@/lib/api.generated';
 import { extractItem, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
@@ -127,7 +127,7 @@ export default function ProfilesPage() {
 
 	return (
 		<div>
-			<PageHeader title={t('profilesList.title')} subtitle={t('profilesList.subtitle')} />
+			<ConsolePageHeader title={t('profilesList.title')} description={t('profilesList.subtitle')} />
 			<SectionCard>
 				<Space className="mb-4">
 					<Input.Search

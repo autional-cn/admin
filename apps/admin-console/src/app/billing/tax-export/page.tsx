@@ -7,6 +7,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
 import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
 import type { DateRangeValue } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 /** 该页的筛选口径（收敛前是 `Record<string, unknown>`；`period` 是 `开始_结束` 的拼接串）。 */
@@ -79,9 +80,7 @@ export default function BillingTaxExportPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('taxExport.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('taxExport.title')} />
 
 			{error && <PageError message={t('taxExport.loadError')} retry={refetch} className="mb-4" />}
 

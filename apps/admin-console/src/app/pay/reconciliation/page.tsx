@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-pay';
 import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
 import type { DateRangeValue } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 /** 该页的筛选口径（收敛前是 `Record<string, unknown>`，于是 RangePicker 那边只能靠 `dates[0]?.format()` 现场拼）。 */
 type ReconFilters = {
@@ -135,9 +136,7 @@ export default function PayReconciliationPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('payReconciliation.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('payReconciliation.title')} />
 
 			{error && (
 				<PageError message={t('payReconciliation.loadError')} retry={refetch} className="mb-4" />

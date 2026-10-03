@@ -7,7 +7,7 @@ import { Button, Tag, Modal, Form, Input, Select, Skeleton, Descriptions } from 
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
-import { PageHeader, StatusBadge, SectionCard, EmptyState, ErrorState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
 import { message } from '@/lib/antd-app';
@@ -131,9 +131,9 @@ export default function DeviceDetailPage() {
 					{t('devices.backToList')}
 				</Button>
 				<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-					<PageHeader
+					<ConsolePageHeader
 						title={device?.name || t('devices.detailTitle')}
-						subtitle={
+						description={
 							device?.manufacturer
 								? `${t('devices.form.manufacturer')}: ${device.manufacturer}`
 								: t('common.loading')

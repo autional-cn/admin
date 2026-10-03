@@ -6,7 +6,7 @@ import { DataTable } from '@autional-cn/ui/antd';
 import { Button, Modal, Input, Space, message, Tag } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { PageHeader, SectionCard, LoadingScreen, EmptyState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, API_PATHS, extractList } from '@autional-cn/shared';
 import { adminProfilesApprovalRequests } from '@autional-cn/shared/generated/api';
@@ -139,7 +139,7 @@ export default function ApprovalPage() {
 
 	return (
 		<div>
-			<PageHeader title={t('profileApproval.title')} subtitle={t('profileApproval.subtitle')} />
+			<ConsolePageHeader title={t('profileApproval.title')} description={t('profileApproval.subtitle')} />
 			<SectionCard>
 				<DataTable
 					columns={columns}

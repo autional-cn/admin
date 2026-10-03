@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, Button, Typography, List, Tag, Space } from 'antd';
 import { DownloadOutlined, SafetyOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Title, Paragraph } = Typography;
 
@@ -15,7 +16,7 @@ export default function NhiSdkPage() {
 			<div className="mb-6">
 				<div className="flex items-center gap-2">
 					<SafetyOutlined style={{ fontSize: 24, color: 'var(--color-success)' }} />
-					<h1 className="text-xl font-semibold">{t('sdks.nhiTitle')}</h1>
+					<ConsolePageHeader title={t('sdks.nhiTitle')} />
 				</div>
 				<Paragraph className="mt-2 text-gray-500">{t('sdks.nhiDescription')}</Paragraph>
 			</div>

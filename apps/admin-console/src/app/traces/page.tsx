@@ -5,6 +5,7 @@ import { Input, Button, Empty } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function TracesPage() {
 	const { t } = useTranslation();
@@ -20,22 +21,26 @@ export default function TracesPage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('traces.title')}</h1>
-				<div className="flex gap-2">
-					<Input.Search
-						placeholder={t('traces.search')}
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
-						onSearch={handleUnavailable}
-						style={{ width: 300 }}
-						enterButton={<SearchOutlined />}
-					/>
-					<Button icon={<ReloadOutlined />} onClick={handleUnavailable}>
-						{t('common.refresh')}
-					</Button>
-				</div>
-			</div>
+			<ConsolePageHeader
+				title={t('traces.title')}
+				actions={
+					<>
+						<div className="flex gap-2">
+							<Input.Search
+								placeholder={t('traces.search')}
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								onSearch={handleUnavailable}
+								style={{ width: 300 }}
+								enterButton={<SearchOutlined />}
+							/>
+							<Button icon={<ReloadOutlined />} onClick={handleUnavailable}>
+								{t('common.refresh')}
+							</Button>
+						</div>
+					</>
+				}
+			/>
 
 			{unavailable && (
 				<Empty

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
 
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function UsagePage() {
 	const { t } = useTranslation();
@@ -54,14 +55,18 @@ export default function UsagePage() {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6">
-				<h1 className="text-xl font-semibold">{t('usage.title')}</h1>
-				<Select value={days} onChange={setDays} style={{ width: 120 }}>
-					<Select.Option value={7}>{t('usage.last7Days')}</Select.Option>
-					<Select.Option value={30}>{t('usage.last30Days')}</Select.Option>
-					<Select.Option value={90}>{t('usage.last90Days')}</Select.Option>
-				</Select>
-			</div>
+			<ConsolePageHeader
+				title={t('usage.title')}
+				actions={
+					<>
+						<Select value={days} onChange={setDays} style={{ width: 120 }}>
+							<Select.Option value={7}>{t('usage.last7Days')}</Select.Option>
+							<Select.Option value={30}>{t('usage.last30Days')}</Select.Option>
+							<Select.Option value={90}>{t('usage.last90Days')}</Select.Option>
+						</Select>
+					</>
+				}
+			/>
 
 			{tlError && (
 				<PageError message={t('usage.loadError')} retry={refetchTimeline} className="mb-4" />

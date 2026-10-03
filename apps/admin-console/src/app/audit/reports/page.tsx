@@ -26,6 +26,7 @@ import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 const { Text, Paragraph } = Typography;
@@ -409,9 +410,7 @@ export default function AuditReportsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('auditReports.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('auditReports.title')} />
 
 			<Tabs
 				defaultActiveKey="security"

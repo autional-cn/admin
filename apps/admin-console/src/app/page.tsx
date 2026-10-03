@@ -20,6 +20,7 @@ import { useAuditStats, useAuditLogs, type AuditLogRecord } from '@/hooks/use-au
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const DashboardPage = memo(function DashboardPage() {
 	const { t } = useTranslation();
@@ -95,14 +96,18 @@ const DashboardPage = memo(function DashboardPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('dashboard.title')}</h1>
-				<Segmented
-					options={timeRangeOptions}
-					value={timeRange}
-					onChange={(v) => setTimeRange(v as string)}
-				/>
-			</div>
+			<ConsolePageHeader
+				title={t('dashboard.title')}
+				actions={
+					<>
+						<Segmented
+							options={timeRangeOptions}
+							value={timeRange}
+							onChange={(v) => setTimeRange(v as string)}
+						/>
+					</>
+				}
+			/>
 
 			{usersError && (
 				<PageError message={t('dashboard.loadError')} retry={usersRefetch} className="mb-4" />

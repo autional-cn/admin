@@ -41,6 +41,7 @@ import type { Transaction, Dispute, Coupon, FraudRule } from '@/hooks/use-wallet
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
 import type { DateRangeValue } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function WalletsPage() {
 	const { t } = useTranslation();
@@ -455,39 +456,43 @@ export default function WalletsPage() {
 				/>
 			)}
 
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('wallets.title')}</h1>
-				<Space>
-					<Button
-						icon={<LockOutlined />}
-						onClick={() => {
-							batchForm.resetFields();
-							setBatchFreezeModal(true);
-						}}
-					>
-						{t('wallets.batchFreeze')}
-					</Button>
-					<Button
-						icon={<UnlockOutlined />}
-						onClick={() => {
-							batchForm.resetFields();
-							setBatchUnfreezeModal(true);
-						}}
-					>
-						{t('wallets.batchUnfreeze')}
-					</Button>
-					<Button
-						type="primary"
-						icon={<ToolOutlined />}
-						onClick={() => {
-							adjustForm.resetFields();
-							setAdjustModal(true);
-						}}
-					>
-						{t('wallets.manualAdjust')}
-					</Button>
-				</Space>
-			</div>
+			<ConsolePageHeader
+				title={t('wallets.title')}
+				actions={
+					<>
+						<Space>
+							<Button
+								icon={<LockOutlined />}
+								onClick={() => {
+									batchForm.resetFields();
+									setBatchFreezeModal(true);
+								}}
+							>
+								{t('wallets.batchFreeze')}
+							</Button>
+							<Button
+								icon={<UnlockOutlined />}
+								onClick={() => {
+									batchForm.resetFields();
+									setBatchUnfreezeModal(true);
+								}}
+							>
+								{t('wallets.batchUnfreeze')}
+							</Button>
+							<Button
+								type="primary"
+								icon={<ToolOutlined />}
+								onClick={() => {
+									adjustForm.resetFields();
+									setAdjustModal(true);
+								}}
+							>
+								{t('wallets.manualAdjust')}
+							</Button>
+						</Space>
+					</>
+				}
+			/>
 
 			<Row gutter={16} className="mb-4">
 				<Col xs={24} sm={12} md={6}>

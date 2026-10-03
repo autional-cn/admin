@@ -22,6 +22,7 @@ import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from '@/hooks/u
 import { getUsers } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { createUserSchema } from '@/lib/validators';
 
 interface UserRecord {
@@ -230,12 +231,16 @@ export default function UsersPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('nav.users')}</h1>
-				<Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
-					{t('users.createUser')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('nav.users')}
+				actions={
+					<>
+						<Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
+							{t('users.createUser')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('users.loadError')} retry={refetch} className="mb-4" />}
 

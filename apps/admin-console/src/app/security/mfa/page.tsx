@@ -10,6 +10,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 interface AuthPolicyMFA {
@@ -108,7 +109,7 @@ export default function MFAPolicyPage() {
 
 	return (
 		<div>
-			<h1 className="text-xl font-semibold mb-6">{t('mfa.title')}</h1>
+			<ConsolePageHeader title={t('mfa.title')} />
 			{error && <PageError message={t('mfa.saveFailed')} retry={refetch} className="mb-4" />}
 			<Card loading={isLoading}>
 				<Form form={form} layout="vertical" onFinish={onFinish}>

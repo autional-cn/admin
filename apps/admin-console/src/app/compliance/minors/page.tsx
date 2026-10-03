@@ -16,7 +16,7 @@ import { handleApiError } from '@/lib/error-handler';
 
 import { apiClient, API_PATHS, extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { adminUsers } from '@autional-cn/shared/generated/api';
-import { PageHeader, SectionCard } from '@autional-cn/ui';
+import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
 import dayjs from 'dayjs';
 
 interface MinorsProtectionConfig {
@@ -220,7 +220,7 @@ export default function MinorsProtectionPage() {
 
 	return (
 		<div className="p-6">
-			<PageHeader title={t('compliance.minors.title')} subtitle={t('compliance.minors.subtitle')} />
+			<ConsolePageHeader title={t('compliance.minors.title')} description={t('compliance.minors.subtitle')} />
 
 			<Row gutter={16} className="mb-6">
 				<Col span={8}>

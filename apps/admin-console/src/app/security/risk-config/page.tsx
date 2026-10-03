@@ -17,7 +17,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getRiskConfig, updateRiskConfig, resetRiskConfig } from '@/lib/api.generated';
 import { queryKeys } from '@/lib/query-keys';
 import { snakeCaseKeys } from '@autional-cn/shared';
-import { PageHeader } from '@autional-cn/ui';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Text } = Typography;
 
@@ -111,7 +111,7 @@ export default function RiskConfigPage() {
 
 	return (
 		<div style={{ maxWidth: 800 }}>
-			<PageHeader title="风险评分配置" subtitle="配置自适应 MFA 的风险评分阈值与信号权重" />
+			<ConsolePageHeader title="风险评分配置" description="配置自适应 MFA 的风险评分阈值与信号权重" />
 
 			<Form form={form} layout="vertical" initialValues={config}>
 				<Card title="风险等级阈值" style={{ marginBottom: 16 }}>

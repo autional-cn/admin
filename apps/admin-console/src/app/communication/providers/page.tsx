@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-communication';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -159,20 +160,24 @@ export default function CommunicationProvidersPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('communication.providers.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('communication.providers.addProvider')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('communication.providers.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('communication.providers.addProvider')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError

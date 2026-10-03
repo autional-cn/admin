@@ -6,7 +6,7 @@ import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Skeleton } 
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
-import { PageHeader, StatusBadge, EmptyState, ErrorState } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	adminAgents,
@@ -220,22 +220,22 @@ export default function AgentsPage() {
 
 	return (
 		<div className="p-6">
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<PageHeader
-					title={t('agents.title')}
-					subtitle={t('agents.subtitle')}
-				/>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('agents.createBtn')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('agents.title')}
+				description={t('agents.subtitle')}
+				actions={
+					<Button
+						type="primary"
+						icon={<PlusOutlined />}
+						onClick={() => {
+							form.resetFields();
+							setModalVisible(true);
+						}}
+					>
+						{t('agents.createBtn')}
+					</Button>
+				}
+			/>
 
 			{isLoading && (
 				<div className="space-y-3">

@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function WalletPolicyPage() {
 	const { t } = useTranslation();
@@ -47,9 +48,7 @@ export default function WalletPolicyPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('walletPolicy.title')}</h1>
-			</div>
+			<ConsolePageHeader title={t('walletPolicy.title')} />
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<Form.Item label={t('walletPolicy.appId')} className="mb-0">

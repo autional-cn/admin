@@ -6,6 +6,7 @@ import { Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch, E
 import { getAccessToken, getPortalUrl, API_BASE_URL, PLATFORM_TENANT_ID, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function PlatformPortalsPage() {
 	const { t } = useTranslation();
@@ -180,11 +181,7 @@ export default function PlatformPortalsPage() {
 	if (!isPlatformTenant) {
 		return (
 			<div>
-				<div className="mb-6">
-					<h1 className="text-xl font-semibold">
-						{t('applications.platformPortals', 'Platform Portals')}
-					</h1>
-				</div>
+				<ConsolePageHeader title={t('applications.platformPortals', 'Platform Portals')} />
 				<Empty
 					description={t(
 						'applications.platformOnlyTenant',
@@ -201,15 +198,10 @@ export default function PlatformPortalsPage() {
 
 	return (
 		<div>
-			<div className="mb-6">
-				<h1 className="text-xl font-semibold">
-					{t('applications.platformPortals', 'Platform Portals')}
-				</h1>
-				<p className="text-sm text-neutral-500 mt-1">
-					{t('applications.platformPortalsDesc', '平台内置的系统 Portal，对所有租户可见。')}{' '}
-					{portals.length} {t('applications.portalsCount', 'portals')}
-				</p>
-			</div>
+			<ConsolePageHeader
+				title={t('applications.platformPortals', 'Platform Portals')}
+				description={<>{t('applications.platformPortalsDesc', '平台内置的系统 Portal，对所有租户可见。')}{' '} {portals.length} {t('applications.portalsCount', 'portals')}</>}
+			/>
 			<DataTable
 				rowKey="id"
 				columns={columns}

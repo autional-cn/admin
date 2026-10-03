@@ -27,6 +27,7 @@ import {
 } from '@autional-cn/shared/generated/api';
 import { useTranslation } from 'react-i18next';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Text, Paragraph } = Typography;
 
@@ -316,25 +317,29 @@ export default function AuditLogsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('audit.title')}</h1>
-				<Space>
-					<Button
-						icon={<SafetyOutlined />}
-						onClick={handleVerifyChain}
-						loading={verifyMutation.isPending}
-					>
-						{t('audit.action.verifyChain')}
-					</Button>
-					<Button
-						icon={<ExportOutlined />}
-						onClick={() => handleExport('csv')}
-						loading={exportMutation.isPending}
-					>
-						{t('audit.action.exportCSV')}
-					</Button>
-				</Space>
-			</div>
+			<ConsolePageHeader
+				title={t('audit.title')}
+				actions={
+					<>
+						<Space>
+							<Button
+								icon={<SafetyOutlined />}
+								onClick={handleVerifyChain}
+								loading={verifyMutation.isPending}
+							>
+								{t('audit.action.verifyChain')}
+							</Button>
+							<Button
+								icon={<ExportOutlined />}
+								onClick={() => handleExport('csv')}
+								loading={exportMutation.isPending}
+							>
+								{t('audit.action.exportCSV')}
+							</Button>
+						</Space>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('audit.loadError')} retry={refetch} className="mb-4" />}
 			<Card className="mb-4" size="small">

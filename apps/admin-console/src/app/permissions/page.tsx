@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-permissions';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 interface PermissionRecord {
 	id: string;
@@ -148,20 +149,24 @@ export default function PermissionsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('nav.permissions')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						setEditing(null);
-						form.resetFields();
-						setModalVisible(true);
-					}}
-				>
-					{t('permissions.createPermission')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('nav.permissions')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								setEditing(null);
+								form.resetFields();
+								setModalVisible(true);
+							}}
+						>
+							{t('permissions.createPermission')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('permissions.loadError')} retry={refetch} className="mb-4" />}
 			<div className="flex gap-4 mb-4 flex-wrap">

@@ -32,6 +32,7 @@ import {
 	useEncryptionKeys,
 } from '@/hooks/use-secrets';
 import type { SecretVersionResponse } from '@autional-cn/shared/generated/types';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Text } = Typography;
 
@@ -340,41 +341,45 @@ export default function SecretsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('secrets.title')}</h1>
-				<Space>
-					{selectedRowKeys.length > 0 && (
-						<>
-							<Button danger icon={<StopOutlined />} onClick={handleBatchRevoke}>
-								{t('secrets.batchRevokeCount', { count: selectedRowKeys.length })}
+			<ConsolePageHeader
+				title={t('secrets.title')}
+				actions={
+					<>
+						<Space>
+							{selectedRowKeys.length > 0 && (
+								<>
+									<Button danger icon={<StopOutlined />} onClick={handleBatchRevoke}>
+										{t('secrets.batchRevokeCount', { count: selectedRowKeys.length })}
+									</Button>
+									<Button danger icon={<DeleteOutlined />} onClick={handleBatchDelete}>
+										{t('secrets.batchDeleteCount', { count: selectedRowKeys.length })}
+									</Button>
+								</>
+							)}
+							<Tooltip
+								title={
+									encryptionKeys
+										? t('secrets.encryptionKeyTooltip', { key: encryptionKeys.current })
+										: ''
+								}
+							>
+								<Button icon={<KeyOutlined />}>{encryptionKeys?.current ?? '...'}</Button>
+							</Tooltip>
+							<Button
+								type="primary"
+								icon={<PlusOutlined />}
+								onClick={() => {
+									setEditing(null);
+									form.resetFields();
+									setModalVisible(true);
+								}}
+							>
+								{t('secrets.createButton')}
 							</Button>
-							<Button danger icon={<DeleteOutlined />} onClick={handleBatchDelete}>
-								{t('secrets.batchDeleteCount', { count: selectedRowKeys.length })}
-							</Button>
-						</>
-					)}
-					<Tooltip
-						title={
-							encryptionKeys
-								? t('secrets.encryptionKeyTooltip', { key: encryptionKeys.current })
-								: ''
-						}
-					>
-						<Button icon={<KeyOutlined />}>{encryptionKeys?.current ?? '...'}</Button>
-					</Tooltip>
-					<Button
-						type="primary"
-						icon={<PlusOutlined />}
-						onClick={() => {
-							setEditing(null);
-							form.resetFields();
-							setModalVisible(true);
-						}}
-					>
-						{t('secrets.createButton')}
-					</Button>
-				</Space>
-			</div>
+						</Space>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('secrets.loadError')} retry={refetch} className="mb-4" />}
 

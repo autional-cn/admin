@@ -19,6 +19,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly, extractItem } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -311,17 +312,21 @@ export default function AuditAnomaliesPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('auditAnomalies.title')}</h1>
-				<Button
-					type="primary"
-					icon={<SecurityScanOutlined />}
-					loading={detectMut.isPending}
-					onClick={handleDetect}
-				>
-					{detectMut.isPending ? t('auditAnomalies.detecting') : t('auditAnomalies.runDetection')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('auditAnomalies.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<SecurityScanOutlined />}
+							loading={detectMut.isPending}
+							onClick={handleDetect}
+						>
+							{detectMut.isPending ? t('auditAnomalies.detecting') : t('auditAnomalies.runDetection')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('auditAnomalies.loadError')} retry={refetch} className="mb-4" />

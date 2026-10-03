@@ -19,6 +19,7 @@ import {
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { CreateWalletRequest } from '@autional-cn/shared/generated/types';
+import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function WalletListPage() {
 	const { t } = useTranslation();
@@ -154,19 +155,23 @@ export default function WalletListPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('walletList.title')}</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => {
-						form.resetFields();
-						setCreateModal(true);
-					}}
-				>
-					{t('walletList.createButton')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('walletList.title')}
+				actions={
+					<>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => {
+								form.resetFields();
+								setCreateModal(true);
+							}}
+						>
+							{t('walletList.createButton')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && <PageError message={t('walletList.loadError')} retry={refetch} className="mb-4" />}
 

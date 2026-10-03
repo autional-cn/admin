@@ -17,6 +17,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { ConsolePageHeader } from '@autional-cn/ui';
 import {
 	useVerifications,
 	useVerificationStats,
@@ -181,12 +182,16 @@ export default function VerificationsPage() {
 
 	return (
 		<div>
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
-				<h1 className="text-xl font-semibold">{t('verifications.title')}</h1>
-				<Button icon={<AuditOutlined />} onClick={() => refetch()}>
-					{t('common.refresh')}
-				</Button>
-			</div>
+			<ConsolePageHeader
+				title={t('verifications.title')}
+				actions={
+					<>
+						<Button icon={<AuditOutlined />} onClick={() => refetch()}>
+							{t('common.refresh')}
+						</Button>
+					</>
+				}
+			/>
 
 			{error && (
 				<PageError message={t('verifications.loadListError')} retry={refetch} className="mb-4" />
