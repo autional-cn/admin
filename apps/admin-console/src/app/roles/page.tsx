@@ -41,7 +41,7 @@ import { useCloneRole } from '@/hooks/use-role-hierarchy';
 import { usePermissions } from '@/hooks/use-permissions';
 import type { PermissionItem } from '@/hooks/use-permissions';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { createRoleSchema } from '@/lib/validators';
 
 const { Title, Text } = Typography;

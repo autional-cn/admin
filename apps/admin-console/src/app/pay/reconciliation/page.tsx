@@ -10,7 +10,7 @@ import {
 	useRunPayReconciliation,
 	type ReconciliationRecord,
 } from '@/hooks/use-pay';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 

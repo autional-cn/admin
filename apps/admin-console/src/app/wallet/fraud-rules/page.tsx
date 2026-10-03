@@ -3,7 +3,7 @@
 import React from 'react';
 import { Table, Tag } from 'antd';
 import { useFraudRules, type FraudRule } from '@/hooks/use-wallet-admin';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function WalletFraudRulesPage() {

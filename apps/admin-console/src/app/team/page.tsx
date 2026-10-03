@@ -23,7 +23,7 @@ import { getMembers, inviteMember, removeMember } from '@/lib/api.generated';
 import { extractList } from '@autional-cn/shared';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 

@@ -37,7 +37,7 @@ import {
 import type { WebhookRecord, DeliveryLog } from '@/hooks/use-webhooks';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { createWebhookSchema } from '@/lib/validators';
 
 const { Option } = Select;

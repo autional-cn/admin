@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useBranding, useUpdateBranding } from '@/hooks/use-branding';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 interface BrandingData {
 	logoUrl?: string;

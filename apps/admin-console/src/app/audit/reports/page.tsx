@@ -24,7 +24,7 @@ import {
 import type { ComplianceCheckResp, SecurityRiskResp } from '@autional-cn/shared/generated/types';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTenantId } from '@/hooks/use-tenant';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';

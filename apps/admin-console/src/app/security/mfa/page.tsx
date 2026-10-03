@@ -8,7 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAuthPolicy, updateAuthPolicy } from '@/lib/api.generated';
 import { useTenantId } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
 import { extractItem } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';

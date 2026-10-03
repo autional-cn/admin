@@ -28,7 +28,7 @@ import {
 } from '@/hooks/use-communication';
 import { getCommunicationHealth } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 interface HealthStatus {
 	channel: string;

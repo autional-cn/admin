@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Table, Card, Row, Col, Statistic, DatePicker, Space, Select, Button } from 'antd';
 import { SearchOutlined, DollarOutlined } from '@ant-design/icons';
 import { useBillingRevenue, type RevenueItem } from '@/hooks/use-billing-admin';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 const { RangePicker } = DatePicker;

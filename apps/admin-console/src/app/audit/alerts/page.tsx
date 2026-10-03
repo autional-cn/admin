@@ -7,7 +7,7 @@ import { message } from '@/lib/antd-app';
 import { SearchOutlined } from '@ant-design/icons';
 import { useAlerts, useUpdateAlertStatus, useAssignAlert } from '@/hooks/use-audit-alerts';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 import type * as Types from '@autional-cn/shared/generated/types';
 import { useTranslation } from 'react-i18next';

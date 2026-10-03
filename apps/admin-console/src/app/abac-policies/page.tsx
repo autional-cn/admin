@@ -13,7 +13,7 @@ import {
 } from '@/hooks/use-abac-policies';
 import type { ABACPolicy } from '@/hooks/use-abac-policies';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function AbacPoliciesPage() {
 	const { t } = useTranslation();

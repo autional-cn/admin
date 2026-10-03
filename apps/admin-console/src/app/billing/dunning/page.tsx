@@ -5,7 +5,7 @@ import { Form, InputNumber, Select, Button, Card, Spin, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
 import { useDunningSettings, useUpdateDunningSettings } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTenantId } from '@/hooks/use-tenant';
 import { Input } from 'antd';
 import { useTranslation } from 'react-i18next';

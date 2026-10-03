@@ -36,7 +36,7 @@ import {
 } from '@ant-design/icons';
 import { useUser } from '@/hooks/use-users';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import {
 	getUserRoles,
 	getUserPermissions,

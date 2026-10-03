@@ -12,7 +12,7 @@ import {
 	useDeletePermission,
 } from '@/hooks/use-permissions';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 interface PermissionRecord {
 	id: string;

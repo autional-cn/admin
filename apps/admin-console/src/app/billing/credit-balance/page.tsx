@@ -5,7 +5,7 @@ import { Table, Tag, Button, Input, Space, Card, Descriptions, Spin, Select } fr
 import { SearchOutlined } from '@ant-design/icons';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingCreditBalancePage() {

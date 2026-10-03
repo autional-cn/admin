@@ -12,7 +12,7 @@ import {
 } from '@/hooks/use-role-activations';
 import type { RoleActivation } from '@/hooks/use-role-activations';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const STATUS_MAP: Record<string, { color: string; label: string }> = {
 	active: { color: 'green', label: '' },

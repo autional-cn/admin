@@ -54,7 +54,7 @@ import { useWalletPolicy, useUpdateWalletPolicy } from '@/hooks/use-wallet-admin
 import type { Transaction, Dispute, Coupon, FraudRule } from '@/hooks/use-wallets';
 import { useTenantId } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 

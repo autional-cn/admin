@@ -12,7 +12,7 @@ import {
 	type Receipt,
 	type RefundRecord,
 } from '@/hooks/use-pay';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { SectionCard } from '@autional-cn/ui';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';

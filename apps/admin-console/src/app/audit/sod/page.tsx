@@ -8,7 +8,7 @@ import { extractItem } from '@autional-cn/shared';
 import { useTenantId } from '@/hooks/use-tenant';
 import { apiClient, API_PATHS } from '@autional-cn/shared';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 interface SodConfigData {

@@ -31,7 +31,7 @@ import {
 	PlayCircleOutlined,
 } from '@ant-design/icons';
 import { useTenantId } from '@/hooks/use-tenant';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { handleApiError } from '@/lib/error-handler';
 import { useTranslation } from 'react-i18next';
 import {

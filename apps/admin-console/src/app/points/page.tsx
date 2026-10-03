@@ -48,7 +48,7 @@ import {
 	useExchangePoints,
 } from '@/hooks/use-points';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 interface PointRule {
 	id: string;

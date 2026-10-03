@@ -33,7 +33,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from '@/hooks/use-users';
 import { getUsers } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { createUserSchema } from '@/lib/validators';
 
 interface UserRecord {

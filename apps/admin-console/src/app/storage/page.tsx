@@ -42,7 +42,7 @@ import {
 } from '@/hooks/use-storage';
 import { uploadFile, downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { useTranslation } from 'react-i18next';
 

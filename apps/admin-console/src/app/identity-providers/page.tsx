@@ -32,7 +32,7 @@ import {
 	useTestLdapConnection,
 } from '@/hooks/use-identity-providers';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { createIdpSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 import type {

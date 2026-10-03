@@ -11,7 +11,7 @@ import {
 	type WithdrawalItem,
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function WalletWithdrawalsPage() {
 	const { t } = useTranslation();

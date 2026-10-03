@@ -20,7 +20,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { message, modal } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
 import dayjs from 'dayjs';

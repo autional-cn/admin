@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
 import { useTenantIdOr } from '@/hooks/use-tenant';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function UsagePage() {
 	const { t } = useTranslation();

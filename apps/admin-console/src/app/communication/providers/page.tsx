@@ -12,7 +12,7 @@ import {
 	useDeleteCommunicationProvider,
 } from '@/hooks/use-communication';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 const { TextArea } = Input;

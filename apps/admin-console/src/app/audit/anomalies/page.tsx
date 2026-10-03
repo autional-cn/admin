@@ -32,7 +32,7 @@ import {
 	useLinkAnomalyToCase,
 } from '@/hooks/use-audit-anomalies';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly, extractItem } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 

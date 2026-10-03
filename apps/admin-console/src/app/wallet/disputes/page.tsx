@@ -7,7 +7,7 @@ import { message } from '@/lib/antd-app';
 import { useTenantId } from '@/hooks/use-tenant';
 import { useWalletDisputes, useResolveDispute, type Dispute } from '@/hooks/use-wallets';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function WalletDisputesPage() {
 	const { t } = useTranslation();

@@ -39,7 +39,7 @@ import {
 	adminComplianceTenantsSelfGapAnalysisPost,
 	adminComplianceTenantsSelfOverridesByOverridesDelete,
 } from '@autional-cn/shared/generated/api';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 interface StandardItem {
 	id: string;

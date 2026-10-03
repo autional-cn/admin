@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { usePayPayments, type PaymentItem } from '@/hooks/use-pay';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 

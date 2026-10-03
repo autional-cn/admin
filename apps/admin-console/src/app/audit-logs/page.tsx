@@ -34,7 +34,7 @@ import {
 } from '@ant-design/icons';
 import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/use-audit-logs';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, extractItem, extractList } from '@autional-cn/shared';
 import {
 	adminAuditExportJobs,

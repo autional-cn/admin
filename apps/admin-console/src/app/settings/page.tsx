@@ -15,7 +15,7 @@ import { PublicAuthConfigByAuthConfig } from '@autional-cn/shared/generated/api'
 import { useUpdateSettings } from '@/hooks/use-settings';
 import { updateUser, changePassword } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 const PREFERENCE_KEYS = {

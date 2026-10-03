@@ -38,7 +38,7 @@ import {
 import type { AppRecord } from '@/hooks/use-applications';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 import { createApplicationSchema } from '@/lib/validators';
 

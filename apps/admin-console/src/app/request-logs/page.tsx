@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function RequestLogsPage() {
 	const { t } = useTranslation();

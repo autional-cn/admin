@@ -19,7 +19,7 @@ import { useRoles } from '@/hooks/use-roles';
 import { useAuditStats, useAuditLogs, type AuditLogRecord } from '@/hooks/use-audit-logs';
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 const DashboardPage = memo(function DashboardPage() {
 	const { t } = useTranslation();

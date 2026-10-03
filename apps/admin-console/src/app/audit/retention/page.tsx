@@ -27,7 +27,7 @@ import { useRetentionPolicy, useSaveRetentionPolicy } from '@/hooks/use-retentio
 import type { RetentionPolicy } from '@/hooks/use-retention-policy';
 import type * as Types from '@autional-cn/shared/generated/types';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { apiClient, extractItem } from '@autional-cn/shared';
 import { adminAuditArchiveStatus, adminAuditArchivePost } from '@autional-cn/shared/generated/api';
 import { useTranslation } from 'react-i18next';

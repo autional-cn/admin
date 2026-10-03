@@ -28,7 +28,7 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { createSecretSchema, updateSecretSchema } from '@/lib/validators';
 import {
 	useSecrets,

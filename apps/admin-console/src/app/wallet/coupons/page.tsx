@@ -25,7 +25,7 @@ import {
 	type CouponItem,
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import type { CreateCouponRequest } from '@autional-cn/shared/generated/types';
 
 export default function WalletCouponsPage() {

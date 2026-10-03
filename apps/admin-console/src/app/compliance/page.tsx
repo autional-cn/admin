@@ -44,7 +44,7 @@ import {
 	useRevokeConsent,
 } from '@/hooks/use-compliance';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, useIsAuditRestricted, AuditStatsOnly, extractItem, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useNavigate } from 'react-router';

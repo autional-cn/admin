@@ -5,7 +5,7 @@ import { Table, Card, Form, Select, DatePicker, Button, Space, Tag } from 'antd'
 import { message } from '@/lib/antd-app';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 

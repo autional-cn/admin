@@ -23,7 +23,7 @@ import { getAuthConfig, updateAuthConfig } from '@/lib/api.generated';
 import { useTenantId } from '@/hooks/use-tenant';
 import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { extractItem } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { COMPLIANCE_PROFILES, type ProfilePreset } from '@/lib/compliance-profiles';

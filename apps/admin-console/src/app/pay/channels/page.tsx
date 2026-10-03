@@ -14,7 +14,7 @@ import {
 	type Channel,
 } from '@/hooks/use-pay';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function PayChannelsPage() {
 	const { t } = useTranslation();

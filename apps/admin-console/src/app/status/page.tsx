@@ -6,7 +6,7 @@ import { ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-d
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { statusOverview } from '@autional-cn/shared/generated/api';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 
 export default function StatusPage() {
 	const { t } = useTranslation();

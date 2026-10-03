@@ -7,7 +7,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useMembers, useInviteMember, useUpdateMember, useRemoveMember } from '@/hooks/use-members';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@/components/ui/page-status';
+import { PageError } from '@autional-cn/ui/antd';
 import { inviteMemberSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 
