@@ -7,17 +7,21 @@ vi.mock('@/hooks/use-tenant', () => ({
 	useTenantId: vi.fn(),
 }));
 
+const { PLATFORM_TENANT_ID } = vi.hoisted(() => ({
+	PLATFORM_TENANT_ID: '01KSQCBNVMS6SX64PJS937CE33',
+}));
+
 vi.mock('@autional-cn/shared', () => ({
 	getAccessToken: vi.fn(() => 'test-token'),
 	getPortalUrl: vi.fn((code: string) => `https://${code}.portal.test`),
 	API_BASE_URL: 'https://api.test',
+	PLATFORM_TENANT_ID,
 }));
 
 import { useTenantId } from '@/hooks/use-tenant';
 
 const mockedUseTenantId = vi.mocked(useTenantId);
 
-const PLATFORM_TENANT_ID = '01KSQCBNVMS6SX64PJS937CE33';
 const OTHER_TENANT_ID = '01AAAA1111BBBB2222CCCC3333';
 
 const portalFixture = {

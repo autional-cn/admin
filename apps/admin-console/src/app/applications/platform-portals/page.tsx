@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch, Empty } from 'antd';
-import { getAccessToken, getPortalUrl, API_BASE_URL } from '@autional-cn/shared';
+import { getAccessToken, getPortalUrl, API_BASE_URL, PLATFORM_TENANT_ID } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { PageError } from '@/components/ui/page-status';
 import { useTenantId } from '@/hooks/use-tenant';
-
-const PLATFORM_TENANT_ID = '01KSQCBNVMS6SX64PJS937CE33';
 
 export default function PlatformPortalsPage() {
 	const { t } = useTranslation();

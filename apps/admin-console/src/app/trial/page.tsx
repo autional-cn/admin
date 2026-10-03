@@ -13,8 +13,8 @@ export default function TrialPage() {
 	} | null>(null);
 
 	useEffect(() => {
-		// 从 authms 获取试用状态
-		const config = (window as any).__AUTHMS_CONFIG__ || {};
+		// 运行时试用配置（宿主页面可注入 __AUTIONAL_CONFIG__；无注入时用默认值）
+		const config = (window as any).__AUTIONAL_CONFIG__ || {};
 		setTrial({
 			active: config.trial !== false,
 			expiresAt: config.trialExpiresAt,
