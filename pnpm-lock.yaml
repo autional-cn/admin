@@ -58,8 +58,8 @@ importers:
         specifier: 0.1.0-rc.5
         version: 0.1.0-rc.5
       '@autional-cn/ui':
-        specifier: 0.1.0-rc.15
-        version: 0.1.0-rc.15(@autional-cn/tokens@0.1.0-rc.5)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
+        specifier: 0.1.0-rc.18
+        version: 0.1.0-rc.18(@autional-cn/tokens@0.1.0-rc.5)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.20)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
       '@tanstack/react-query':
         specifier: 5.100.9
         version: 5.100.9(react@19.2.5)
@@ -214,11 +214,12 @@ packages:
   '@autional-cn/tsconfig@0.1.0-rc':
     resolution: {integrity: sha512-XY7N2lbMlR1D+OlkxDAw9Pz9CleV4UZ14RfWkkhGTZbbHvxT/d69H8GXWhyc9/634RoEUyVajYmjT75cZbKF4A==}
 
-  '@autional-cn/ui@0.1.0-rc.15':
-    resolution: {integrity: sha512-YN4gRqOEQGpUw7tqsS8ASM9b2hWfEt/rzb5XShT89vdi7r58JaT3JHXCrvL1oYilGqy2e87splWvRQaJT6xRQw==}
+  '@autional-cn/ui@0.1.0-rc.18':
+    resolution: {integrity: sha512-/wNAPI1eQY0oBP9gZfI7t5X6EDKc9pzL2ZRCvS47lFVXvwYaAEMdITKThacO9Ic2nGM2289YooQVnNUdJ2m2RQ==}
     peerDependencies:
       '@autional-cn/tokens': '>=0.1.0-rc'
       antd: '>=6.0.0'
+      dayjs: '>=1.11.0'
       i18next: '>=26.0.0'
       lucide-react: '>=0.500.0'
       react: 19.2.5
@@ -226,6 +227,8 @@ packages:
       react-i18next: '>=17.0.0'
     peerDependenciesMeta:
       antd:
+        optional: true
+      dayjs:
         optional: true
 
   '@babel/code-frame@7.29.7':
@@ -2415,7 +2418,7 @@ snapshots:
 
   '@autional-cn/tsconfig@0.1.0-rc': {}
 
-  '@autional-cn/ui@0.1.0-rc.15(@autional-cn/tokens@0.1.0-rc.5)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
+  '@autional-cn/ui@0.1.0-rc.18(@autional-cn/tokens@0.1.0-rc.5)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.20)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
     dependencies:
       '@autional-cn/tokens': 0.1.0-rc.5
       i18next: 26.0.10(typescript@5.8.3)
@@ -2425,6 +2428,7 @@ snapshots:
       react-i18next: 17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3)
     optionalDependencies:
       antd: 6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      dayjs: 1.11.20
 
   '@babel/code-frame@7.29.7':
     dependencies:
