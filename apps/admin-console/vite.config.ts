@@ -71,10 +71,17 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
+        // 分块策略必须与其余 portal 一致（ui 仓 check-consistency 的 C6 守着）。
+        // 此前这里没有给 antd 分块，1.3MB 的 antd 因此混进了入口块：
+        // 实测入口 2,698KB / gzip 739KB，而 platform / security 只 224–282KB——
+        // 同一套代码、同一个产品，首屏差了一个量级，而且业务代码每改一次
+        // 用户就要把整个 antd 重下一遍。
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router'],
+          'vendor-ui': ['antd', '@ant-design/icons'],
           'vendor-charts': ['recharts'],
           'vendor-query': ['@tanstack/react-query'],
+          'vendor-i18n': ['i18next', 'react-i18next'],
           'shared-api': ['@autional-cn/shared'],
         },
       },

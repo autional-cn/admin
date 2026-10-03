@@ -55,11 +55,11 @@ importers:
         specifier: 0.1.0-rc.2
         version: 0.1.0-rc.2(tailwindcss@3.4.19)
       '@autional-cn/tokens':
-        specifier: 0.1.0-rc.3
-        version: 0.1.0-rc.3
+        specifier: 0.1.0-rc.4
+        version: 0.1.0-rc.4
       '@autional-cn/ui':
-        specifier: 0.1.0-rc.8
-        version: 0.1.0-rc.8(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
+        specifier: 0.1.0-rc.11
+        version: 0.1.0-rc.11(@autional-cn/tokens@0.1.0-rc.4)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
       '@tanstack/react-query':
         specifier: 5.100.9
         version: 5.100.9(react@19.2.5)
@@ -208,18 +208,25 @@ packages:
   '@autional-cn/tokens@0.1.0-rc.3':
     resolution: {integrity: sha512-qBkqGOr6P0m31RrehjOAPp105UIZiIR9LJkSEUPoRtVY9ZlH/ghzCGodnam/cUOVgIjnt6fh2RkXF7fsm7gt/g==}
 
+  '@autional-cn/tokens@0.1.0-rc.4':
+    resolution: {integrity: sha512-Ovm6jWJOiepWmpvA+UYdd7jhFhYzEralJqyIn0bvXMhzKhtHlGwK2JOIx00VHmAKghZt10qTzS3rIp9zOE3oHw==}
+
   '@autional-cn/tsconfig@0.1.0-rc':
     resolution: {integrity: sha512-XY7N2lbMlR1D+OlkxDAw9Pz9CleV4UZ14RfWkkhGTZbbHvxT/d69H8GXWhyc9/634RoEUyVajYmjT75cZbKF4A==}
 
-  '@autional-cn/ui@0.1.0-rc.8':
-    resolution: {integrity: sha512-Kn9KkNCoQIIbWjFLDKbhVJziqsMF/pBARDJPnV6mUBeNF8PBwgD69BoIhZEkGeQD7tjEzPUzmrUlK94sR7PamQ==}
+  '@autional-cn/ui@0.1.0-rc.11':
+    resolution: {integrity: sha512-5Oi6ttwgBdS1CHSOBtHwAv4GtTCP/fivK7wGheLZQVwuMPEWfHfjX2E+84ifMz+mSdg7oLIJgYzOYuaA9MhNOA==}
     peerDependencies:
+      '@autional-cn/tokens': '>=0.1.0-rc'
       antd: '>=6.0.0'
       i18next: '>=26.0.0'
       lucide-react: '>=0.500.0'
       react: 19.2.5
       react-dom: 19.2.5
       react-i18next: '>=17.0.0'
+    peerDependenciesMeta:
+      antd:
+        optional: true
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -2404,16 +2411,20 @@ snapshots:
 
   '@autional-cn/tokens@0.1.0-rc.3': {}
 
+  '@autional-cn/tokens@0.1.0-rc.4': {}
+
   '@autional-cn/tsconfig@0.1.0-rc': {}
 
-  '@autional-cn/ui@0.1.0-rc.8(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
+  '@autional-cn/ui@0.1.0-rc.11(@autional-cn/tokens@0.1.0-rc.4)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
     dependencies:
-      antd: 6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@autional-cn/tokens': 0.1.0-rc.4
       i18next: 26.0.10(typescript@5.8.3)
       lucide-react: 0.509.0(react@19.2.5)
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
       react-i18next: 17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3)
+    optionalDependencies:
+      antd: 6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
 
   '@babel/code-frame@7.29.7':
     dependencies:
