@@ -2,22 +2,22 @@
 
 import React from 'react';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router';
-import { Breadcrumb as AntBreadcrumb } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
-import { buildNavHref, stripTenantPrefix } from '@/lib/nav';
+import { Breadcrumb as SharedBreadcrumb } from '@autional-cn/ui/antd';
+import { buildNavHref } from '@/lib/nav';
 
 /**
- * Breadcrumb component.
- * Auto-maps route paths to breadcrumb names.
+ * 面包屑。
+ *
+ * 这里只剩**业务**：路由 → 文案的映射表（78 条，与另外三个门户完全不重叠）。
+ * 机制（剥租户段、按段累积、中间段可点、末段纯文本、「详情」启发式、只有一项不渲染）
+ * 已经收进设计系统 —— 本站原本 145 行，是四份里能力最全的一份，那一份也成了收敛的基准。
  */
 export function Breadcrumb() {
 	const location = useLocation();
 	const { t } = useTranslation();
 	const tenantSlug = useTenantSlug();
-	// 剥租户段后按站内相对路径匹配 breadcrumbMap（键均为 '/users' 形态）
-	const path = stripTenantPrefix(location.pathname, tenantSlug);
 
 	const breadcrumbMap: Record<string, string> = React.useMemo(
 		() => ({
@@ -103,43 +103,14 @@ export function Breadcrumb() {
 		[t],
 	);
 
-	const items = React.useMemo(() => {
-		if (path === '/') {
-			return [{ title: t('breadcrumb.dashboard') }];
-		}
-
-		const parts = path.split('/').filter(Boolean);
-		const result: { title: React.ReactNode }[] = [
-			{ title: <Link to={buildNavHref('/', tenantSlug)}>{t('breadcrumb.dashboard')}</Link> },
-		];
-
-		let currentPath = '';
-		for (let i = 0; i < parts.length; i++) {
-			const part = parts[i];
-			currentPath += `/${part}`;
-
-			const name = breadcrumbMap[currentPath];
-			if (name) {
-				const isLast = i === parts.length - 1;
-				result.push({
-					title: isLast ? name : <Link to={buildNavHref(currentPath, tenantSlug)}>{name}</Link>,
-				});
-			} else if (/^[a-zA-Z0-9_-]+$/.test(part) && part.length > 8) {
-				const isLast = i === parts.length - 1;
-				result.push({
-					title: isLast ? (
-						t('breadcrumb.detail')
-					) : (
-						<Link to={buildNavHref(currentPath, tenantSlug)}>{t('breadcrumb.detail')}</Link>
-					),
-				});
-			}
-		}
-
-		return result;
-	}, [path, tenantSlug, breadcrumbMap, t]);
-
-	if (items.length <= 1) return null;
-
-	return <AntBreadcrumb items={items} className="mb-4" />;
+	return (
+		<SharedBreadcrumb
+			pathname={location.pathname}
+			tenantSlug={tenantSlug}
+			labels={breadcrumbMap}
+			home={{ label: t('breadcrumb.dashboard'), href: buildNavHref('/', tenantSlug) }}
+			detailLabel={t('breadcrumb.detail')}
+			buildHref={(path) => buildNavHref(path, tenantSlug)}
+		/>
+	);
 }
