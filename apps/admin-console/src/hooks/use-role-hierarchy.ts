@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -38,7 +38,7 @@ export interface EffectivePermissionInfo {
 }
 
 export function useRoleChildren(roleId: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.children(tenantId, roleId),
 		staleTime: 60000,
@@ -51,7 +51,7 @@ export function useRoleChildren(roleId: string) {
 }
 
 export function useAddRoleChild() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, data }: { roleId: string; data: { childId: string } }) =>
@@ -64,7 +64,7 @@ export function useAddRoleChild() {
 }
 
 export function useRemoveRoleChild() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, childId }: { roleId: string; childId: string }) =>
@@ -77,7 +77,7 @@ export function useRemoveRoleChild() {
 }
 
 export function useRoleParents(roleId: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.parents(tenantId, roleId),
 		staleTime: 60000,
@@ -90,7 +90,7 @@ export function useRoleParents(roleId: string) {
 }
 
 export function useRoleEffectivePermissions(roleId: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.effectivePermissions(tenantId, roleId),
 		staleTime: 60000,
@@ -103,7 +103,7 @@ export function useRoleEffectivePermissions(roleId: string) {
 }
 
 export function useCloneRole() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, data }: { roleId: string; data: { code: string; name: string } }) =>
@@ -115,7 +115,7 @@ export function useCloneRole() {
 }
 
 export function useRequestApproval() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, data }: { roleId: string; data: any }) => requestApproval(roleId, data),

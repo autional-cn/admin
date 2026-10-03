@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Tabs, Card, Button, Tree, Progress, Space, Upload, Modal, Form, Input, Row, Col } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -29,7 +30,7 @@ import {
 import { uploadFile, downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { useTranslation } from 'react-i18next';
 
 const getFileIcon = (type: string) => {
@@ -83,7 +84,7 @@ export default function StoragePage() {
 	const deleteTrashMut = useDeleteTrashItem();
 	const createFolderMut = useCreateFolder();
 	const deleteFileMut = useDeleteFile();
-	const tenantId = useTenantIdOr('');
+	const tenantId = useCurrentTenantIdOr('');
 
 	const loading = filesLoading || quotaLoading || statsLoading || trashLoading;
 

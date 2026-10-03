@@ -1,8 +1,8 @@
 'use client';
 
-import { extractItem } from '@autional-cn/shared';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery } from '@tanstack/react-query';
 import { getPasswordStatus } from '@/lib/api.generated';
@@ -16,7 +16,7 @@ export interface PasswordStatus {
 }
 
 export function usePasswordStatus(userId: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.passwordStatus(tenantId, userId),
 		queryFn: async () => {

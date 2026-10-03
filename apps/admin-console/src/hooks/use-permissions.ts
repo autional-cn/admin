@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -21,7 +21,7 @@ export interface PermissionItem {
 }
 
 export function usePermissions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.permissions.all(tenantId),
 		staleTime: 300000,
@@ -33,7 +33,7 @@ export function usePermissions() {
 }
 
 export function useCreatePermission() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: any) => createPermission(data),
@@ -43,7 +43,7 @@ export function useCreatePermission() {
 }
 
 export function useUpdatePermission() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: any }) => updatePermission(id, data),
@@ -53,7 +53,7 @@ export function useUpdatePermission() {
 }
 
 export function useDeletePermission() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (permissionId: string) => deletePermission(permissionId),

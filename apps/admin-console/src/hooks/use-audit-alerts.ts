@@ -1,8 +1,8 @@
 'use client';
 
-import { extractListResult, extractItem } from '@autional-cn/shared';
+import { extractListResult, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAlerts, getAlertById, assignAlert, updateAlertStatus } from '@/lib/api.generated';
@@ -17,7 +17,7 @@ export type AlertListResult = {
 };
 
 export function useAlerts(params?: Record<string, unknown>) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.auditAlerts.all(tenantId, params),
 		queryFn: async ({ signal }) => {
@@ -28,7 +28,7 @@ export function useAlerts(params?: Record<string, unknown>) {
 }
 
 export function useAlertDetail(id: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.auditAlerts.detail(tenantId, id),
 		queryFn: async ({ signal }) => {

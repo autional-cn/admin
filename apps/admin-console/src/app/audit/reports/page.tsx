@@ -16,7 +16,7 @@ import {
 	Typography,
 } from 'antd';
 import { FileProtectOutlined, AuditOutlined, ReloadOutlined } from '@ant-design/icons';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditReportsSecurity,
 	adminAuditReportsCompliance,
@@ -25,7 +25,6 @@ import type { ComplianceCheckResp, SecurityRiskResp } from '@autional-cn/shared/
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
-import { useTenantId } from '@/hooks/use-tenant';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 
@@ -46,7 +45,7 @@ const SEVERITY_COLORS: Record<string, string> = {
 
 export default function AuditReportsPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const isRestricted = useIsAuditRestricted();
 
 	const PERIOD_OPTIONS = [

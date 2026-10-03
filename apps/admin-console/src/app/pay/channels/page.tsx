@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { Button, Modal, Form, Input, Select, Tag, Space, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import {
 	usePayChannels,
 	useCreateChannel,
@@ -18,7 +19,7 @@ import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function PayChannelsPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data: channels = [], isLoading, error, refetch } = usePayChannels(tenantId);
 	const createMut = useCreateChannel();
 	const updateMut = useUpdateChannel();

@@ -13,8 +13,8 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
-import { useTenantId } from '@/hooks/use-tenant';
-import { apiClient, API_PATHS, extractList, extractItem } from '@autional-cn/shared';
+
+import { apiClient, API_PATHS, extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { adminUsers } from '@autional-cn/shared/generated/api';
 import { PageHeader, SectionCard } from '@autional-cn/ui';
 import dayjs from 'dayjs';
@@ -85,7 +85,7 @@ export default function MinorsProtectionPage() {
 	const [consentsLoading, setConsentsLoading] = useState(false);
 	const [activeTab, setActiveTab] = useState('config');
 	const [form] = Form.useForm();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 
 	useEffect(() => {
 		loadConfig();

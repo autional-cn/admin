@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Form, Input, InputNumber, Select, Button, Card, Spin, Switch, Space, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import {
 	useWalletPolicy,
 	useUpdateWalletPolicy,
@@ -15,7 +16,7 @@ import { PageError } from '@autional-cn/ui/antd';
 
 export default function WalletPolicyPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [appId, setAppId] = useState('default');
 	const { data: policy, isLoading, error, refetch } = useWalletPolicy(tenantId, appId);
 	const updateMut = useUpdateWalletPolicy();

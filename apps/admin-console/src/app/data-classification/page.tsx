@@ -8,8 +8,8 @@ import {
 	useDataClassification,
 	useUpdateDataClassification,
 } from '@/hooks/use-data-classification';
-import { useTenantIdOr } from '@/hooks/use-tenant';
-import { usePageTitle } from '@autional-cn/shared';
+
+import { usePageTitle, useCurrentTenantIdOr } from '@autional-cn/shared';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,7 @@ export default function DataClassificationPage() {
 	usePageTitle(t('dataClassification.title'));
 
 	const [form] = Form.useForm<ClassificationFormData>();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data, isLoading, error, refetch } = useDataClassification(tenantId);
 	const updateMut = useUpdateDataClassification(tenantId);

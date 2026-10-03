@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -46,7 +46,7 @@ function derivePasswordStatus(u: Record<string, unknown>): 'normal' | 'must_chan
 }
 
 export function useUsers(params?: Record<string, unknown>) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.list(tenantId, params),
 		queryFn: async ({ signal }) => {
@@ -67,7 +67,7 @@ export function useUsers(params?: Record<string, unknown>) {
 }
 
 export function useActiveSessions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.activeSessions(tenantId),
 		queryFn: async ({ signal }) => {
@@ -78,7 +78,7 @@ export function useActiveSessions() {
 }
 
 export function useUser(id: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.detail(tenantId, id),
 		queryFn: async ({ signal }) => {
@@ -94,7 +94,7 @@ export function useUser(id: string) {
 }
 
 export function useCreateUser() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: Record<string, unknown>) => createUser(data),
@@ -103,7 +103,7 @@ export function useCreateUser() {
 }
 
 export function useUpdateUser() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
@@ -113,7 +113,7 @@ export function useUpdateUser() {
 }
 
 export function useDeleteUser() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (id: string) => deleteUser(id),

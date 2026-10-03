@@ -6,11 +6,10 @@ import { message } from '@/lib/antd-app';
 import { SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getSecurityPolicy, updateSecurityPolicy } from '@/lib/api.generated';
-import { useTenantId } from '@/hooks/use-tenant';
 import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
-import { extractItem } from '@autional-cn/shared';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 
 /** 后端 GET 返回的嵌套结构（apiClient 响应已转 camelCase） */
@@ -51,7 +50,7 @@ interface SecurityPolicyForm {
 export default function SecurityPolicyPage() {
 	const { t } = useTranslation();
 	const [form] = Form.useForm();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 
 	const { data: policy, isLoading } = useQuery({
 		queryKey: queryKeys.security.tenantPolicy(tenantId),

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { Tree, Card, Button, Space, Tag, Modal, Form, Input, Empty } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ApartmentOutlined } from '@ant-design/icons';
@@ -11,7 +12,7 @@ import {
 	useUpdateDepartment,
 	useDeleteDepartment,
 } from '@/hooks/use-departments';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +61,7 @@ export default function DepartmentsPage() {
 	const [editing, setEditing] = useState<DeptRecord | null>(null);
 	const [form] = Form.useForm();
 
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data = [], isLoading, error, refetch } = useDepartments(tenantId);
 	const createMut = useCreateDepartment();
 	const updateMut = useUpdateDepartment();

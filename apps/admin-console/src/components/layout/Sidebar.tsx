@@ -19,11 +19,11 @@ import {
 } from '@ant-design/icons';
 import { Layout, Menu, Typography, Badge } from 'antd';
 import { useUIStore } from '@/stores/ui-store';
-import { usePermission, useTenantSlug } from '@autional-cn/shared';
+import { usePermission, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getPendingMembers } from '@/lib/api.generated';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { queryKeys } from '@/lib/query-keys';
 import { useFeatureGates } from '@/hooks/use-feature-gates';
 import { buildNavHref, stripTenantPrefix } from '@/lib/nav';
@@ -96,7 +96,7 @@ export function Sidebar() {
 	const featureGates = useFeatureGates();
 	const { t } = useTranslation();
 
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 
 	const { data: pendingData } = useQuery({
 		queryKey: queryKeys.members.pending(tenantId),

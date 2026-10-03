@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { Card, Tag, Descriptions, Tabs, Button, Spin, Empty, Row, Col, Statistic, Modal, Form, Input, InputNumber, Select, Space } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -12,7 +13,7 @@ import {
 	CloseOutlined,
 	PlayCircleOutlined,
 } from '@ant-design/icons';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { handleApiError } from '@/lib/error-handler';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ function isNotFoundError(err: unknown): boolean {
 
 export default function BillingPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [activeTab, setActiveTab] = useState('subscription');
 
 	const {

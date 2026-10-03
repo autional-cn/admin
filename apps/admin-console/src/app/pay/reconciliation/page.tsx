@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { Tag, DatePicker, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
 import { RetweetOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import {
 	usePayReconciliation,
 	useRunPayReconciliation,
@@ -16,7 +17,7 @@ const { RangePicker } = DatePicker;
 
 export default function PayReconciliationPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [filters, setFilters] = useState<Record<string, unknown>>({});
 
 	const params: Record<string, unknown> = {};

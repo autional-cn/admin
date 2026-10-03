@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useMembers, useInviteMember, useUpdateMember, useRemoveMember } from '@/hooks/use-members';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { inviteMemberSchema } from '@/lib/validators';
@@ -34,7 +35,7 @@ export default function MembersPage() {
 	const [editingMember, setEditingMember] = useState<MemberRecord | null>(null);
 	const [inviteForm] = Form.useForm();
 	const [editForm] = Form.useForm();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data = [], isLoading, error, refetch } = useMembers(tenantId);
 	const inviteMut = useInviteMember();

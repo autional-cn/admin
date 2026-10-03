@@ -2,9 +2,9 @@
 
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { getRoles } from '@/lib/api.generated';
 
 interface RoleRecord {
@@ -14,7 +14,7 @@ interface RoleRecord {
 }
 
 export function useRolesForSelect() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data: roles = [] } = useQuery({
 		queryKey: queryKeys.roles.all(tenantId),
 		staleTime: 60000,

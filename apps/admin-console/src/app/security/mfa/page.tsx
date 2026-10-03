@@ -6,11 +6,10 @@ import { message } from '@/lib/antd-app';
 import { SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAuthPolicy, updateAuthPolicy } from '@/lib/api.generated';
-import { useTenantId } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
-import { extractItem } from '@autional-cn/shared';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 
 interface AuthPolicyMFA {
@@ -72,7 +71,7 @@ function formToPolicy(values: {
 
 export default function MFAPolicyPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [form] = Form.useForm();
 
 	const { data: policy, isLoading, error, refetch } = useQuery({

@@ -1,19 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Card, Row, Col, Statistic, Select, Spin, Empty, Button } from 'antd';
 import { ReloadOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function UsagePage() {
 	const { t } = useTranslation();
 	const [days, setDays] = useState<number>(7);
 	// ADM-008: 用量端点需要 tenantId 路径参数（billing-service router.go 确认）
-	const tenantId = useTenantIdOr('');
+	const tenantId = useCurrentTenantIdOr('');
 
 	const {
 		data: timeline,

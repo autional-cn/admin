@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Tabs, Tooltip, Popconfirm, Descriptions, Divider } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
@@ -21,7 +22,7 @@ import {
 	useActivateApplication,
 } from '@/hooks/use-applications';
 import type { AppRecord } from '@/hooks/use-applications';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +36,7 @@ export default function ApplicationsPage() {
 	const [editing, setEditing] = useState<AppRecord | null>(null);
 	const [detailRecord, setDetailRecord] = useState<AppRecord | null>(null);
 	const [form] = Form.useForm();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data = [], isLoading, error, refetch } = useApplications(tenantId);
 	const createMut = useCreateApplication();

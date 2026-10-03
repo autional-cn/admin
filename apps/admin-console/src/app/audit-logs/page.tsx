@@ -19,14 +19,13 @@ import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/u
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { DataTablePagination } from '@autional-cn/ui/antd';
-import { apiClient, API_PATHS, extractItem, extractList } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractItem, extractList, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditExportJobs,
 	adminAuditMerkleProof,
 	adminAuditVerifications,
 } from '@autional-cn/shared/generated/api';
 import { useTranslation } from 'react-i18next';
-import { useTenantId } from '@/hooks/use-tenant';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 
 const { Text, Paragraph } = Typography;
@@ -35,7 +34,7 @@ const { RangePicker } = DatePicker;
 
 export default function AuditLogsPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const isRestricted = useIsAuditRestricted();
 
 	const ACTION_OPTIONS = [

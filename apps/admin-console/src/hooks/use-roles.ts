@@ -1,10 +1,10 @@
 'use client';
 
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	getRoles,
 	getRole,
@@ -31,7 +31,7 @@ export type RoleDetail = Record<string, unknown>;
 export type RolePermission = Record<string, unknown>;
 
 export function useRoles() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.all(tenantId),
 		staleTime: 300000,
@@ -49,7 +49,7 @@ export function useRoles() {
 }
 
 export function useRole(id: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.detail(tenantId, id),
 		staleTime: 300000,
@@ -62,7 +62,7 @@ export function useRole(id: string) {
 }
 
 export function useCreateRole() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: any) => createRole(data),
@@ -71,7 +71,7 @@ export function useCreateRole() {
 }
 
 export function useUpdateRole() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: any }) => updateRole(id, data),
@@ -80,7 +80,7 @@ export function useUpdateRole() {
 }
 
 export function useDeleteRole() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (roleId: string) => deleteRole(roleId),
@@ -89,7 +89,7 @@ export function useDeleteRole() {
 }
 
 export function useRolePermissions(roleId: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.permissions(tenantId, roleId),
 		staleTime: 300000,
@@ -102,7 +102,7 @@ export function useRolePermissions(roleId: string) {
 }
 
 export function useAssignRolePermissions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, data }: { roleId: string; data: any }) =>
@@ -115,7 +115,7 @@ export function useAssignRolePermissions() {
 }
 
 export function useRemoveRolePermissions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ roleId, data }: { roleId: string; data: any }) =>

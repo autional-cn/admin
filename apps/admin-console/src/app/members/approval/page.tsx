@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Spin, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
 import { CheckOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
@@ -11,7 +12,7 @@ import {
 	useBatchApproveMembers,
 	type PendingMember,
 } from '@/hooks/use-members-approval';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +22,7 @@ const { Option } = Select;
 
 export default function ApprovalPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 	const [approveVisible, setApproveVisible] = useState(false);
 	const [rejectVisible, setRejectVisible] = useState(false);
 	const [selectedMember, setSelectedMember] = useState<PendingMember | null>(null);

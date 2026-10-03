@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Form, Input, Button, Slider, ColorPicker, Card, Row, Col, Spin } from 'antd';
 import { message } from '@/lib/antd-app';
 import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useBranding, useUpdateBranding } from '@/hooks/use-branding';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 
@@ -33,7 +34,7 @@ export default function BrandingPage() {
 		loginTitle: t('branding.defaultLoginTitle'),
 		loginSubtitle: t('branding.defaultLoginSubtitle'),
 	});
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data, isLoading, error, refetch } = useBranding(tenantId);
 	const updateMut = useUpdateBranding();

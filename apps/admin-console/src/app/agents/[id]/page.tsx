@@ -6,7 +6,7 @@ import { DataTable } from '@autional-cn/ui/antd';
 import { useParams, useNavigate } from 'react-router';
 import { Button, Tag, Modal, Form, Input, Select, Skeleton, Descriptions } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { PageHeader, StatusBadge, SectionCard, EmptyState, ErrorState } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -19,7 +19,7 @@ import {
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { useTranslation } from 'react-i18next';
 
 interface AgentDetail {
@@ -150,7 +150,7 @@ export default function AgentDetailPage() {
 	const navigate = useNavigate();
 	const tenantSlug = useTenantSlug();
 	const queryClient = useQueryClient();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [editVisible, setEditVisible] = useState(false);
 	const [form] = Form.useForm();
 

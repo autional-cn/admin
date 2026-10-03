@@ -1,26 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PlatformPortalsPage from '../applications/platform-portals/page';
-
-vi.mock('@/hooks/use-tenant', () => ({
-	useTenantId: vi.fn(),
-}));
 
 const { PLATFORM_TENANT_ID } = vi.hoisted(() => ({
 	PLATFORM_TENANT_ID: '01KSQCBNVMS6SX64PJS937CE33',
 }));
 
+// 这个 mock 只列用到的导出（历史写法）。**注意**：页面新增任何来自 @autional-cn/shared 的导入，
+// 都必须在这里补上，否则运行到就是 undefined —— 租户 hook 从站点本地搬到 shared 时就踩过一次。
 vi.mock('@autional-cn/shared', () => ({
 	getAccessToken: vi.fn(() => 'test-token'),
 	getPortalUrl: vi.fn((code: string) => `https://${code}.portal.test`),
 	API_BASE_URL: 'https://api.test',
 	PLATFORM_TENANT_ID,
+	useCurrentTenantId: vi.fn(),
 }));
 
-import { useTenantId } from '@/hooks/use-tenant';
-
-const mockedUseTenantId = vi.mocked(useTenantId);
+const mockedUseTenantId = vi.mocked(useCurrentTenantId);
 
 const OTHER_TENANT_ID = '01AAAA1111BBBB2222CCCC3333';
 

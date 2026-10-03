@@ -1,17 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Space } from 'antd';
 import { message } from '@/lib/antd-app';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { useWalletDisputes, useResolveDispute, type Dispute } from '@/hooks/use-wallets';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function WalletDisputesPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data: disputes = [], isLoading, error, refetch } = useWalletDisputes(tenantId);
 	const resolveMut = useResolveDispute();
 

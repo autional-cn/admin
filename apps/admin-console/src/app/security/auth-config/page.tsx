@@ -20,11 +20,11 @@ import { message } from '@/lib/antd-app';
 import { SaveOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getAuthConfig, updateAuthConfig } from '@/lib/api.generated';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
-import { extractItem } from '@autional-cn/shared';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { COMPLIANCE_PROFILES, type ProfilePreset } from '@/lib/compliance-profiles';
 
@@ -33,7 +33,7 @@ const { Option } = Select;
 export default function AuthConfigPage() {
 	const { t } = useTranslation();
 	const [form] = Form.useForm();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [selectedProfile, setSelectedProfile] = useState<string>('custom');
 	const [showProfileConfirm, setShowProfileConfirm] = useState<ProfilePreset | null>(null);
 

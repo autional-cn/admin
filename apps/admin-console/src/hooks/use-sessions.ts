@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteSession, getActiveSessionCount, getSessions } from '@/lib/api.generated';
@@ -27,7 +27,7 @@ export interface SessionRecord {
 }
 
 export function useSessions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.sessions.all(tenantId),
 		queryFn: async () => {
@@ -38,7 +38,7 @@ export function useSessions() {
 }
 
 export function useActiveSessionCount() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.sessions.activeCount(tenantId),
 		queryFn: async ({ signal }) => {
@@ -49,7 +49,7 @@ export function useActiveSessionCount() {
 }
 
 export function useDeleteSession() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (id: string) => deleteSession(id, {}),

@@ -10,8 +10,8 @@ import { message, modal } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { DataTableProps } from '@autional-cn/ui/antd';
-import { useTenantIdOr } from '@/hooks/use-tenant';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+
+import { apiClient, API_PATHS, extractItem, useCurrentTenantIdOr } from '@autional-cn/shared';
 import dayjs from 'dayjs';
 
 interface LegalDocumentItem {
@@ -43,7 +43,7 @@ const FETCH_LIMIT = 50;
 
 export default function LegalDocumentsPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	/** status → Tag 颜色映射（AC-004） */
 	const STATUS_COLORS: Record<string, string> = {

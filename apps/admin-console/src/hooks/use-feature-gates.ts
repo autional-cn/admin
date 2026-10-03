@@ -1,9 +1,10 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { useQuery } from '@tanstack/react-query';
 import { getFeatureGates } from '@/lib/api.generated';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { queryKeys } from '@/lib/query-keys';
 import type { FeatureGateResponse } from '@autional-cn/shared/generated/types';
 
@@ -16,7 +17,7 @@ import type { FeatureGateResponse } from '@autional-cn/shared/generated/types';
  *        featureGates.has('nhi') → whether NHI management is enabled
  */
 export function useFeatureGates(): Set<string> {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data } = useQuery({
 		queryKey: queryKeys.featureGates(tenantId),
 		queryFn: () => getFeatureGates(),
@@ -43,7 +44,7 @@ export function useFeatureGates(): Set<string> {
  * Phase 0b: for components that do not support TanStack Query.
  */
 export function useStaticFeatureGates(): Set<string> {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data } = useQuery({
 		queryKey: queryKeys.featureGates(tenantId),
 		queryFn: () => getFeatureGates(),

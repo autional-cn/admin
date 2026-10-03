@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { PageHeader, StatusBadge, EmptyState, ErrorState } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 interface DeviceRecord {
 	id: string;
@@ -87,7 +87,7 @@ export default function DevicesPage() {
 	const navigate = useNavigate();
 	const tenantSlug = useTenantSlug();
 	const queryClient = useQueryClient();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [modalVisible, setModalVisible] = useState(false);
 	const [form] = Form.useForm();
 

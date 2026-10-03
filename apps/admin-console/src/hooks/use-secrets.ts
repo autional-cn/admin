@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import type * as GeneratedTypes from '@autional-cn/shared/generated/types';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import {
 	getSecrets,
 	getSecretDetail,
@@ -28,7 +28,7 @@ export function useSecrets(params?: {
 	page?: number;
 	page_size?: number;
 }) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 
 	return useQuery({
 		queryKey: queryKeys.secrets.list(tenantId, params),
@@ -41,7 +41,7 @@ export function useSecrets(params?: {
 }
 
 export function useSecretDetail(key: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.secrets.detail(tenantId, key),
 		queryFn: async () => {
@@ -53,7 +53,7 @@ export function useSecretDetail(key: string) {
 }
 
 export function useSecretVersions(key: string) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.secrets.versions(tenantId, key),
 		queryFn: async () => {
@@ -74,7 +74,7 @@ export function useSecretVersionValue() {
 }
 
 export function useCreateSecret() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (data: { key: string; value: string; description?: string }) => {
@@ -85,7 +85,7 @@ export function useCreateSecret() {
 }
 
 export function useUpdateSecret() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ key, data }: { key: string; data: { description?: string } }) => {
@@ -96,7 +96,7 @@ export function useUpdateSecret() {
 }
 
 export function useDeleteSecret() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (key: string) => {
@@ -107,7 +107,7 @@ export function useDeleteSecret() {
 }
 
 export function useRotateSecret() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ key, data }: { key: string; data: { value: string } }) => {
@@ -118,7 +118,7 @@ export function useRotateSecret() {
 }
 
 export function useRevokeSecret() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (key: string) => {
@@ -129,7 +129,7 @@ export function useRevokeSecret() {
 }
 
 export function useBatchRevoke() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (keys: string[]) => {
@@ -141,7 +141,7 @@ export function useBatchRevoke() {
 }
 
 export function useBatchDelete() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (keys: string[]) => {
@@ -153,7 +153,7 @@ export function useBatchDelete() {
 }
 
 export function useEncryptionKeys() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.secrets.encryptionKeys(tenantId),
 		queryFn: async () => {

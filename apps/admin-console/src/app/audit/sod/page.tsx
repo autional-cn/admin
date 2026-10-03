@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, Form, Select, Button, Spin, Descriptions, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
 import { SaveOutlined, ReloadOutlined, SafetyOutlined } from '@ant-design/icons';
-import { extractItem } from '@autional-cn/shared';
-import { useTenantId } from '@/hooks/use-tenant';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
+
 import { apiClient, API_PATHS } from '@autional-cn/shared';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
@@ -17,7 +17,7 @@ interface SodConfigData {
 
 export default function SodConfigPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const [form] = Form.useForm<SodConfigData>();
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);

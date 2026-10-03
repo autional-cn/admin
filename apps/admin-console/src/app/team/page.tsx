@@ -8,8 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMembers, inviteMember, removeMember } from '@/lib/api.generated';
-import { extractList } from '@autional-cn/shared';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+import { extractList, useCurrentTenantIdOr } from '@autional-cn/shared';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 
@@ -25,7 +25,7 @@ interface TeamMember {
 
 export default function TeamPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 	const queryClient = useQueryClient();
 	const [modalVisible, setModalVisible] = useState(false);
 	const [form] = Form.useForm();

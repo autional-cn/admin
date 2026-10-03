@@ -3,15 +3,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch, Empty } from 'antd';
-import { getAccessToken, getPortalUrl, API_BASE_URL, PLATFORM_TENANT_ID } from '@autional-cn/shared';
+import { getAccessToken, getPortalUrl, API_BASE_URL, PLATFORM_TENANT_ID, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { useTenantId } from '@/hooks/use-tenant';
 
 export default function PlatformPortalsPage() {
 	const { t } = useTranslation();
 	const token = getAccessToken();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	// 平台内置 Portal 属平台租户数据：非平台租户会话隐藏并停取数（U320；语义与 U94 同轴）。
 	const isPlatformTenant = tenantId === PLATFORM_TENANT_ID;
 	const queryClient = useQueryClient();

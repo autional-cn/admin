@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -26,7 +26,7 @@ export interface ABACPolicy {
 }
 
 export function useAbacPolicies() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.abacPolicies.all(tenantId),
 		staleTime: 300000,
@@ -38,7 +38,7 @@ export function useAbacPolicies() {
 }
 
 export function useCreateAbacPolicy() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (data: any) => createAbacPolicy(data),
@@ -48,7 +48,7 @@ export function useCreateAbacPolicy() {
 }
 
 export function useUpdateAbacPolicy() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ id, data }: { id: string; data: any }) => updateAbacPolicy(id, data),
@@ -58,7 +58,7 @@ export function useUpdateAbacPolicy() {
 }
 
 export function useDeleteAbacPolicy() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (id: string) => deleteAbacPolicy(id),

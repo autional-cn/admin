@@ -1,8 +1,8 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -35,7 +35,7 @@ export interface UserPermission {
 }
 
 export function useUserRoles(userId: string, enabled = true) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.userRoles(tenantId, userId) as unknown as readonly unknown[],
 		staleTime: 300_000,
@@ -48,7 +48,7 @@ export function useUserRoles(userId: string, enabled = true) {
 }
 
 export function useUserPermissions(userId: string, enabled = true) {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.userPermissions(tenantId, userId) as unknown as readonly unknown[],
 		staleTime: 300_000,
@@ -61,7 +61,7 @@ export function useUserPermissions(userId: string, enabled = true) {
 }
 
 export function useAssignUserRoles() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: AssignRolesRequest }) =>
@@ -81,7 +81,7 @@ export function useAssignUserRoles() {
 }
 
 export function useRemoveUserRoles() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: RemoveRolesRequest }) =>
@@ -101,7 +101,7 @@ export function useRemoveUserRoles() {
 }
 
 export function useAssignUserPermissions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: AssignPermissionsRequest }) =>
@@ -118,7 +118,7 @@ export function useAssignUserPermissions() {
 }
 
 export function useRevokeUserPermissions() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: ({ userId, data }: { userId: string; data: AssignPermissionsRequest }) =>

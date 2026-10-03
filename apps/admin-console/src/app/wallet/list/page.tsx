@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Space, Popconfirm, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -14,14 +15,14 @@ import {
 	useBatchUnfreeze,
 	type WalletItem,
 } from '@/hooks/use-wallet-admin';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { CreateWalletRequest } from '@autional-cn/shared/generated/types';
 
 export default function WalletListPage() {
 	const { t } = useTranslation();
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	const { data: wallets = [], isLoading, error, refetch } = useWalletList({ tenant_id: tenantId });
 	const createMut = useCreateWallet();
 	const updateMut = useUpdateWallet();

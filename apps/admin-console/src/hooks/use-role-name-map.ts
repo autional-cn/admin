@@ -1,9 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { extractList } from '@autional-cn/shared';
+import { extractList, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import { useTenantId } from '@/hooks/use-tenant';
+
 import { getRoles } from '@/lib/api.generated';
 
 interface RoleRecord {
@@ -13,7 +13,7 @@ interface RoleRecord {
 }
 
 export function useRoleNameMap() {
-	const tenantId = useTenantId();
+	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.roles.all(tenantId),
 		staleTime: 60000,

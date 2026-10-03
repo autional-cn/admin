@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Drawer, Timeline, Popconfirm, Spin, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
@@ -20,7 +21,7 @@ import {
 	useWebhookDeliveryLogs,
 } from '@/hooks/use-webhooks';
 import type { WebhookRecord, DeliveryLog } from '@/hooks/use-webhooks';
-import { useTenantIdOr } from '@/hooks/use-tenant';
+
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createWebhookSchema } from '@/lib/validators';
@@ -46,7 +47,7 @@ export default function WebhooksPage() {
 	const [editing, setEditing] = useState<WebhookRecord | null>(null);
 	const [selectedHookId, setSelectedHookId] = useState<string>('');
 	const [form] = Form.useForm();
-	const tenantId = useTenantIdOr('default-tenant');
+	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data = [], isLoading, error, refetch } = useWebhooks(tenantId);
 	const createMut = useCreateWebhook();
