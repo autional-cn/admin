@@ -49,17 +49,17 @@ importers:
         specifier: 6.2.2
         version: 6.2.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@autional-cn/shared':
-        specifier: 0.1.0-rc.10
-        version: 0.1.0-rc.10(immer@11.1.18)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))
+        specifier: ^0.1.0-rc.13
+        version: 0.1.0-rc.13(immer@11.1.18)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))
       '@autional-cn/tailwind-preset':
-        specifier: 0.1.0-rc
+        specifier: ^0.1.0-rc
         version: 0.1.0-rc(tailwindcss@3.4.19)
       '@autional-cn/tokens':
-        specifier: 0.1.0-rc.2
+        specifier: ^0.1.0-rc.2
         version: 0.1.0-rc.2
       '@autional-cn/ui':
-        specifier: 0.1.0-rc
-        version: 0.1.0-rc(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
+        specifier: ^0.1.0-rc.2
+        version: 0.1.0-rc.2(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)
       '@tanstack/react-query':
         specifier: 5.100.9
         version: 5.100.9(react@19.2.5)
@@ -101,7 +101,7 @@ importers:
         version: 5.0.13(@types/react@19.2.14)(immer@11.1.18)(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))
     devDependencies:
       '@autional-cn/tsconfig':
-        specifier: 0.1.0-rc
+        specifier: ^0.1.0-rc
         version: 0.1.0-rc
       '@types/react':
         specifier: 19.2.14
@@ -194,8 +194,8 @@ packages:
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
-  '@autional-cn/shared@0.1.0-rc.10':
-    resolution: {integrity: sha512-vl7pYRiyaO4IT216Llqu5qU93wiXym+CyFjmzvBaIZhBOb61kwYOkLni0WthrYd/IWhWn3oSwyu+4Ttr0Q/yeg==}
+  '@autional-cn/shared@0.1.0-rc.13':
+    resolution: {integrity: sha512-+dqSRvhA2WmwnJr7OMrU6R6wKdxsSU/cWk1mJ9FAY0RJcr7OYCM+TXKNsYF4vsdMOLJxM1RDYE3Mbkg+582I5Q==}
     peerDependencies:
       react: 19.2.5
       react-dom: 19.2.5
@@ -214,8 +214,8 @@ packages:
   '@autional-cn/tsconfig@0.1.0-rc':
     resolution: {integrity: sha512-XY7N2lbMlR1D+OlkxDAw9Pz9CleV4UZ14RfWkkhGTZbbHvxT/d69H8GXWhyc9/634RoEUyVajYmjT75cZbKF4A==}
 
-  '@autional-cn/ui@0.1.0-rc':
-    resolution: {integrity: sha512-5M5SslaVnV3ilchTo+d18Vf2EBgtvgTQRtd1aGddAIUvra/S6Brnc+hiuuXiK/faoF4DqIKx9Pw79cva+uFq8A==}
+  '@autional-cn/ui@0.1.0-rc.2':
+    resolution: {integrity: sha512-souQyes2J9km8E2lGqH4AT4iLa9I6F6U1ziBvBaTXi9nvVWvMdLViIe96AiO3COiWpDmxgEoU36a+d+zqG19tw==}
     peerDependencies:
       antd: '>=6.0.0'
       i18next: '>=26.0.0'
@@ -2376,7 +2376,7 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@autional-cn/shared@0.1.0-rc.10(immer@11.1.18)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))':
+  '@autional-cn/shared@0.1.0-rc.13(immer@11.1.18)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@tanstack/react-query': 5.100.9(react@19.2.5)
@@ -2405,7 +2405,7 @@ snapshots:
 
   '@autional-cn/tsconfig@0.1.0-rc': {}
 
-  '@autional-cn/ui@0.1.0-rc(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
+  '@autional-cn/ui@0.1.0-rc.2(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react@19.2.5)':
     dependencies:
       antd: 6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       i18next: 26.0.10(typescript@5.8.3)

@@ -2,17 +2,17 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router';
-import {
-	LogoutOutlined,
-	MenuFoldOutlined,
-	MenuUnfoldOutlined,
-	UserOutlined,
-} from '@ant-design/icons';
-import { Layout, Button, Avatar, Dropdown, Space, Typography, Select, Tag } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { Layout, Button, Space, Typography, Select, Tag } from 'antd';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUIStore } from '@/stores/ui-store';
-import { useAuthStore, useLogout, useTenantSlug } from '@autional-cn/shared';
-import { LanguageSwitcher, ThemeToggle } from '@autional-cn/ui';
+import {
+	useAuthStore,
+	useLogout,
+	usePortalCatalog,
+	useTenantSlug,
+} from '@autional-cn/shared';
+import { LanguageSwitcher, PortalSwitcher, ThemeToggle, UserMenu } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 import { buildNavHref } from '@/lib/nav';
 
@@ -21,7 +21,7 @@ const { Text } = Typography;
 
 /**
  * Header component.
- * Includes sidebar collapse toggle, tenant selector, user dropdown.
+ * Includes sidebar collapse toggle, portal switcher, tenant selector, user menu.
  */
 export function Header() {
 	const navigate = useNavigate();
@@ -38,20 +38,12 @@ export function Header() {
 	const queryClient = useQueryClient();
 	const { t } = useTranslation();
 
-	const userMenuItems = [
-		{
-			key: 'profile',
-			icon: <UserOutlined />,
-			label: t('common.profile'),
-			onClick: () => navigate(buildNavHref('/settings', tenantSlug)),
-		},
-		{
-			key: 'logout',
-			icon: <LogoutOutlined />,
-			label: t('common.logout'),
-			onClick: handleLogout,
-		},
-	];
+	// 管理面平面（audiences [admin, platform]）：控制台侧走 admin 受众端点
+	const { portals } = usePortalCatalog({
+		tenantId: currentTenantId,
+		slug: tenantSlug,
+		audience: 'admin',
+	});
 
 	return (
 		<AntHeader className="sticky top-0 z-10 flex items-center justify-between h-[var(--layout-header-height)] bg-[var(--color-bg-surface)] px-6 border-b border-[var(--color-border)]">
@@ -64,6 +56,7 @@ export function Header() {
 			/>
 
 			<Space size="large">
+				<PortalSwitcher portals={portals} currentPortal="admin" />
 				<LanguageSwitcher />
 				<ThemeToggle />
 				{tenants.length === 0 ? (
@@ -87,12 +80,17 @@ export function Header() {
 					/>
 				)}
 
-				<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-					<Space className="cursor-pointer" aria-label={t('header.userMenu')}>
-						<Avatar className="!bg-blue-500">{user?.username?.[0]?.toUpperCase() || 'A'}</Avatar>
-						<Text>{user?.username || t('common.admin')}</Text>
-					</Space>
-				</Dropdown>
+				<UserMenu
+					user={user}
+					items={[
+						{
+							key: 'settings',
+							type: 'settings',
+							onClick: () => navigate(buildNavHref('/settings', tenantSlug)),
+						},
+						{ key: 'logout', type: 'logout', onClick: handleLogout },
+					]}
+				/>
 			</Space>
 		</AntHeader>
 	);
