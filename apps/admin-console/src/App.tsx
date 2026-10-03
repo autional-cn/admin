@@ -1,11 +1,14 @@
 import { Routes, Route, Outlet, useParams } from 'react-router';
 import type { ReactNode } from 'react';
-import { Layout } from 'antd';
-import { ErrorBoundary } from '@autional-cn/ui';
+import { Button } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { AppShell, ErrorBoundary } from '@autional-cn/ui';
 import { DEFAULT_ERROR_BOUNDARY } from './lib/error-boundary-config';
-import { Sidebar } from './components/layout/Sidebar';
-import { Header } from './components/layout/Header';
+import { NavMenu } from './components/layout/NavMenu';
+import { HeaderActions } from './components/layout/HeaderActions';
 import { Breadcrumb } from './components/layout/Breadcrumb';
+import { useUIStore } from './stores/ui-store';
 import { ForbiddenRedirect } from './components/common/ForbiddenRedirect';
 import {
 	AuthGuard,
@@ -52,8 +55,6 @@ import { AuditComplianceRoutes } from './routes/audit-compliance';
 import { ConfigRoutes } from './routes/config';
 import { DeveloperRoutes } from './routes/developer';
 
-const { Content } = Layout;
-
 /**
  * 挂载级闸门：/:tenantSlug 交给共享 RequireAuth（含 F-W6/F-W7 未知 slug 闸门）；
  * 首段解析不出 slug 的裸路径（/users、/403 等站内业务段）一律本地 404 ——
@@ -69,19 +70,41 @@ function AdminMountGate({ children }: { children: ReactNode }) {
 function LayoutWrapper() {
 	const { tenantSlug } = useParams<{ tenantSlug?: string }>();
 	useBootstrap();
+	const { t } = useTranslation();
+	const collapsed = useUIStore((s) => s.sidebarCollapsed);
+	const toggleSidebar = useUIStore((s) => s.toggleSidebar);
+
+	// 外壳（侧栏框架 + sticky 顶栏 + 移动端抽屉 + 内容滚动容器）来自设计系统，
+	// 本站只提供内容：品牌、菜单、面包屑、折叠按钮、右上角控件。
 	return (
 		<TenantSlugProvider value={tenantSlug}>
-			<Layout className="h-screen overflow-hidden">
-				<Sidebar />
-				<Layout>
-					<Header />
-					<Content className="overflow-auto m-6 p-6 bg-[var(--color-bg-surface)] rounded-lg h-[calc(100vh-64px)]">
-						<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
+			<AppShell
+				brand={
+					<span className="truncate text-lg font-bold">{collapsed ? 'A' : t('app.brand')}</span>
+				}
+				nav={<NavMenu />}
+				sidebarCollapsed={collapsed}
+				headerLeft={
+					<>
+						<Button
+							type="text"
+							className="hidden lg:inline-flex"
+							icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+							onClick={toggleSidebar}
+							aria-label={collapsed ? t('header.expandSidebar') : t('header.collapseSidebar')}
+							aria-expanded={!collapsed}
+						/>
 						<Breadcrumb />
-						<Outlet />
-					</Content>
-				</Layout>
-			</Layout>
+					</>
+				}
+				headerRight={<HeaderActions />}
+				contentClassName="p-6"
+			>
+				<div className="min-h-[calc(100vh-112px)] rounded-lg bg-[var(--color-bg-surface)] p-6">
+					<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
+					<Outlet />
+				</div>
+			</AppShell>
 		</TenantSlugProvider>
 	);
 }

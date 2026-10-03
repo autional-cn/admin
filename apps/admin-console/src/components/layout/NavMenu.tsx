@@ -1,6 +1,11 @@
 'use client';
 
 import React from 'react';
+// NavMenu —— 本站的**导航内容**（菜单树 + 权限/功能门过滤 + 展开态管理）。
+//
+// 它过去是 Sidebar.tsx：一个 <Sider> 外壳 + 品牌 + <Menu>。外壳那部分（固定定位、宽度、折叠、
+// 移动端抽屉、滚动容器）2026-10-04 起归设计系统的 <AppShell>；品牌挪到 AppShell 的 brand 槽。
+// 这里只留四个门户里**真正不同**的那部分。
 import { useNavigate, useLocation } from 'react-router';
 import {
 	DashboardOutlined,
@@ -17,7 +22,7 @@ import {
 	KeyOutlined,
 	ApiOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu, Typography, Badge } from 'antd';
+import { Menu, Badge } from 'antd';
 import { useUIStore } from '@/stores/ui-store';
 import { usePermission, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
@@ -28,8 +33,6 @@ import { queryKeys } from '@/lib/query-keys';
 import { useFeatureGates } from '@/hooks/use-feature-gates';
 import { buildNavHref, stripTenantPrefix } from '@/lib/nav';
 
-const { Sider } = Layout;
-const { Text } = Typography;
 
 interface MenuItem {
 	key: string;
@@ -86,7 +89,7 @@ function filterMenuByFeatureGate(items: MenuItem[], gates: Set<string>): MenuIte
  * Sidebar component.
  * Extracted from AppLayout. Supports permission-filtered menus, collapse/expand.
  */
-export function Sidebar() {
+export function NavMenu() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const tenantSlug = useTenantSlug();
@@ -597,20 +600,8 @@ export function Sidebar() {
 	}, []);
 
 	const loading = !antMenuItems.length;
-
 	return (
-		<Sider
-			trigger={null}
-			collapsible
-			collapsed={collapsed}
-			theme="light"
-			className="border-r border-[var(--color-border)] h-screen overflow-auto sticky top-0 left-0"
-		>
-			<div className="flex h-16 items-center justify-center border-b border-[var(--color-border)]">
-				<Text strong className="text-lg">
-					{collapsed ? 'A' : t('app.brand')}
-				</Text>
-			</div>
+		<>
 			<Menu
 				mode="inline"
 				selectedKeys={[path]}
@@ -622,11 +613,7 @@ export function Sidebar() {
 				role="navigation"
 				aria-label={t('common.mainNavigation', '主导航')}
 			/>
-			{loading && !collapsed && (
-				<div className="px-4 py-8 text-center text-sm text-gray-400">
-					{t('common.loading', 'Loading...')}
-				</div>
-			)}
-		</Sider>
+			{loading && <div className="px-4 py-8 text-center text-sm text-[var(--color-text-muted)]">{t('common.loading', 'Loading...')}</div>}
+		</>
 	);
 }
