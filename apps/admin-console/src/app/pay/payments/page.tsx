@@ -1,22 +1,31 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Tag, Input, Select, DatePicker, Space, Button, Card } from 'antd';
+import { Tag, Input, Select, Space, Button, Card } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { usePayPayments, type PaymentItem } from '@/hooks/use-pay';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DateRangeValue } from '@autional-cn/ui/antd';
 
-const { RangePicker } = DatePicker;
+/** 该页的筛选口径（收敛前是 `Record<string, unknown>`）。 */
+type PaymentFilters = {
+	status?: string;
+	channel?: string;
+	startDate?: string;
+	endDate?: string;
+};
 
 export default function PayPaymentsPage() {
 	const { t } = useTranslation();
 	const navigate = useNavigate();
 	const tenantSlug = useTenantSlug();
-	const [filters, setFilters] = useState<Record<string, unknown>>({});
+	const [filters, setFilters] = useState<PaymentFilters>({});
+	const dateRange: DateRangeValue =
+		filters.startDate && filters.endDate ? [filters.startDate, filters.endDate] : null;
 	const [searchText, setSearchText] = useState('');
 
 	const params = useMemo(() => {
@@ -167,14 +176,11 @@ export default function PayPaymentsPage() {
 							{ value: 'stripe', label: t('payPayments.channel.stripe') },
 						]}
 					/>
-					<RangePicker
-						onChange={(dates) => {
-							if (dates) {
-								setFilters({
-									...filters,
-									startDate: dates[0]?.format('YYYY-MM-DD'),
-									endDate: dates[1]?.format('YYYY-MM-DD'),
-								});
+					<DateRangeFilter
+						value={dateRange}
+						onChange={(range) => {
+							if (range) {
+								setFilters({ ...filters, startDate: range[0], endDate: range[1] });
 							} else {
 								const { startDate, endDate, ...rest } = filters;
 								setFilters(rest);

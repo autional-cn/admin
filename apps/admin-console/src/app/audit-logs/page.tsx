@@ -2,7 +2,7 @@
 // @generated-api-exempt: 2 key(s) [AUDIT.ADMIN_EXPORT_DOWNLOAD, AUDIT.ADMIN_HASHCHAIN] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import { Tag, Button, Input, Space, DatePicker, Select, Drawer, Card, Row, Col, Modal, Collapse, Typography, Spin, Empty } from 'antd';
+import { Tag, Button, Input, Space, Select, Drawer, Card, Row, Col, Modal, Collapse, Typography, Spin, Empty } from 'antd';
 
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -17,8 +17,8 @@ import {
 } from '@ant-design/icons';
 import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/use-audit-logs';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import type { DataTablePagination } from '@autional-cn/ui/antd';
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DataTablePagination, DateRangeValue } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, extractItem, extractList, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditExportJobs,
@@ -29,8 +29,6 @@ import { useTranslation } from 'react-i18next';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 
 const { Text, Paragraph } = Typography;
-
-const { RangePicker } = DatePicker;
 
 export default function AuditLogsPage() {
 	const { t } = useTranslation();
@@ -75,7 +73,7 @@ export default function AuditLogsPage() {
 	const [status, setStatus] = useState<number | undefined>();
 	const [level, setLevel] = useState<string | undefined>();
 	const [module, setModule] = useState<string | undefined>();
-	const [dateRange, setDateRange] = useState<[string, string] | null>(null);
+	const [dateRange, setDateRange] = useState<DateRangeValue>(null);
 	const [pagination, setPagination] = useState({ page: 1, pageSize: 20 });
 
 	const [drawerVisible, setDrawerVisible] = useState(false);
@@ -342,13 +340,13 @@ export default function AuditLogsPage() {
 			<Card className="mb-4" size="small">
 				<Row gutter={16} className="items-center">
 					<Col xs={24} sm={12} md={6} lg={4}>
-						<RangePicker
+						<DateRangeFilter
 							showTime
+							format="YYYY-MM-DD HH:mm:ss"
 							className="w-full"
 							placeholder={[t('audit.filter.startTime'), t('audit.filter.endTime')]}
-							onChange={(_, dates) => {
-								setDateRange(dates && dates[0] && dates[1] ? (dates as [string, string]) : null);
-							}}
+							value={dateRange}
+							onChange={setDateRange}
 						/>
 					</Col>
 					<Col xs={24} sm={12} md={6} lg={4}>

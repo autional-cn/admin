@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
-import { Tag, DatePicker, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
+import { Tag, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
 import { RetweetOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -11,14 +11,22 @@ import {
 	useRunPayReconciliation,
 	type ReconciliationRecord,
 } from '@/hooks/use-pay';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DateRangeValue } from '@autional-cn/ui/antd';
 
-const { RangePicker } = DatePicker;
+/** 该页的筛选口径（收敛前是 `Record<string, unknown>`，于是 RangePicker 那边只能靠 `dates[0]?.format()` 现场拼）。 */
+type ReconFilters = {
+	channel?: string;
+	startDate?: string;
+	endDate?: string;
+};
 
 export default function PayReconciliationPage() {
 	const { t } = useTranslation();
 	const tenantId = useCurrentTenantId() ?? '';
-	const [filters, setFilters] = useState<Record<string, unknown>>({});
+	const [filters, setFilters] = useState<ReconFilters>({});
+	const dateRange: DateRangeValue =
+		filters.startDate && filters.endDate ? [filters.startDate, filters.endDate] : null;
 
 	const params: Record<string, unknown> = {};
 	if (filters.channel) params.channel = filters.channel;
@@ -184,14 +192,11 @@ export default function PayReconciliationPage() {
 							{ value: 'stripe', label: t('payReconciliation.channel.stripe') },
 						]}
 					/>
-					<RangePicker
-						onChange={(dates) => {
-							if (dates) {
-								setFilters({
-									...filters,
-									startDate: dates[0]?.format('YYYY-MM-DD'),
-									endDate: dates[1]?.format('YYYY-MM-DD'),
-								});
+					<DateRangeFilter
+						value={dateRange}
+						onChange={(range) => {
+							if (range) {
+								setFilters({ ...filters, startDate: range[0], endDate: range[1] });
 							} else {
 								const { startDate, endDate, ...rest } = filters;
 								setFilters(rest);

@@ -1,20 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Form, Select, DatePicker, Button, Space, Tag } from 'antd';
+import { Card, Form, Select, Button, Space, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import dayjs from 'dayjs';
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DateRangeValue } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
-const { RangePicker } = DatePicker;
+/** 该页的筛选口径（收敛前是 `Record<string, unknown>`；`period` 是 `开始_结束` 的拼接串）。 */
+type TaxExportFilters = {
+	period?: string;
+	format?: string;
+};
 
 export default function BillingTaxExportPage() {
 	const { t } = useTranslation();
-	const [filters, setFilters] = useState<Record<string, unknown>>({});
+	const [filters, setFilters] = useState<TaxExportFilters>({});
 	const { data: exports = [], isLoading, error, refetch } = useTaxExport(filters);
+
+	// `period` 是 `开始_结束` 的拼接串，这里拆回区间给筛选器；拆不出两段就是「未选」。
+	const [periodStart, periodEnd] = (filters.period ?? '').split('_');
+	const periodRange: DateRangeValue = periodStart && periodEnd ? [periodStart, periodEnd] : null;
 
 	const columns = [
 		{ title: t('taxExport.column.id'), dataIndex: 'id', key: 'id', ellipsis: true, width: 160 },
@@ -79,21 +87,11 @@ export default function BillingTaxExportPage() {
 
 			<Card size="small" className="mb-4">
 				<Space wrap>
-					<RangePicker
-						value={
-							filters.period
-								? (() => {
-										const [sd, ed] = String(filters.period).split('_');
-										return sd && ed ? [dayjs(sd), dayjs(ed)] : null;
-									})()
-								: null
-						}
-						onChange={(dates) => {
-							if (dates) {
-								setFilters({
-									...filters,
-									period: `${dates[0]?.format('YYYY-MM-DD')}_${dates[1]?.format('YYYY-MM-DD')}`,
-								});
+					<DateRangeFilter
+						value={periodRange}
+						onChange={(range) => {
+							if (range) {
+								setFilters({ ...filters, period: `${range[0]}_${range[1]}` });
 							} else {
 								const { period, ...rest } = filters;
 								setFilters(rest);

@@ -39,9 +39,8 @@ import { useWalletPolicy, useUpdateWalletPolicy } from '@/hooks/use-wallet-admin
 import type { Transaction, Dispute, Coupon, FraudRule } from '@/hooks/use-wallets';
 
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-
-const { RangePicker } = DatePicker;
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DateRangeValue } from '@autional-cn/ui/antd';
 
 export default function WalletsPage() {
 	const { t } = useTranslation();
@@ -50,7 +49,7 @@ export default function WalletsPage() {
 		user: '',
 		type: undefined as string | undefined,
 		status: undefined as string | undefined,
-		dateRange: null as [string, string] | null,
+		dateRange: null as DateRangeValue,
 	});
 
 	const [disputeModal, setDisputeModal] = useState(false);
@@ -590,15 +589,11 @@ export default function WalletsPage() {
 												{ value: 'failed', label: t('wallets.failed') },
 											]}
 										/>
-										<RangePicker
+										<DateRangeFilter
 											showTime
-											onChange={(_, dates) => {
-												if (dates && dates[0] && dates[1]) {
-													setTxFilters({ ...txFilters, dateRange: dates as [string, string] });
-												} else {
-													setTxFilters({ ...txFilters, dateRange: null });
-												}
-											}}
+											format="YYYY-MM-DD HH:mm:ss"
+											value={txFilters.dateRange}
+											onChange={(dateRange) => setTxFilters({ ...txFilters, dateRange })}
 										/>
 										<Button type="primary" onClick={applyTxFilters}>
 											{t('wallets.filter')}

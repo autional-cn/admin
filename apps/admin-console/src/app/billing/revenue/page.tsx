@@ -1,17 +1,24 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Row, Col, Statistic, DatePicker, Space, Select, Button } from 'antd';
+import { Card, Row, Col, Statistic, Space, Select, Button } from 'antd';
 import { SearchOutlined, DollarOutlined } from '@ant-design/icons';
 import { useBillingRevenue, type RevenueItem } from '@/hooks/use-billing-admin';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
+import type { DateRangeValue } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
-const { RangePicker } = DatePicker;
+/** 该页的筛选口径（收敛前是 `Record<string, unknown>`）。 */
+type RevenueFilters = {
+	startDate?: string;
+	endDate?: string;
+};
 
 export default function BillingRevenuePage() {
 	const { t } = useTranslation();
-	const [filters, setFilters] = useState<Record<string, unknown>>({});
+	const [filters, setFilters] = useState<RevenueFilters>({});
+	const dateRange: DateRangeValue =
+		filters.startDate && filters.endDate ? [filters.startDate, filters.endDate] : null;
 
 	const { data: revenues = [], isLoading, error, refetch } = useBillingRevenue(filters);
 
@@ -105,14 +112,11 @@ export default function BillingRevenuePage() {
 
 			<Card size="small" className="mb-4">
 				<Space wrap>
-					<RangePicker
-						onChange={(dates) => {
-							if (dates) {
-								setFilters({
-									...filters,
-									startDate: dates[0]?.format('YYYY-MM-DD'),
-									endDate: dates[1]?.format('YYYY-MM-DD'),
-								});
+					<DateRangeFilter
+						value={dateRange}
+						onChange={(range) => {
+							if (range) {
+								setFilters({ ...filters, startDate: range[0], endDate: range[1] });
 							} else {
 								const { startDate, endDate, ...rest } = filters;
 								setFilters(rest);
