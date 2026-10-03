@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { Card, Descriptions, Tag, Button, Spin, Tabs, Table } from 'antd';
+import { Card, Descriptions, Tag, Button, Spin, Tabs } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import {
 	usePayPaymentDetail,
@@ -12,7 +12,7 @@ import {
 	type Receipt,
 	type RefundRecord,
 } from '@/hooks/use-pay';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { SectionCard } from '@autional-cn/ui';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
@@ -177,7 +177,7 @@ export default function PayPaymentDetailPage() {
 						key: 'refunds',
 						label: t('paymentDetail.refunds'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="refundId"
 								dataSource={refunds}
 								loading={refundsLoading}

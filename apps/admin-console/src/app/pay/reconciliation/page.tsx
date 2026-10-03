@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Tag, DatePicker, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
+import { Tag, DatePicker, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
 import { RetweetOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useTenantId } from '@/hooks/use-tenant';
@@ -10,7 +10,7 @@ import {
 	useRunPayReconciliation,
 	type ReconciliationRecord,
 } from '@/hooks/use-pay';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 
@@ -208,7 +208,7 @@ export default function PayReconciliationPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={records}

@@ -2,8 +2,9 @@
 // @generated-api-exempt: 2 key(s) [IDENTITY.ADMIN_AGENTS_ACTIVITY, IDENTITY.ADMIN_AGENTS_PERMISSIONS] lack generated func
 
 import React, { useState } from 'react';
+import { DataTable } from '@autional-cn/ui/antd';
 import { useParams, useNavigate } from 'react-router';
-import { Button, Tag, Modal, Form, Input, Select, Skeleton, Table, Descriptions } from 'antd';
+import { Button, Tag, Modal, Form, Input, Select, Skeleton, Descriptions } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
@@ -379,7 +380,7 @@ export default function AgentDetailPage() {
 								description={t('agents.detail.emptyCredentialsDesc')}
 							/>
 						) : (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={credentialColumns}
 								dataSource={credentials}
@@ -399,7 +400,7 @@ export default function AgentDetailPage() {
 								description={t('agents.detail.emptyActivityDesc')}
 							/>
 						) : (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={activityColumns}
 								dataSource={activity}
@@ -419,7 +420,7 @@ export default function AgentDetailPage() {
 								description={t('agents.detail.emptyPermissionsDesc')}
 							/>
 						) : (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={permissionColumns}
 								dataSource={permissions}

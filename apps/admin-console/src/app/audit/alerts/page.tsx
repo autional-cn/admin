@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Tag, Button, Select, Space, Drawer, Row, Col, Modal, Input } from 'antd';
-import type { TablePaginationConfig } from 'antd';
+import { Tag, Button, Select, Space, Drawer, Row, Col, Modal, Input } from 'antd';
+
 import { message } from '@/lib/antd-app';
 import { SearchOutlined } from '@ant-design/icons';
 import { useAlerts, useUpdateAlertStatus, useAssignAlert } from '@/hooks/use-audit-alerts';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
+import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
 import type * as Types from '@autional-cn/shared/generated/types';
 import { useTranslation } from 'react-i18next';
@@ -256,7 +257,7 @@ export default function AuditAlertsPage() {
 				</Row>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data?.items || []}
@@ -269,7 +270,7 @@ export default function AuditAlertsPage() {
 					pageSizeOptions: [20, 50, 100],
 					total: data?.pagination?.total || 0,
 				}}
-				onChange={(pag: TablePaginationConfig) => {
+				onChange={(pag: DataTablePagination) => {
 					setPagination({ page: pag.current || 1, pageSize: pag.pageSize || 20 });
 				}}
 			/>

@@ -2,18 +2,8 @@
 // @generated-api-exempt: 1 key(s) [PROFILE.ADMIN_FIELD_SCHEMA] lack generated func
 
 import { useState, useEffect } from 'react';
-import {
-	Table,
-	Button,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Switch,
-	InputNumber,
-	Space,
-	Popconfirm,
-} from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Button, Modal, Form, Input, Select, Switch, InputNumber, Space, Popconfirm } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
@@ -157,7 +147,7 @@ export default function FieldSchemaPage() {
 				>
 					{t('profileFields.addField')}
 				</Button>
-				<Table
+				<DataTable
 					columns={columns}
 					dataSource={schemas}
 					rowKey="fieldKey"

@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Tag, Button, Input, Space, Card, Descriptions, Spin, Select } from 'antd';
+import { Tag, Button, Input, Space, Card, Descriptions, Spin, Select } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingCreditBalancePage() {
@@ -198,7 +198,7 @@ export default function BillingCreditBalancePage() {
 						</Space>
 					</Card>
 
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={txColumns}
 						dataSource={transactions}

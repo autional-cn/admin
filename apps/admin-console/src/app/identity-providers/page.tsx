@@ -1,19 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Tag,
-	Button,
-	Space,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Popconfirm,
-	Upload,
-	Alert,
-} from 'antd';
+import { Tag, Button, Space, Modal, Form, Input, Select, Popconfirm, Upload, Alert } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -32,7 +20,7 @@ import {
 	useTestLdapConnection,
 } from '@/hooks/use-identity-providers';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createIdpSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -318,7 +306,7 @@ export default function IdentityProvidersPage() {
 			)}
 
 			{error && <PageError message={t('idp.loadError')} retry={refetch} className="mb-4" />}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data}

@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Input, DatePicker, Space, Button, Spin, Empty, Card } from 'antd';
+import { Input, DatePicker, Space, Button, Spin, Empty, Card } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function LogsPage() {
 	const { t } = useTranslation();
@@ -57,7 +57,7 @@ export default function LogsPage() {
 			) : logs.length === 0 ? (
 				<Empty description={t('logs.noData')} />
 			) : (
-				<Table
+				<DataTable
 					rowKey="id"
 					columns={columns}
 					dataSource={logs}

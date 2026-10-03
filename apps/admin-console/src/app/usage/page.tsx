@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Select, Spin, Empty, Button } from 'antd';
+import { Card, Row, Col, Statistic, Select, Spin, Empty, Button } from 'antd';
 import { ReloadOutlined, BarChartOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
 import { useTenantIdOr } from '@/hooks/use-tenant';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function UsagePage() {
 	const { t } = useTranslation();
@@ -84,7 +84,7 @@ export default function UsagePage() {
 				) : timelineData.length === 0 ? (
 					<Empty description={t('usage.noData')} />
 				) : (
-					<Table
+					<DataTable
 						rowKey="date"
 						columns={timelineColumns}
 						dataSource={timelineData}
@@ -100,7 +100,7 @@ export default function UsagePage() {
 				) : endpointData.length === 0 ? (
 					<Empty description={t('usage.noData')} />
 				) : (
-					<Table
+					<DataTable
 						rowKey="endpoint"
 						columns={endpointColumns}
 						dataSource={endpointData}

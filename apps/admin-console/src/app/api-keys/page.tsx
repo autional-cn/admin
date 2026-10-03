@@ -1,19 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Popconfirm,
-	Empty,
-	Spin,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Empty, Spin } from 'antd';
 import { PlusOutlined, DeleteOutlined, SyncOutlined, KeyOutlined } from '@ant-design/icons';
 import { message } from '@/lib/antd-app';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +14,7 @@ import {
 } from '@/hooks/use-api-keys';
 import type { ApiKeyRecord } from '@/hooks/use-api-keys';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 
@@ -183,7 +171,7 @@ export default function ApiKeysPage() {
 			) : data.length === 0 ? (
 				<Empty description={t('apiKeys.noData')} />
 			) : (
-				<Table
+				<DataTable
 					rowKey="id"
 					columns={columns}
 					dataSource={data}

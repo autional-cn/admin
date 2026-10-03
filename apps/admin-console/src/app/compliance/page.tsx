@@ -2,25 +2,7 @@
 // @generated-api-exempt: 2 key(s) [COMPLIANCE.ADMIN_TENANT_SELF_POLICY, COMPLIANCE.ADMIN_TENANT_SELF_SCORE] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import {
-	Tabs,
-	Card,
-	Tag,
-	Button,
-	Table,
-	Statistic,
-	Row,
-	Col,
-	Space,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Empty,
-	Drawer,
-	Progress,
-	Badge,
-} from 'antd';
+import { Tabs, Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, Empty, Drawer, Progress, Badge } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	SafetyCertificateOutlined,
@@ -44,7 +26,7 @@ import {
 	useRevokeConsent,
 } from '@/hooks/use-compliance';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, useIsAuditRestricted, AuditStatsOnly, extractItem, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useNavigate } from 'react-router';
@@ -461,7 +443,7 @@ export default function CompliancePage() {
 						key: 'dsar',
 						label: t('compliance.tabDsar'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={dsarColumns}
 								dataSource={dsars}
@@ -488,7 +470,7 @@ export default function CompliancePage() {
 										{t('compliance.consent.newConsent')}
 									</Button>
 								</div>
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={consentColumns}
 									dataSource={consents}
@@ -521,7 +503,7 @@ export default function CompliancePage() {
 								{error && (
 									<PageError message={t('compliance.loadError')} retry={refetch} className="mb-4" />
 								)}
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={policyColumns}
 									dataSource={policies}
@@ -536,7 +518,7 @@ export default function CompliancePage() {
 						key: 'sod',
 						label: t('compliance.tabSod'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={sodColumns}
 								dataSource={sodRules}
@@ -550,7 +532,7 @@ export default function CompliancePage() {
 						key: 'iso',
 						label: t('compliance.tabIso'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={isoColumns}
 								dataSource={isoControls}

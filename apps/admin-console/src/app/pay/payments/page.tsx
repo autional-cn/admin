@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Table, Tag, Input, Select, DatePicker, Space, Button, Card } from 'antd';
+import { Tag, Input, Select, DatePicker, Space, Button, Card } from 'antd';
 import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { usePayPayments, type PaymentItem } from '@/hooks/use-pay';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 
@@ -187,7 +187,7 @@ export default function PayPaymentsPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="paymentId"
 				columns={columns}
 				dataSource={payments}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Popconfirm, Tooltip } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Popconfirm, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import {
 	useDeleteGlobalVariable,
 } from '@/hooks/use-global-variables';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { TextArea } = Input;
 
@@ -146,7 +146,7 @@ export default function GlobalVariablesPage() {
 					className="mb-4"
 				/>
 			)}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data as readonly Record<string, unknown>[]}

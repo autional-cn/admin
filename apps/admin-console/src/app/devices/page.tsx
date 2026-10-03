@@ -2,7 +2,8 @@
 // @generated-api-exempt: 2 key(s) [IDENTITY.ADMIN_DEVICE, IDENTITY.ADMIN_DEVICES] lack generated func
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
@@ -262,7 +263,7 @@ export default function DevicesPage() {
 			)}
 
 			{!isLoading && !error && devices.length > 0 && (
-				<Table
+				<DataTable
 					rowKey="id"
 					columns={columns}
 					dataSource={devices}

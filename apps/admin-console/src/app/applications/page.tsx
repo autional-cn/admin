@@ -1,22 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Empty,
-	Tabs,
-	Tooltip,
-	Popconfirm,
-	Descriptions,
-	Divider,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Tabs, Tooltip, Popconfirm, Descriptions, Divider } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -38,7 +23,7 @@ import {
 import type { AppRecord } from '@/hooks/use-applications';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 import { createApplicationSchema } from '@/lib/validators';
 
@@ -270,7 +255,7 @@ export default function ApplicationsPage() {
 			{data.length === 0 && !isLoading ? (
 				<Empty description={t('applications.noData')} className="py-12" />
 			) : (
-				<Table
+				<DataTable
 					rowKey="id"
 					columns={columns}
 					dataSource={data}

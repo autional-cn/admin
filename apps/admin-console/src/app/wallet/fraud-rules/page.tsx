@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Table, Tag } from 'antd';
+import { Tag } from 'antd';
 import { useFraudRules, type FraudRule } from '@/hooks/use-wallet-admin';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function WalletFraudRulesPage() {
@@ -54,7 +54,7 @@ export default function WalletFraudRulesPage() {
 
 			{error && <PageError message={t('fraudRules.loadError')} retry={refetch} className="mb-4" />}
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={rules}

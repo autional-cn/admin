@@ -1,20 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-	Tabs,
-	Table,
-	Button,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Space,
-	Tag,
-	Popconfirm,
-	InputNumber,
-	Switch,
-} from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Tabs, Button, Modal, Form, Input, Select, Space, Tag, Popconfirm, InputNumber, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { PageHeader, SectionCard, LoadingScreen, EmptyState } from '@autional-cn/ui';
@@ -197,7 +185,7 @@ function CrudTab({
 			<Button icon={<ReloadOutlined />} onClick={fetchData} className="mb-4 ml-2">
 				{t('common.refresh')}
 			</Button>
-			<Table
+			<DataTable
 				columns={displayCols}
 				dataSource={data}
 				rowKey={(r: any) => r.id || r._id}

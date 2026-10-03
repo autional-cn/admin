@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
+import { Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
 import { EyeOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { usePayRefunds, type PaymentItem } from '@/hooks/use-pay';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function PayRefundsPage() {
 	const { t } = useTranslation();
@@ -126,7 +126,7 @@ export default function PayRefundsPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="paymentId"
 				columns={columns}
 				dataSource={refundedPayments}

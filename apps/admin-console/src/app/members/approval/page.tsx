@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select, Empty, Spin, Tooltip } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Spin, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
 import { CheckOutlined, CloseOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import {
@@ -13,7 +13,7 @@ import {
 } from '@/hooks/use-members-approval';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 const { TextArea } = Input;
@@ -186,7 +186,7 @@ export default function ApprovalPage() {
 			) : data.length === 0 ? (
 				<Empty description={t('approval.noPending')} className="py-12" />
 			) : (
-				<Table
+				<DataTable
 					rowKey="userId"
 					columns={columns}
 					dataSource={Array.isArray(data) ? data : []}

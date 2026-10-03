@@ -1,19 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Tabs,
-	Tooltip,
-	Popconfirm,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Tabs, Tooltip, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -31,7 +19,7 @@ import {
 	useTestNotification,
 } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createNotificationTemplateSchema } from '@/lib/validators';
 
 const { Option } = Select;
@@ -235,7 +223,7 @@ export default function NotificationTemplatesPage() {
 					className="mb-4"
 				/>
 			)}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data}

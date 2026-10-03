@@ -1,18 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Modal,
-	Form,
-	Input,
-	Select,
-	InputNumber,
-	Space,
-	Popconfirm,
-	Tag,
-} from 'antd';
+import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
@@ -23,7 +12,7 @@ import {
 	type PlanItem,
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 import { createPlanSchema } from '@/lib/validators';
 
@@ -172,7 +161,7 @@ export default function BillingPlansPage() {
 
 			{error && <PageError message={t('plans2.loadError')} retry={refetch} className="mb-4" />}
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={plans}

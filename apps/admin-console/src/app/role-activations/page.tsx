@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import {
 } from '@/hooks/use-role-activations';
 import type { RoleActivation } from '@/hooks/use-role-activations';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const STATUS_MAP: Record<string, { color: string; label: string }> = {
 	active: { color: 'green', label: '' },
@@ -181,7 +181,7 @@ export default function RoleActivationsPage() {
 				/>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data as RoleActivation[]}

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select, Switch, Popconfirm } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -20,7 +20,7 @@ import {
 	useCommunicationTemplateStats,
 } from '@/hooks/use-communication';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -222,7 +222,7 @@ export default function CommunicationTemplatesPage() {
 					className="mb-4"
 				/>
 			)}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data}

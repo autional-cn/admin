@@ -1,21 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Card,
-	Tabs,
-	Form,
-	Input,
-	Button,
-	Table,
-	Tag,
-	Row,
-	Col,
-	Space,
-	Spin,
-	Statistic,
-	Skeleton,
-} from 'antd';
+import { Card, Tabs, Form, Input, Button, Tag, Row, Col, Space, Spin, Statistic, Skeleton } from 'antd';
 import { message } from '@/lib/antd-app';
 import { CheckCircleOutlined, SendOutlined, SwapRightOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +14,7 @@ import {
 } from '@/hooks/use-communication';
 import { getCommunicationHealth } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 interface HealthStatus {
 	channel: string;
@@ -223,7 +209,7 @@ export default function CommunicationPage() {
 						{dashLoading ? (
 							<Skeleton active paragraph={{ rows: 3 }} />
 						) : (
-							<Table
+							<DataTable
 								dataSource={Object.entries(dashboard?.byChannel ?? {}).map(([key, count]) => ({
 									channel: key.toUpperCase(),
 									count,
@@ -255,7 +241,7 @@ export default function CommunicationPage() {
 						{dashLoading ? (
 							<Skeleton active paragraph={{ rows: 3 }} />
 						) : (
-							<Table
+							<DataTable
 								dataSource={Object.entries(dashboard?.byStatus ?? {}).map(([key, count]) => ({
 									status: key,
 									label: statusLabels[key] || key,
@@ -353,7 +339,7 @@ export default function CommunicationPage() {
 
 					<Card title={t('communication.sendLogs')}>
 						<Spin spinning={logsLoading}>
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={logColumns}
 								dataSource={logs}

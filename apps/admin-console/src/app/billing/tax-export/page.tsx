@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Card, Form, Select, DatePicker, Button, Space, Tag } from 'antd';
+import { Card, Form, Select, DatePicker, Button, Space, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
 import { DownloadOutlined } from '@ant-design/icons';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
@@ -118,7 +118,7 @@ export default function BillingTaxExportPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={exports}

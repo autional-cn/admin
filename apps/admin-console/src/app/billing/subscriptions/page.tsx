@@ -1,20 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Tag,
-	Button,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Space,
-	Card,
-	Descriptions,
-	Popconfirm,
-	InputNumber,
-} from 'antd';
+import { Tag, Button, Modal, Form, Input, Select, Space, Card, Descriptions, Popconfirm, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
 import { EyeOutlined, StopOutlined, RetweetOutlined, CalendarOutlined } from '@ant-design/icons';
 import {
@@ -26,7 +13,7 @@ import {
 	type SubscriptionItem,
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingSubscriptionsPage() {
@@ -244,7 +231,7 @@ export default function BillingSubscriptionsPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={subscriptions}

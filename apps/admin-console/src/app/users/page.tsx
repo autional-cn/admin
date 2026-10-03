@@ -2,19 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import {
-	Table,
-	Tag,
-	Button,
-	Input,
-	Space,
-	Popconfirm,
-	Empty,
-	Skeleton,
-	Modal,
-	Form,
-	Checkbox,
-} from 'antd';
+import { Tag, Button, Input, Space, Popconfirm, Empty, Skeleton, Modal, Form, Checkbox } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	SearchOutlined,
@@ -33,7 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from '@/hooks/use-users';
 import { getUsers } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createUserSchema } from '@/lib/validators';
 
 interface UserRecord {
@@ -288,7 +276,7 @@ export default function UsersPage() {
 						)}
 					</div>
 
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={columns}
 						dataSource={data || []}

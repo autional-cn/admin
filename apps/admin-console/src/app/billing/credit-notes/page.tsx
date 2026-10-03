@@ -1,19 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Tag,
-	Button,
-	Modal,
-	Form,
-	Input,
-	InputNumber,
-	Space,
-	Card,
-	Descriptions,
-	Popconfirm,
-} from 'antd';
+import { Tag, Button, Modal, Form, Input, InputNumber, Space, Card, Descriptions, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -30,7 +18,7 @@ import {
 	type CreditNoteItem,
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function BillingCreditNotesPage() {
@@ -224,7 +212,7 @@ export default function BillingCreditNotesPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="creditNoteNumber"
 				columns={columns}
 				dataSource={results}

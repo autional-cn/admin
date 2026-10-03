@@ -1,23 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Drawer,
-	Switch,
-	Checkbox,
-	Divider,
-	Typography,
-	Empty,
-	Spin,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Switch, Checkbox, Divider, Typography, Empty, Spin } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -41,7 +25,7 @@ import { useCloneRole } from '@/hooks/use-role-hierarchy';
 import { usePermissions } from '@/hooks/use-permissions';
 import type { PermissionItem } from '@/hooks/use-permissions';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createRoleSchema } from '@/lib/validators';
 
 const { Title, Text } = Typography;
@@ -371,7 +355,7 @@ export default function RolesPage() {
 				/>
 			)}
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={roles}

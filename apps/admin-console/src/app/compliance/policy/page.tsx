@@ -2,24 +2,7 @@
 // @generated-api-exempt: 3 key(s) [COMPLIANCE.ADMIN_TENANT_SELF_POLICY, COMPLIANCE.ADMIN_TENANT_SELF_READINESS, COMPLIANCE.ADMIN_TENANT_SELF_SCORE] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import {
-	Tabs,
-	Card,
-	Checkbox,
-	Button,
-	Table,
-	Tag,
-	Space,
-	Modal,
-	Form,
-	Input,
-	message,
-	Progress,
-	Row,
-	Col,
-	Statistic,
-	Descriptions,
-} from 'antd';
+import { Tabs, Card, Checkbox, Button, Tag, Space, Modal, Form, Input, message, Progress, Row, Col, Statistic, Descriptions } from 'antd';
 import {
 	SafetyCertificateOutlined,
 	CheckCircleOutlined,
@@ -39,7 +22,7 @@ import {
 	adminComplianceTenantsSelfGapAnalysisPost,
 	adminComplianceTenantsSelfOverridesByOverridesDelete,
 } from '@autional-cn/shared/generated/api';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 interface StandardItem {
 	id: string;
@@ -324,7 +307,7 @@ export default function CompliancePolicyPage() {
 								))}
 							</Space>
 						)}
-						<Table
+						<DataTable
 							rowKey="parameter"
 							dataSource={Object.entries(resolvedPolicy).map(([k, v]) => ({
 								parameter: k,
@@ -398,7 +381,7 @@ export default function CompliancePolicyPage() {
 								</Space>
 							}
 						>
-							<Table
+							<DataTable
 								rowKey="parameter"
 								dataSource={gapItems}
 								columns={[
@@ -468,7 +451,7 @@ export default function CompliancePolicyPage() {
 							</Button>
 						}
 					>
-						<Table
+						<DataTable
 							rowKey="parameter"
 							dataSource={overrides}
 							columns={[

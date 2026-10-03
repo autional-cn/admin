@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, Select, Empty, Popconfirm } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useMembers, useInviteMember, useUpdateMember, useRemoveMember } from '@/hooks/use-members';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { inviteMemberSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 
@@ -179,7 +179,7 @@ export default function MembersPage() {
 			{data.length === 0 && !isLoading ? (
 				<Empty description={t('members.noData')} className="py-12" />
 			) : (
-				<Table
+				<DataTable
 					rowKey="userId"
 					columns={columns}
 					dataSource={data}

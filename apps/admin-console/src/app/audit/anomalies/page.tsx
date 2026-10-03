@@ -1,24 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-	Table,
-	Tag,
-	Button,
-	Select,
-	Space,
-	Drawer,
-	Row,
-	Col,
-	Modal,
-	Input,
-	Descriptions,
-	Divider,
-	Timeline,
-	Empty,
-	Spin,
-} from 'antd';
-import type { TablePaginationConfig } from 'antd';
+import { Tag, Button, Select, Space, Drawer, Row, Col, Modal, Input, Descriptions, Divider, Timeline, Empty, Spin } from 'antd';
+
 import { message } from '@/lib/antd-app';
 import { SecurityScanOutlined, LinkOutlined, WarningOutlined } from '@ant-design/icons';
 import {
@@ -32,7 +16,8 @@ import {
 	useLinkAnomalyToCase,
 } from '@/hooks/use-audit-anomalies';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
+import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly, extractItem } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 
@@ -386,7 +371,7 @@ export default function AuditAnomaliesPage() {
 				</Row>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data?.items || []}
@@ -399,7 +384,7 @@ export default function AuditAnomaliesPage() {
 					pageSizeOptions: [20, 50, 100],
 					total: data?.pagination?.total || 0,
 				}}
-				onChange={(pag: TablePaginationConfig) => {
+				onChange={(pag: DataTablePagination) => {
 					setPagination({ page: pag.current || 1, pageSize: pag.pageSize || 20 });
 				}}
 			/>

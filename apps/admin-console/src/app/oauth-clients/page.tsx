@@ -1,27 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Drawer,
-	Descriptions,
-	Popconfirm,
-	Empty,
-	Spin,
-	Tabs,
-	Statistic,
-	Card,
-	Row,
-	Col,
-	Typography,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Descriptions, Popconfirm, Empty, Spin, Tabs, Statistic, Card, Row, Col, Typography } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -52,7 +32,7 @@ import type {
 	OAuthClientStats,
 } from '@/hooks/use-oauth-clients';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -248,7 +228,7 @@ export default function OAuthClientsPage() {
 			) : data.length === 0 ? (
 				<Empty description={t('oauthClients.noData')} />
 			) : (
-				<Table
+				<DataTable
 					rowKey="clientId"
 					columns={columns}
 					dataSource={data}
@@ -395,7 +375,7 @@ export default function OAuthClientsPage() {
 						) : secrets.length === 0 ? (
 							<Empty description={t('oauthClients.noSecrets')} />
 						) : (
-							<Table
+							<DataTable
 								rowKey="id"
 								dataSource={secrets}
 								pagination={false}

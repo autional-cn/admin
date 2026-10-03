@@ -2,23 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	Card,
-	Tag,
-	Button,
-	Table,
-	Statistic,
-	Row,
-	Col,
-	Space,
-	Modal,
-	Form,
-	Input,
-	Select,
-	DatePicker,
-	Tabs,
-	InputNumber,
-} from 'antd';
+import { Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, DatePicker, Tabs, InputNumber } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	WalletOutlined,
@@ -54,7 +38,7 @@ import { useWalletPolicy, useUpdateWalletPolicy } from '@/hooks/use-wallet-admin
 import type { Transaction, Dispute, Coupon, FraudRule } from '@/hooks/use-wallets';
 import { useTenantId } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { RangePicker } = DatePicker;
 
@@ -620,7 +604,7 @@ export default function WalletsPage() {
 										</Button>
 									</Space>
 								</Card>
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={txColumns}
 									dataSource={transactions}
@@ -635,7 +619,7 @@ export default function WalletsPage() {
 						key: 'disputes',
 						label: t('wallets.disputeHandling'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={disputeColumns}
 								dataSource={disputes}
@@ -670,7 +654,7 @@ export default function WalletsPage() {
 										className="mb-4"
 									/>
 								)}
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={couponColumns}
 									dataSource={coupons}
@@ -821,7 +805,7 @@ export default function WalletsPage() {
 									</Button>
 								</Space>
 								{reconDate ? (
-									<Table
+									<DataTable
 										rowKey="date"
 										columns={reconColumns}
 										dataSource={reconciliation}

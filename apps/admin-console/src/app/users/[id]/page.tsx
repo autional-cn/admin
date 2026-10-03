@@ -5,22 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router';
 import { extractList, apiClient } from '@autional-cn/shared';
 import { adminSessions } from '@autional-cn/shared/generated/api';
-import {
-	Card,
-	Avatar,
-	Tabs,
-	Tag,
-	Button,
-	Space,
-	Table,
-	Form,
-	Input,
-	Descriptions,
-	Modal,
-	Spin,
-	Empty,
-	Select,
-} from 'antd';
+import { Card, Avatar, Tabs, Tag, Button, Space, Form, Input, Descriptions, Modal, Spin, Empty, Select } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	ArrowLeftOutlined,
@@ -36,7 +21,7 @@ import {
 } from '@ant-design/icons';
 import { useUser } from '@/hooks/use-users';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import {
 	getUserRoles,
 	getUserPermissions,
@@ -368,7 +353,7 @@ export default function UserDetailPage() {
 									{permissions.length === 0 ? (
 										<Empty description={t('userDetail.noPermissions')} />
 									) : (
-										<Table
+										<DataTable
 											rowKey="id"
 											dataSource={permissions}
 											columns={[
@@ -415,7 +400,7 @@ export default function UserDetailPage() {
 									{permissions.length === 0 ? (
 										<Empty description={t('userDetail.noDirectPermissions')} />
 									) : (
-										<Table
+										<DataTable
 											rowKey="id"
 											dataSource={permissions}
 											columns={[
@@ -461,7 +446,7 @@ export default function UserDetailPage() {
 						label: t('userDetail.loginHistory'),
 						children: (
 							<Spin spinning={tabLoading}>
-								<Table
+								<DataTable
 									rowKey="id"
 									dataSource={loginHistories}
 									columns={[
@@ -492,7 +477,7 @@ export default function UserDetailPage() {
 						label: t('userDetail.activeSessions'),
 						children: (
 							<Spin spinning={tabLoading}>
-								<Table
+								<DataTable
 									rowKey="id"
 									dataSource={sessions}
 									columns={[
@@ -590,7 +575,7 @@ export default function UserDetailPage() {
 						label: t('userDetail.auditLogs'),
 						children: (
 							<Spin spinning={tabLoading}>
-								<Table
+								<DataTable
 									rowKey="id"
 									dataSource={auditLogs}
 									columns={[

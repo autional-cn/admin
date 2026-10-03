@@ -2,7 +2,8 @@
 // @generated-api-exempt: 2 key(s) [PROFILE.ADMIN_APPROVAL_APPROVE, PROFILE.ADMIN_APPROVAL_REJECT] lack generated func
 
 import React, { useState } from 'react';
-import { Table, Button, Modal, Input, Space, message, Tag } from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Button, Modal, Input, Space, message, Tag } from 'antd';
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { PageHeader, SectionCard, LoadingScreen, EmptyState } from '@autional-cn/ui';
@@ -140,7 +141,7 @@ export default function ApprovalPage() {
 		<div>
 			<PageHeader title={t('profileApproval.title')} subtitle={t('profileApproval.subtitle')} />
 			<SectionCard>
-				<Table
+				<DataTable
 					columns={columns}
 					dataSource={items}
 					rowKey="id"

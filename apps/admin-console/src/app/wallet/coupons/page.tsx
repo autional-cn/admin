@@ -2,19 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-	Table,
-	Button,
-	Modal,
-	Form,
-	Input,
-	Select,
-	InputNumber,
-	Space,
-	Popconfirm,
-	DatePicker,
-	Tag,
-} from 'antd';
+import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, DatePicker, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
@@ -25,7 +13,7 @@ import {
 	type CouponItem,
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { CreateCouponRequest } from '@autional-cn/shared/generated/types';
 
 export default function WalletCouponsPage() {
@@ -164,7 +152,7 @@ export default function WalletCouponsPage() {
 				<PageError message={t('walletCoupons.loadError')} retry={refetch} className="mb-4" />
 			)}
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={coupons}

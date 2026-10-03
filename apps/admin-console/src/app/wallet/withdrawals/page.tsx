@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, Tag, Button, Modal, Form, Input, Select, Space, Card } from 'antd';
+import { Tag, Button, Modal, Form, Input, Select, Space, Card } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	useWithdrawals,
@@ -11,7 +11,7 @@ import {
 	type WithdrawalItem,
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function WalletWithdrawalsPage() {
 	const { t } = useTranslation();
@@ -145,7 +145,7 @@ export default function WalletWithdrawalsPage() {
 				</Space>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={withdrawals}

@@ -2,23 +2,8 @@
 // @generated-api-exempt: 2 key(s) [IDENTITY.ADMIN_CONSENTS, TENANT.MINORS_PROTECTION] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import {
-	Card,
-	Form,
-	InputNumber,
-	Switch,
-	Button,
-	message,
-	Spin,
-	TimePicker,
-	Space,
-	Statistic,
-	Row,
-	Col,
-	Tabs,
-	Table,
-	Tag,
-} from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Card, Form, InputNumber, Switch, Button, message, Spin, TimePicker, Space, Statistic, Row, Col, Tabs, Tag } from 'antd';
 import {
 	SafetyCertificateOutlined,
 	SaveOutlined,
@@ -387,7 +372,7 @@ export default function MinorsProtectionPage() {
 						key: 'users',
 						label: `${t('compliance.minors.userTab')} (${userTotal})`,
 						children: (
-							<Table
+							<DataTable
 								columns={userColumns}
 								dataSource={users}
 								rowKey="id"
@@ -406,7 +391,7 @@ export default function MinorsProtectionPage() {
 						key: 'consents',
 						label: t('compliance.minors.parentalConsentTab'),
 						children: (
-							<Table
+							<DataTable
 								columns={[
 									{
 										title: t('compliance.minors.columnUserId'),

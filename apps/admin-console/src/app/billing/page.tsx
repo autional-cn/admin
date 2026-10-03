@@ -1,25 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Card,
-	Table,
-	Tag,
-	Descriptions,
-	Tabs,
-	Button,
-	Spin,
-	Empty,
-	Row,
-	Col,
-	Statistic,
-	Modal,
-	Form,
-	Input,
-	InputNumber,
-	Select,
-	Space,
-} from 'antd';
+import { Card, Tag, Descriptions, Tabs, Button, Spin, Empty, Row, Col, Statistic, Modal, Form, Input, InputNumber, Select, Space } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	ReloadOutlined,
@@ -31,7 +13,7 @@ import {
 	PlayCircleOutlined,
 } from '@ant-design/icons';
 import { useTenantId } from '@/hooks/use-tenant';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { handleApiError } from '@/lib/error-handler';
 import { useTranslation } from 'react-i18next';
 import {
@@ -646,7 +628,7 @@ export default function BillingPage() {
 							{usage.usage && usage.usage.length > 0 && (
 								<div className="mt-4">
 									<h4 className="text-sm font-medium mb-2">{t('billing.usage.trend')}</h4>
-									<Table
+									<DataTable
 										rowKey="date"
 										dataSource={usage.usage}
 										pagination={false}
@@ -742,7 +724,7 @@ export default function BillingPage() {
 							className="mb-4"
 						/>
 					)}
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={recordColumns}
 						dataSource={records}
@@ -779,7 +761,7 @@ export default function BillingPage() {
 							className="mb-4"
 						/>
 					)}
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={planColumns}
 						dataSource={plans}
@@ -816,7 +798,7 @@ export default function BillingPage() {
 							className="mb-4"
 						/>
 					)}
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={gatewayColumns}
 						dataSource={paymentGateways}
@@ -840,7 +822,7 @@ export default function BillingPage() {
 							className="mb-4"
 						/>
 					)}
-					<Table
+					<DataTable
 						rowKey="id"
 						columns={refundColumns}
 						dataSource={refundApprovals}

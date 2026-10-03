@@ -2,20 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router';
-import {
-	Tabs,
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	InputNumber,
-	Popconfirm,
-	Card,
-} from 'antd';
+import { Tabs, Button, Space, Tag, Modal, Form, Input, Select, InputNumber, Popconfirm, Card } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { extractItem, usePageTitle, useAuthStore } from '@autional-cn/shared';
@@ -29,7 +16,7 @@ import {
 	revokeAppMember,
 } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 interface AppRole {
@@ -301,7 +288,7 @@ export default function AppRolesPage() {
 										{t('appRoles.createRole')}
 									</Button>
 								</div>
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={roleColumns}
 									dataSource={roles}
@@ -330,7 +317,7 @@ export default function AppRolesPage() {
 										{t('appRoles.assignMember')}
 									</Button>
 								</div>
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={memberColumns}
 									dataSource={members}

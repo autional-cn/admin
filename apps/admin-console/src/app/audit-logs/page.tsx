@@ -2,25 +2,8 @@
 // @generated-api-exempt: 2 key(s) [AUDIT.ADMIN_EXPORT_DOWNLOAD, AUDIT.ADMIN_HASHCHAIN] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import {
-	Table,
-	Tag,
-	Button,
-	Input,
-	Space,
-	DatePicker,
-	Select,
-	Drawer,
-	Card,
-	Row,
-	Col,
-	Modal,
-	Collapse,
-	Typography,
-	Spin,
-	Empty,
-} from 'antd';
-import type { TablePaginationConfig } from 'antd';
+import { Tag, Button, Input, Space, DatePicker, Select, Drawer, Card, Row, Col, Modal, Collapse, Typography, Spin, Empty } from 'antd';
+
 import { message, modal } from '@/lib/antd-app';
 import {
 	SearchOutlined,
@@ -34,7 +17,8 @@ import {
 } from '@ant-design/icons';
 import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/use-audit-logs';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
+import type { DataTablePagination } from '@autional-cn/ui/antd';
 import { apiClient, API_PATHS, extractItem, extractList } from '@autional-cn/shared';
 import {
 	adminAuditExportJobs,
@@ -441,7 +425,7 @@ export default function AuditLogsPage() {
 				</div>
 			</Card>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data?.items || []}
@@ -455,7 +439,7 @@ export default function AuditLogsPage() {
 				}}
 				scroll={{ x: 1400 }}
 				locale={{ emptyText: <Empty description={t('audit.emptyText')} /> }}
-				onChange={(pag: TablePaginationConfig) => {
+				onChange={(pag: DataTablePagination) => {
 					setPagination({ page: pag.current || 1, pageSize: pag.pageSize || 20 });
 				}}
 			/>
@@ -634,7 +618,7 @@ export default function AuditLogsPage() {
 										{t('common.refresh')}
 									</Button>
 								</div>
-								<Table
+								<DataTable
 									rowKey="id"
 									dataSource={exportJobs}
 									loading={exportLoading}
@@ -763,7 +747,7 @@ export default function AuditLogsPage() {
 												image={Empty.PRESENTED_IMAGE_SIMPLE}
 											/>
 										) : (
-											<Table
+											<DataTable
 												rowKey="id"
 												dataSource={verifications}
 												pagination={false}
@@ -804,7 +788,7 @@ export default function AuditLogsPage() {
 				) : hashChainData.length === 0 ? (
 					<Empty description={t('audit.hashChain.empty')} />
 				) : (
-					<Table
+					<DataTable
 						rowKey="id"
 						dataSource={hashChainData}
 						pagination={false}

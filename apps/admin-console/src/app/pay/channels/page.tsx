@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Tag, Space, Popconfirm } from 'antd';
+import { Button, Modal, Form, Input, Select, Tag, Space, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import {
 	type Channel,
 } from '@/hooks/use-pay';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function PayChannelsPage() {
 	const { t } = useTranslation();
@@ -152,7 +152,7 @@ export default function PayChannelsPage() {
 
 			{error && <PageError message={t('payChannels.loadError')} retry={refetch} className="mb-4" />}
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={channels}

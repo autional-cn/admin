@@ -1,22 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Switch,
-	Drawer,
-	Timeline,
-	Popconfirm,
-	Spin,
-	Empty,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Drawer, Timeline, Popconfirm, Spin, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -37,7 +22,7 @@ import {
 import type { WebhookRecord, DeliveryLog } from '@/hooks/use-webhooks';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createWebhookSchema } from '@/lib/validators';
 
 const { Option } = Select;
@@ -245,7 +230,7 @@ export default function WebhooksPage() {
 			</div>
 
 			{error && <PageError message={t('webhooks.loadError')} retry={refetch} className="mb-4" />}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={data}

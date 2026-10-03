@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Card, Tag, Button, Popconfirm, Empty } from 'antd';
+import { Card, Tag, Button, Popconfirm, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useSessions, useActiveSessionCount, useDeleteSession } from '@/hooks/use-sessions';
 import type { SessionRecord } from '@/hooks/use-sessions';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTranslation } from 'react-i18next';
 
 export default function SessionsPage() {
@@ -156,7 +156,7 @@ export default function SessionsPage() {
 				</Card>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				rowSelection={rowSelection}
 				columns={columns}

@@ -1,20 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Tabs,
-	Card,
-	Tag,
-	Button,
-	Table,
-	Space,
-	Modal,
-	Form,
-	Input,
-	Select,
-	InputNumber,
-	Popconfirm,
-} from 'antd';
+import { Tabs, Card, Tag, Button, Space, Modal, Form, Input, Select, InputNumber, Popconfirm } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -48,7 +35,7 @@ import {
 	useExchangePoints,
 } from '@/hooks/use-points';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 interface PointRule {
 	id: string;
@@ -523,7 +510,7 @@ export default function PointsPage() {
 										className="mb-4"
 									/>
 								)}
-								<Table
+								<DataTable
 									rowKey="id"
 									columns={ruleColumns}
 									dataSource={rules}
@@ -551,7 +538,7 @@ export default function PointsPage() {
 										{t('points.batchEarn')}
 									</Button>
 								</div>
-								<Table
+								<DataTable
 									rowKey="userId"
 									columns={accountColumns}
 									dataSource={accounts}
@@ -576,7 +563,7 @@ export default function PointsPage() {
 									/>
 								</div>
 								{txModalUserId ? (
-									<Table
+									<DataTable
 										rowKey="id"
 										columns={txColumns}
 										dataSource={transactions}

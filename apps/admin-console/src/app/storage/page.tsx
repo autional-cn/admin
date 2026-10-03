@@ -1,21 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-	Tabs,
-	Card,
-	Button,
-	Table,
-	Tree,
-	Progress,
-	Space,
-	Upload,
-	Modal,
-	Form,
-	Input,
-	Row,
-	Col,
-} from 'antd';
+import { Tabs, Card, Button, Tree, Progress, Space, Upload, Modal, Form, Input, Row, Col } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	UploadOutlined,
@@ -42,7 +28,7 @@ import {
 } from '@/hooks/use-storage';
 import { uploadFile, downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { useTranslation } from 'react-i18next';
 
@@ -357,7 +343,7 @@ export default function StoragePage() {
 									/>
 								</div>
 								<div className="flex-1 min-w-0">
-									<Table
+									<DataTable
 										rowKey="id"
 										columns={fileColumns}
 										dataSource={files}
@@ -373,7 +359,7 @@ export default function StoragePage() {
 						key: 'trash',
 						label: t('storage.recycleBin'),
 						children: (
-							<Table
+							<DataTable
 								rowKey="id"
 								columns={trashColumns}
 								dataSource={trash}

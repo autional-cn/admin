@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Input, InputNumber, Select } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import {
 } from '@/hooks/use-abac-policies';
 import type { ABACPolicy } from '@/hooks/use-abac-policies';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 export default function AbacPoliciesPage() {
 	const { t } = useTranslation();
@@ -179,7 +179,7 @@ export default function AbacPoliciesPage() {
 				/>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={filteredData}

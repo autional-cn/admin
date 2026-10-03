@@ -2,25 +2,14 @@
 // @generated-api-exempt: 4 key(s) [COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, COMPLIANCE.ADMIN_LEGAL_DOCUMENT, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_PUBLISH, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_ARCHIVE] lack generated func
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-	Alert,
-	Button,
-	DatePicker,
-	Empty,
-	Form,
-	Input,
-	Modal,
-	Select,
-	Space,
-	Table,
-	Tag,
-} from 'antd';
-import type { TableProps } from 'antd';
+import { Alert, Button, DatePicker, Empty, Form, Input, Modal, Select, Space, Tag } from 'antd';
+
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { message, modal } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
+import type { DataTableProps } from '@autional-cn/ui/antd';
 import { useTenantIdOr } from '@/hooks/use-tenant';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
 import dayjs from 'dayjs';
@@ -244,7 +233,7 @@ export default function LegalDocumentsPage() {
 		});
 	};
 
-	const columns: TableProps<LegalDocumentItem>['columns'] = [
+	const columns: DataTableProps<LegalDocumentItem>['columns'] = [
 		{
 			title: t('legalDocuments.column.docType'),
 			dataIndex: 'doc_type',
@@ -358,7 +347,7 @@ export default function LegalDocumentsPage() {
 					{serverTotal > FETCH_LIMIT && (
 						<Alert type="warning" showIcon message={t('legalDocuments.loadSubsetWarning')} />
 					)}
-					<Table<LegalDocumentItem>
+					<DataTable<LegalDocumentItem>
 						columns={columns}
 						dataSource={filteredItems}
 						rowKey="id"

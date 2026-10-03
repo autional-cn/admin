@@ -1,18 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import {
-	Card,
-	Row,
-	Col,
-	Statistic,
-	Skeleton,
-	Table,
-	Tag,
-	Typography,
-	Empty,
-	Segmented,
-} from 'antd';
+import { Card, Row, Col, Statistic, Skeleton, Tag, Typography, Empty, Segmented } from 'antd';
 import { ArrowUpOutlined, BellOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,7 +9,7 @@ import {
 	useNotificationTrend,
 	useNotificationsReadReport,
 } from '@/hooks/use-notifications';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import {
 	LineChart,
 	Line,
@@ -204,7 +193,7 @@ export default function NotificationStatsPage() {
 				{isLoading ? (
 					<Skeleton active paragraph={{ rows: 4 }} />
 				) : (
-					<Table
+					<DataTable
 						dataSource={byTypeData}
 						pagination={false}
 						size="small"

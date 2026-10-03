@@ -1,21 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import {
-	Table,
-	Button,
-	Space,
-	Tag,
-	Modal,
-	Form,
-	Input,
-	Select,
-	Drawer,
-	Descriptions,
-	Typography,
-	Tooltip,
-	Empty,
-} from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, Drawer, Descriptions, Typography, Tooltip, Empty } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -28,7 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { createSecretSchema, updateSecretSchema } from '@/lib/validators';
 import {
 	useSecrets,
@@ -409,7 +395,7 @@ export default function SecretsPage() {
 				/>
 			</div>
 
-			<Table
+			<DataTable
 				rowKey="key"
 				columns={columns}
 				dataSource={filteredData}
@@ -470,7 +456,7 @@ export default function SecretsPage() {
 						<Text strong className="block mb-2">
 							{t('secrets.versionHistory')}
 						</Text>
-						<Table<SecretVersionResponse>
+						<DataTable<SecretVersionResponse>
 							rowKey="version"
 							dataSource={versions}
 							loading={!versions}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Input, Table, Button, Space, Tag, message, Modal, Typography } from 'antd';
+import { DataTable } from '@autional-cn/ui/antd';
+import { Input, Button, Space, Tag, message, Modal, Typography } from 'antd';
 import { SearchOutlined, DownloadOutlined, LockOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -144,7 +145,7 @@ export default function ProfilesPage() {
 						<Text>{t('profilesList.selected', { count: selected.length })}</Text>
 					</Space>
 				)}
-				<Table
+				<DataTable
 					columns={columns}
 					dataSource={data}
 					rowKey="id"

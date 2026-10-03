@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Table, Button, Space, Tag, Modal, Form, Select, Switch, Popconfirm, Tooltip } from 'antd';
+import { Button, Space, Tag, Modal, Form, Select, Switch, Popconfirm, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined, TagOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
@@ -16,7 +16,7 @@ import {
 } from '@/hooks/use-event-mappings';
 import { useNotificationTemplates } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 
 const { Option } = Select;
 
@@ -217,7 +217,7 @@ export default function EventMappingsPage() {
 					className="mb-4"
 				/>
 			)}
-			<Table
+			<DataTable
 				rowKey="id"
 				columns={columns}
 				dataSource={filteredData as readonly Record<string, unknown>[]}

@@ -5,22 +5,7 @@ import { useNavigate } from 'react-router';
 import { extractList, apiClient, useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
-import {
-	Table,
-	Tag,
-	Button,
-	Input,
-	Space,
-	Card,
-	Statistic,
-	Row,
-	Col,
-	Select,
-	Modal,
-	Form,
-	Empty,
-	Skeleton,
-} from 'antd';
+import { Tag, Button, Input, Space, Card, Statistic, Row, Col, Select, Modal, Form, Empty, Skeleton } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	SearchOutlined,
@@ -31,7 +16,7 @@ import {
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional-cn/ui/antd';
 import {
 	useVerifications,
 	useVerificationStats,
@@ -277,7 +262,7 @@ export default function VerificationsPage() {
 			{isLoading ? (
 				<Skeleton active paragraph={{ rows: 8 }} />
 			) : (
-				<Table
+				<DataTable
 					rowKey="id"
 					columns={columns}
 					dataSource={data || []}
