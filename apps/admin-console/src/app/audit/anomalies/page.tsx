@@ -450,7 +450,7 @@ export default function AuditAnomaliesPage() {
 						</Descriptions>
 
 						{currentRecord.eventIds?.length > 0 && (
-							<div className="text-sm text-gray-500">
+							<div className="text-sm text-neutral-600">
 								<span className="font-medium">{t('auditAnomalies.eventIds')}</span>
 								{currentRecord.eventIds.join(', ')}
 							</div>
@@ -500,7 +500,7 @@ export default function AuditAnomaliesPage() {
 								items={currentRecord.comments.map((c: any) => ({
 									children: (
 										<div>
-											<div className="text-xs text-gray-400 mb-1">
+											<div className="text-xs text-neutral-500 mb-1">
 												{c.authorName || c.authorId || t('auditAnomalies.unknown')} —{' '}
 												{formatTs(c.createdAt)}
 											</div>
@@ -510,7 +510,7 @@ export default function AuditAnomaliesPage() {
 								}))}
 							/>
 						) : (
-							<div className="text-gray-400 text-sm py-2">{t('auditAnomalies.noComments')}</div>
+							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noComments')}</div>
 						)}
 						<div className="flex gap-2">
 							<Input.TextArea
@@ -562,24 +562,24 @@ export default function AuditAnomaliesPage() {
 									</Descriptions>
 								)}
 								{timelineData.context && (
-									<div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded text-sm">
+									<div className="mb-4 p-3 bg-neutral-50 dark:bg-neutral-900 rounded text-sm">
 										<div className="font-medium mb-1">{t('auditAnomalies.contextSummary')}</div>
 										<Row gutter={16}>
 											<Col span={8}>
-												<span className="text-gray-500">{t('auditAnomalies.contextEvents')}</span>{' '}
+												<span className="text-neutral-600">{t('auditAnomalies.contextEvents')}</span>{' '}
 												{timelineData.context.totalEvents}
 											</Col>
 											<Col span={8}>
-												<span className="text-gray-500">{t('auditAnomalies.contextDevices')}</span>{' '}
+												<span className="text-neutral-600">{t('auditAnomalies.contextDevices')}</span>{' '}
 												{timelineData.context.uniqueDevices}
 											</Col>
 											<Col span={8}>
-												<span className="text-gray-500">{t('auditAnomalies.contextIps')}</span>{' '}
+												<span className="text-neutral-600">{t('auditAnomalies.contextIps')}</span>{' '}
 												{timelineData.context.uniqueIps}
 											</Col>
 										</Row>
 										{timelineData.context.timeSpanSeconds != null && (
-											<div className="mt-1 text-gray-500">
+											<div className="mt-1 text-neutral-600">
 												{t('auditAnomalies.timeSpan', {
 													minutes: Math.round(timelineData.context.timeSpanSeconds / 60),
 												})}
@@ -593,7 +593,7 @@ export default function AuditAnomaliesPage() {
 											color: LEVEL_COLORS[evt.level] || 'blue',
 											children: (
 												<div>
-													<div className="text-xs text-gray-400">
+													<div className="text-xs text-neutral-500">
 														{formatTs(evt.timestamp)}
 														{evt.action && (
 															<Tag className="ml-2" color="blue">
@@ -602,7 +602,7 @@ export default function AuditAnomaliesPage() {
 														)}
 													</div>
 													<div className="text-sm mt-1">{evt.message || '-'}</div>
-													<div className="text-xs text-gray-400 mt-1">
+													<div className="text-xs text-neutral-500 mt-1">
 														IP: {evt.ip || '-'} | UA: {(evt.userAgent || '').substring(0, 40)}
 														{(evt.userAgent || '').length > 40 ? '...' : ''}
 													</div>
@@ -611,13 +611,13 @@ export default function AuditAnomaliesPage() {
 										}))}
 									/>
 								) : (
-									<div className="text-gray-400 text-sm py-2">
+									<div className="text-neutral-500 text-sm py-2">
 										{t('auditAnomalies.noTimelineEvents')}
 									</div>
 								)}
 							</div>
 						) : (
-							<div className="text-gray-400 text-sm py-2">{t('auditAnomalies.noTimelineData')}</div>
+							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noTimelineData')}</div>
 						)}
 
 						<Divider />
@@ -635,7 +635,7 @@ export default function AuditAnomaliesPage() {
 								{relatedData.items.map((item: any) => (
 									<div
 										key={item.id}
-										className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+										className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded hover:bg-neutral-50 hover:bg-neutral-900 cursor-pointer transition-colors"
 										onClick={() => openDetail(item)}
 									>
 										<div className="flex items-center gap-3 min-w-0">
@@ -652,7 +652,7 @@ export default function AuditAnomaliesPage() {
 								))}
 							</div>
 						) : (
-							<div className="text-gray-400 text-sm py-2">{t('auditAnomalies.noRelated')}</div>
+							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noRelated')}</div>
 						)}
 					</div>
 				) : null}
@@ -670,7 +670,7 @@ export default function AuditAnomaliesPage() {
 				confirmLoading={assignMut.isPending}
 				className="w-full max-w-[560px]"
 			>
-				<div className="mb-2 text-sm text-gray-500">{t('auditAnomalies.assigneeHint')}</div>
+				<div className="mb-2 text-sm text-neutral-600">{t('auditAnomalies.assigneeHint')}</div>
 				<Input
 					placeholder={t('auditAnomalies.assigneePlaceholder')}
 					value={assigneeName}
@@ -691,7 +691,7 @@ export default function AuditAnomaliesPage() {
 				confirmLoading={linkCaseMut.isPending}
 				className="w-full max-w-[560px]"
 			>
-				<div className="mb-2 text-sm text-gray-500">{t('auditAnomalies.caseId')}</div>
+				<div className="mb-2 text-sm text-neutral-600">{t('auditAnomalies.caseId')}</div>
 				<Input
 					placeholder={t('auditAnomalies.caseIdPlaceholder')}
 					value={caseIdInput}

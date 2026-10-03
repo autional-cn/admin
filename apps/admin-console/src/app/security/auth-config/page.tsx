@@ -167,7 +167,7 @@ export default function AuthConfigPage() {
 				{showProfileConfirm && (
 					<div>
 						<p className="font-medium mb-2">{t(showProfileConfirm.i18nKey)}</p>
-						<p className="text-sm text-neutral-500 mb-3">
+						<p className="text-sm text-neutral-600 mb-3">
 							{t(showProfileConfirm.descriptionI18nKey)}
 						</p>
 						<Alert message={t('authConfig.profileOverrideWarning')} type="warning" showIcon />

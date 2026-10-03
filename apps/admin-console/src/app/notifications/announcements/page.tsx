@@ -168,7 +168,7 @@ export default function AnnouncementsPage() {
 						))}
 					</Space>
 				) : (
-					<span className="text-gray-400">{t('notifications.announcements.allUsers')}</span>
+					<span className="text-neutral-500">{t('notifications.announcements.allUsers')}</span>
 				),
 		},
 		{

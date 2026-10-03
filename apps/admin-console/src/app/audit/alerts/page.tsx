@@ -284,13 +284,13 @@ export default function AuditAlertsPage() {
 				{currentRecord ? (
 					<div className="space-y-4">
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								ID
 							</Col>
 							<Col span={16}>{currentRecord.id}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.severity')}
 							</Col>
 							<Col span={16}>
@@ -300,7 +300,7 @@ export default function AuditAlertsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.type')}
 							</Col>
 							<Col span={16}>
@@ -308,13 +308,13 @@ export default function AuditAlertsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.title')}
 							</Col>
 							<Col span={16}>{currentRecord.title}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.status')}
 							</Col>
 							<Col span={16}>
@@ -324,32 +324,32 @@ export default function AuditAlertsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.assignee')}
 							</Col>
 							<Col span={16}>{currentRecord.assignee || '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.source')}
 							</Col>
 							<Col span={16}>{currentRecord.source || '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.message')}
 							</Col>
 							<Col span={16}>{currentRecord.message || '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('auditAlerts.column.created')}
 							</Col>
 							<Col span={16}>{currentRecord.createdAt}</Col>
 						</Row>
 						{currentRecord.acknowledgedAt && (
 							<Row>
-								<Col span={8} className="text-gray-500">
+								<Col span={8} className="text-neutral-600">
 									{t('auditAlerts.acknowledgedAt')}
 								</Col>
 								<Col span={16}>{currentRecord.acknowledgedAt}</Col>
@@ -357,7 +357,7 @@ export default function AuditAlertsPage() {
 						)}
 						{currentRecord.resolvedAt && (
 							<Row>
-								<Col span={8} className="text-gray-500">
+								<Col span={8} className="text-neutral-600">
 									{t('auditAlerts.resolvedAt')}
 								</Col>
 								<Col span={16}>
@@ -368,7 +368,7 @@ export default function AuditAlertsPage() {
 						)}
 						{currentRecord.escalatedAt && (
 							<Row>
-								<Col span={8} className="text-gray-500">
+								<Col span={8} className="text-neutral-600">
 									{t('auditAlerts.escalatedAt')}
 								</Col>
 								<Col span={16}>{currentRecord.escalatedAt}</Col>
@@ -432,7 +432,7 @@ export default function AuditAlertsPage() {
 				confirmLoading={assignMut.isPending}
 				className="w-full max-w-[560px]"
 			>
-				<div className="mb-2 text-sm text-gray-500">{t('auditAlerts.assigneeHint')}</div>
+				<div className="mb-2 text-sm text-neutral-600">{t('auditAlerts.assigneeHint')}</div>
 				<Input
 					placeholder={t('auditAlerts.assigneePlaceholder')}
 					value={assigneeName}
@@ -452,7 +452,7 @@ export default function AuditAlertsPage() {
 				confirmLoading={statusMut.isPending}
 				className="w-full max-w-[560px]"
 			>
-				<div className="mb-2 text-sm text-gray-500">{t('auditAlerts.commentOptional')}</div>
+				<div className="mb-2 text-sm text-neutral-600">{t('auditAlerts.commentOptional')}</div>
 				<Input.TextArea
 					rows={3}
 					placeholder={t('auditAlerts.commentPlaceholder')}

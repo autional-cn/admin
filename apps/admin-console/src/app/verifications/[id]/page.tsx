@@ -236,7 +236,7 @@ export default function VerificationDetailPage() {
 								{statusLabelMap[record.status] || record.status}
 							</Tag>
 						</div>
-						<div className="text-gray-500 mt-1">
+						<div className="text-neutral-600 mt-1">
 							{t('verifications.detailCreatedAt')} {record.createdAt}
 						</div>
 					</div>

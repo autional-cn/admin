@@ -96,7 +96,7 @@ export default function ApiKeysPage() {
 			dataIndex: 'keyPrefix',
 			key: 'keyPrefix',
 			render: (v: string) => (
-				<code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{v}...</code>
+				<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded">{v}...</code>
 			),
 		},
 		{

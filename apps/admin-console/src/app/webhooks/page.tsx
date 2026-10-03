@@ -158,7 +158,7 @@ export default function WebhooksPage() {
 						</Tag>
 					)}
 					{record.lastDeliveryAt && (
-						<div className="text-xs text-gray-400">{record.lastDeliveryAt}</div>
+						<div className="text-xs text-neutral-500">{record.lastDeliveryAt}</div>
 					)}
 				</div>
 			),
@@ -316,15 +316,15 @@ export default function WebhooksPage() {
 							>
 								<div className="text-sm">
 									<Tag color={log.status === 'success' ? 'success' : 'error'}>{log.status}</Tag>
-									<span className="text-gray-500 ml-2">{log.durationMs}ms</span>
+									<span className="text-neutral-600 ml-2">{log.durationMs}ms</span>
 								</div>
-								<div className="mt-2 bg-gray-50 p-2 rounded text-xs">
+								<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
 									<div className="font-medium">{t('webhooks.request')}</div>
 									<pre className="whitespace-pre-wrap break-all">
 										{log.requestBody ? JSON.stringify(log.requestBody) : '-'}
 									</pre>
 								</div>
-								<div className="mt-2 bg-gray-50 p-2 rounded text-xs">
+								<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
 									<div className="font-medium">{t('webhooks.response')}</div>
 									<pre className="whitespace-pre-wrap break-all">
 										{log.responseBody ? JSON.stringify(log.responseBody) : '-'}

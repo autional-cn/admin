@@ -39,7 +39,7 @@ const getFileIcon = (type: string) => {
 	if (type?.includes('zip') || type?.includes('rar'))
 		return <FileZipOutlined className="text-orange-500" />;
 	if (type?.startsWith('text/')) return <FileTextOutlined className="text-green-500" />;
-	return <FileOutlined className="text-gray-500" />;
+	return <FileOutlined className="text-neutral-600" />;
 };
 
 const formatSize = (bytes: number) => {
@@ -314,19 +314,19 @@ export default function StoragePage() {
 			<Card className="mb-4" size="small">
 				<Row gutter={16} align="middle">
 					<Col xs={24} md={12}>
-						<div className="text-sm text-gray-500 mb-1">{t('storage.storageQuota')}</div>
+						<div className="text-sm text-neutral-600 mb-1">{t('storage.storageQuota')}</div>
 						<Progress percent={usedPercent} status={usedPercent >= 90 ? 'exception' : 'normal'} />
 					</Col>
 					<Col xs={8} md={4}>
-						<div className="text-sm text-gray-500">{t('storage.totalCapacity')}</div>
+						<div className="text-sm text-neutral-600">{t('storage.totalCapacity')}</div>
 						<div className="font-semibold">{formatSize(totalBytes)}</div>
 					</Col>
 					<Col xs={8} md={4}>
-						<div className="text-sm text-gray-500">{t('storage.used')}</div>
+						<div className="text-sm text-neutral-600">{t('storage.used')}</div>
 						<div className="font-semibold">{formatSize(usedBytes)}</div>
 					</Col>
 					<Col xs={8} md={4}>
-						<div className="text-sm text-gray-500">{t('storage.remaining')}</div>
+						<div className="text-sm text-neutral-600">{t('storage.remaining')}</div>
 						<div className="font-semibold">{formatSize(remaining)}</div>
 					</Col>
 				</Row>

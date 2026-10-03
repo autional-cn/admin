@@ -42,7 +42,7 @@ export default function SessionsPage() {
 
 	const getRiskTag = (score: number | undefined) => {
 		// 根因修复 (2026-08-13): 列表接口无 risk_score 字段，缺失时显示 '-' 而非误标低风险
-		if (score === undefined || score === null) return <span className="text-gray-400">-</span>;
+		if (score === undefined || score === null) return <span className="text-neutral-500">-</span>;
 		if (score >= 80) return <Tag color="error">{t('sessions.riskHigh')}</Tag>;
 		if (score >= 50) return <Tag color="warning">{t('sessions.riskMedium')}</Tag>;
 		return <Tag color="success">{t('sessions.riskLow')}</Tag>;
@@ -142,21 +142,21 @@ export default function SessionsPage() {
 			{error && <PageError message={t('sessions.loadError')} retry={refetch} className="mb-4" />}
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
 				<Card>
-					<div className="text-gray-500 text-sm">
+					<div className="text-neutral-600 text-sm">
 						{t('sessions.activeCount', { count: activeCount || 0 })}
 					</div>
 					<div className="text-2xl font-bold mt-1">{activeCount || 0}</div>
 				</Card>
 				<Card>
-					<div className="text-gray-500 text-sm">{t('sessions.highRisk')}</div>
+					<div className="text-neutral-600 text-sm">{t('sessions.highRisk')}</div>
 					<div className="text-2xl font-bold mt-1 text-red-500">{riskDistribution.high}</div>
 				</Card>
 				<Card>
-					<div className="text-gray-500 text-sm">{t('sessions.mediumRisk')}</div>
+					<div className="text-neutral-600 text-sm">{t('sessions.mediumRisk')}</div>
 					<div className="text-2xl font-bold mt-1 text-orange-500">{riskDistribution.medium}</div>
 				</Card>
 				<Card>
-					<div className="text-gray-500 text-sm">{t('sessions.lowRisk')}</div>
+					<div className="text-neutral-600 text-sm">{t('sessions.lowRisk')}</div>
 					<div className="text-2xl font-bold mt-1 text-green-500">{riskDistribution.low}</div>
 				</Card>
 			</div>

@@ -137,7 +137,7 @@ export default function GlobalVariablesPage() {
 				}
 			/>
 			<div className="mb-4 flex gap-2 flex-wrap">
-				<span className="text-gray-500 text-sm">
+				<span className="text-neutral-600 text-sm">
 					{t('notifications.globalVariables.predefinedKeys')}:
 				</span>
 				{PRESET_KEYS.map((k) => (

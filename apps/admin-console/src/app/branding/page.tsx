@@ -161,7 +161,7 @@ export default function BrandingPage() {
 								<h2 className="text-center text-lg font-semibold mb-1">
 									{values.loginTitle || t('branding.defaultLoginTitle')}
 								</h2>
-								<p className="text-center text-gray-500 text-sm mb-6">
+								<p className="text-center text-neutral-600 text-sm mb-6">
 									{values.loginSubtitle || t('branding.defaultLoginSubtitle')}
 								</p>
 								<div className="space-y-4">

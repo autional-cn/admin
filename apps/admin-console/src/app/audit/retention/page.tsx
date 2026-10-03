@@ -172,7 +172,7 @@ export default function RetentionPolicyPage() {
 					<Descriptions column={1} size="middle">
 						<Descriptions.Item label={t('auditRetention.desc.retentionDays')}>{data?.days ?? '-'}</Descriptions.Item>
 						<Descriptions.Item label={t('auditRetention.desc.autoArchive')}>
-							<span className={data?.enabled ? 'text-green-600' : 'text-gray-400'}>
+							<span className={data?.enabled ? 'text-green-600' : 'text-neutral-500'}>
 								{data?.enabled ? t('auditRetention.desc.enabled') : t('auditRetention.desc.disabled')}
 							</span>
 						</Descriptions.Item>
@@ -231,7 +231,7 @@ export default function RetentionPolicyPage() {
 						</Col>
 					</AntRow>
 				) : (
-					<div className="text-gray-400">{t('auditRetention.noArchiveStatus')}</div>
+					<div className="text-neutral-500">{t('auditRetention.noArchiveStatus')}</div>
 				)}
 			</Card>
 		</div>

@@ -255,7 +255,7 @@ export default function SecretsPage() {
 			key: 'key',
 			render: (v: string, record: SecretRecord) => (
 				<Button type="link" onClick={() => setDetailKey(record.key!)} className="p-0">
-					<code className="text-xs bg-gray-100 px-2 py-0.5 rounded">{v}</code>
+					<code className="text-xs bg-neutral-200 px-2 py-0.5 rounded">{v}</code>
 				</Button>
 			),
 		},

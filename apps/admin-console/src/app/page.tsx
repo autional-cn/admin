@@ -128,7 +128,7 @@ const DashboardPage = memo(function DashboardPage() {
 
 			<Card
 				title={t('dashboard.tenantOverview')}
-				extra={<span className="text-sm text-gray-500">{summary.tenantName}</span>}
+				extra={<span className="text-sm text-neutral-600">{summary.tenantName}</span>}
 				className="mb-4"
 			>
 				<Row gutter={[16, 16]}>
@@ -266,7 +266,7 @@ const DashboardPage = memo(function DashboardPage() {
 													: t('dashboard.loginFailure')}
 											</Tag>
 										</div>
-										<div className="text-xs text-gray-400">
+										<div className="text-xs text-neutral-500">
 											<span className="mr-2">{item.ip || '-'}</span>
 											<span>
 												{item.timestamp ? new Date(item.timestamp).toLocaleString('zh-CN') : '-'}
@@ -291,10 +291,10 @@ const DashboardPage = memo(function DashboardPage() {
 								{announcementsData.map((item: AnnouncementRecord, i: number) => (
 									<div key={i} className="flex justify-between items-center py-1">
 										<div className="flex items-center gap-2">
-											<FileTextOutlined className="text-gray-400" />
+											<FileTextOutlined className="text-neutral-500" />
 											<span className="text-sm">{item.title}</span>
 										</div>
-										<span className="text-xs text-gray-400">
+										<span className="text-xs text-neutral-500">
 											{item.publish_at
 												? new Date(item.publish_at).toLocaleDateString('zh-CN')
 												: '-'}

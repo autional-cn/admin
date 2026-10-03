@@ -283,7 +283,7 @@ export default function NotificationTemplatesPage() {
 					</Form.Item>
 
 					<div className="mb-2">
-						<span className="text-sm text-gray-500 mr-2">
+						<span className="text-sm text-neutral-600 mr-2">
 							{t('notifications.templates.insertVariable')}:
 						</span>
 						<Space size="small" wrap>

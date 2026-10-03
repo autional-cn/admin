@@ -270,7 +270,7 @@ export default function CompliancePolicyPage() {
 											<Tag className="ml-2">{categoryLabel[std.category] || std.category}</Tag>
 											<Tag color="blue">{std.version}</Tag>
 										</Checkbox>
-										<div className="mt-1 text-gray-500 text-xs">{std.description}</div>
+										<div className="mt-1 text-neutral-600 text-xs">{std.description}</div>
 									</Card>
 								))}
 							</Space>
@@ -596,7 +596,7 @@ export default function CompliancePolicyPage() {
 												)}
 											</div>
 										) : (
-											<div className="text-gray-400 p-5 text-center">
+											<div className="text-neutral-500 p-5 text-center">
 												{t('compliance.policy.checkReadinessHint')}
 											</div>
 										)}

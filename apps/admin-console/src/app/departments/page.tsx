@@ -191,7 +191,7 @@ export default function DepartmentsPage() {
 									</Button>
 								</Space>
 							</div>
-							<div className="text-gray-500 space-y-2">
+							<div className="text-neutral-600 space-y-2">
 								<p>
 									{t('departments.departmentId')}
 									{selectedDept.id}

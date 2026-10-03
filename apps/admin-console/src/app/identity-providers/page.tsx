@@ -284,7 +284,7 @@ export default function IdentityProvidersPage() {
 			{/* LDAP Health Status Section */}
 			{!ldapHealthLoading && ldapHealth.length > 0 && (
 				<div className="mb-4">
-					<div className="text-sm font-medium text-gray-600 mb-2">
+					<div className="text-sm font-medium text-neutral-700 mb-2">
 						{t('idp.ldapHealthTitle', 'LDAP Directory Health')}
 					</div>
 					<Space direction="vertical" className="w-full" size="small">

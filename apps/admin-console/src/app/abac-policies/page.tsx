@@ -94,7 +94,7 @@ export default function AbacPoliciesPage() {
 			key: 'condition',
 			width: 200,
 			render: (v: string) => (
-				<code className="text-xs bg-gray-100 px-2 py-1 rounded max-w-48 inline-block truncate">
+				<code className="text-xs bg-neutral-200 px-2 py-1 rounded max-w-48 inline-block truncate">
 					{v}
 				</code>
 			),

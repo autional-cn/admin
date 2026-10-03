@@ -456,13 +456,13 @@ export default function AuditLogsPage() {
 				{currentRecord ? (
 					<div className="space-y-4">
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.logId')}
 							</Col>
 							<Col span={16}>{currentRecord.id}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.timestamp')}
 							</Col>
 							<Col span={16}>
@@ -470,19 +470,19 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.operator')}
 							</Col>
 							<Col span={16}>{currentRecord.operatorId}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.operatorType')}
 							</Col>
 							<Col span={16}>{currentRecord.operatorType ?? '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.action')}
 							</Col>
 							<Col span={16}>
@@ -490,25 +490,25 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.level')}
 							</Col>
 							<Col span={16}>{currentRecord.level ?? '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.module')}
 							</Col>
 							<Col span={16}>{currentRecord.module ?? '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.targetType')}
 							</Col>
 							<Col span={16}>{currentRecord.targetType}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.targetId')}
 							</Col>
 							<Col span={16} className="break-all">
@@ -516,13 +516,13 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.description')}
 							</Col>
 							<Col span={16}>{currentRecord.message}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.result')}
 							</Col>
 							<Col span={16}>
@@ -540,13 +540,13 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.ipAddress')}
 							</Col>
 							<Col span={16}>{currentRecord.ip}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.duration')}
 							</Col>
 							<Col span={16}>
@@ -554,13 +554,13 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.sequence')}
 							</Col>
 							<Col span={16}>{currentRecord.sequence ?? '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.requestId')}
 							</Col>
 							<Col span={16} className="break-all">
@@ -568,7 +568,7 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.tenantId')}
 							</Col>
 							<Col span={16} className="break-all">
@@ -576,7 +576,7 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.exportJobs.userAgent')}
 							</Col>
 							<Col span={16} className="break-all">
@@ -585,11 +585,11 @@ export default function AuditLogsPage() {
 						</Row>
 						{currentRecord.metadata && (
 							<Row>
-								<Col span={8} className="text-gray-500">
+								<Col span={8} className="text-neutral-600">
 									{t('audit.detail.metadata')}
 								</Col>
 								<Col span={16}>
-									<pre className="bg-gray-50 p-3 rounded text-xs overflow-auto">
+									<pre className="bg-neutral-50 p-3 rounded text-xs overflow-auto">
 										{JSON.stringify(currentRecord.metadata, null, 2)}
 									</pre>
 								</Col>
@@ -613,7 +613,7 @@ export default function AuditLogsPage() {
 						children: (
 							<div>
 								<div className="flex justify-between mb-3">
-									<span className="text-gray-500">
+									<span className="text-neutral-600">
 										{t('audit.exportJobs.subtitle')}
 									</span>
 									<Button size="small" onClick={fetchExportJobs} loading={exportLoading}>
@@ -694,7 +694,7 @@ export default function AuditLogsPage() {
 											</Button>
 										}
 									>
-										<p className="text-gray-500 text-sm mb-3">
+										<p className="text-neutral-600 text-sm mb-3">
 											{t('audit.hashChain.hint')}
 										</p>
 									</Card>
@@ -721,7 +721,7 @@ export default function AuditLogsPage() {
 												onChange={(e) => setSelectedEntryId(e.target.value)}
 												size="small"
 											/>
-											<span className="text-gray-500 text-xs">
+											<span className="text-neutral-600 text-xs">
 												{t('audit.merkle.hint')}
 											</span>
 										</Space>
@@ -824,13 +824,13 @@ export default function AuditLogsPage() {
 				) : merkleData ? (
 					<div className="space-y-4">
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.merkle.entryId')}
 							</Col>
 							<Col span={16}>{merkleData.entryId || merkleData.entry_id || '-'}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.merkle.rootHash')}
 							</Col>
 							<Col span={16}>
@@ -840,7 +840,7 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.merkle.verified')}
 							</Col>
 							<Col span={16}>
@@ -851,8 +851,8 @@ export default function AuditLogsPage() {
 						</Row>
 						{merkleData.proofPath || merkleData.proof_path ? (
 							<div>
-								<div className="text-gray-500 mb-2">{t('audit.merkle.proofPath')}</div>
-								<pre className="bg-gray-50 p-3 rounded text-xs overflow-auto">
+								<div className="text-neutral-600 mb-2">{t('audit.merkle.proofPath')}</div>
+								<pre className="bg-neutral-50 p-3 rounded text-xs overflow-auto">
 									{JSON.stringify(merkleData.proofPath || merkleData.proof_path, null, 2)}
 								</pre>
 							</div>
@@ -874,7 +874,7 @@ export default function AuditLogsPage() {
 				{verifyReport ? (
 					<div className="space-y-3">
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.verifyReport.result')}
 							</Col>
 							<Col span={16}>
@@ -882,7 +882,7 @@ export default function AuditLogsPage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('audit.verifyReport.brokenAt')}
 							</Col>
 							<Col span={16}>
@@ -895,12 +895,12 @@ export default function AuditLogsPage() {
 						</Row>
 						{verifyReport.message ? (
 							<Row>
-								<Col span={8} className="text-gray-500">
+								<Col span={8} className="text-neutral-600">
 									{t('audit.verifyReport.detail')}
 								</Col>
 								<Col span={16}>
 									<Paragraph
-										className="break-all font-mono text-xs bg-gray-50 p-3 rounded"
+										className="break-all font-mono text-xs bg-neutral-50 p-3 rounded"
 										copyable
 									>
 										{verifyReport.message}

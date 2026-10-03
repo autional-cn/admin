@@ -85,7 +85,7 @@ export default function NotificationStatsPage() {
 				<Title level={4} className="!mb-0">
 					{t('notifications.stats.title')}
 				</Title>
-				<span className="text-gray-400 text-xs">{t('notifications.stats.autoRefresh')}</span>
+				<span className="text-neutral-500 text-xs">{t('notifications.stats.autoRefresh')}</span>
 			</div>
 
 			{error && (

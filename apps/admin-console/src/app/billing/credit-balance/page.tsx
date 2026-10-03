@@ -101,7 +101,7 @@ export default function BillingCreditBalancePage() {
 			<Card size="small" className="mb-4 max-w-xs">
 				<div className="flex gap-2 items-end">
 					<div className="flex-1">
-						<label className="text-xs text-gray-500 mb-1 block">
+						<label className="text-xs text-neutral-600 mb-1 block">
 							{t('creditBalance.tenantId')}
 						</label>
 						<Input
@@ -127,7 +127,7 @@ export default function BillingCreditBalancePage() {
 			</Card>
 
 			{!lookupId ? (
-				<div className="text-gray-400 py-8 text-center">{t('creditBalance.enterTenantIdHint')}</div>
+				<div className="text-neutral-500 py-8 text-center">{t('creditBalance.enterTenantIdHint')}</div>
 			) : (
 				<>
 					{balanceError && (
@@ -165,7 +165,7 @@ export default function BillingCreditBalancePage() {
 							</Card>
 						</div>
 					) : (
-						<div className="text-gray-400 py-4 text-center mb-4">{t('creditBalance.notFound')}</div>
+						<div className="text-neutral-500 py-4 text-center mb-4">{t('creditBalance.notFound')}</div>
 					)}
 
 					{txError && (

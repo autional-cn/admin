@@ -373,14 +373,14 @@ export default function CommunicationPage() {
 							<Card>
 								<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
 									<div>
-										<div className="text-gray-500 text-sm">
+										<div className="text-neutral-600 text-sm">
 											{c.label} {t('common.status')}
 										</div>
 										<div className="text-2xl font-bold mt-1">
 											<Tag color={color}>{text}</Tag>
 										</div>
 										{health?.latency && (
-											<div className="text-xs text-gray-400 mt-1">
+											<div className="text-xs text-neutral-500 mt-1">
 												{t('notifications.stats.readRate')}: {health.latency}
 											</div>
 										)}

@@ -307,7 +307,7 @@ export default function LegalDocumentsPage() {
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h2 className="mb-1">{t('legalDocuments.title')}</h2>
-					<p className="text-sm text-gray-500">{t('legalDocuments.subtitle')}</p>
+					<p className="text-sm text-neutral-600">{t('legalDocuments.subtitle')}</p>
 				</div>
 				<Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
 					{t('legalDocuments.create')}

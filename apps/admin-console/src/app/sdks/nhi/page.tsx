@@ -18,7 +18,7 @@ export default function NhiSdkPage() {
 					<SafetyOutlined style={{ fontSize: 24, color: 'var(--color-success)' }} />
 					<ConsolePageHeader title={t('sdks.nhiTitle')} />
 				</div>
-				<Paragraph className="mt-2 text-gray-500">{t('sdks.nhiDescription')}</Paragraph>
+				<Paragraph className="mt-2 text-neutral-600">{t('sdks.nhiDescription')}</Paragraph>
 			</div>
 
 			<Card>

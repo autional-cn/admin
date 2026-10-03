@@ -554,19 +554,19 @@ export default function CompliancePage() {
 				{currentDsar && (
 					<div className="space-y-4">
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('common.id')}
 							</Col>
 							<Col span={16}>{currentDsar.id}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('compliance.dsar.requester')}
 							</Col>
 							<Col span={16}>{currentDsar.requesterEmail}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('common.type')}
 							</Col>
 							<Col span={16}>
@@ -574,7 +574,7 @@ export default function CompliancePage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('common.status')}
 							</Col>
 							<Col span={16}>
@@ -582,13 +582,13 @@ export default function CompliancePage() {
 							</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('common.createdAt')}
 							</Col>
 							<Col span={16}>{currentDsar.createdAt}</Col>
 						</Row>
 						<Row>
-							<Col span={8} className="text-gray-500">
+							<Col span={8} className="text-neutral-600">
 								{t('common.description')}
 							</Col>
 							<Col span={16}>{currentDsar.description || '-'}</Col>

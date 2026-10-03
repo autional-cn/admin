@@ -258,7 +258,7 @@ export default function UserDetailPage() {
 								{user.username}
 								<Tag color={statusColor(user.status)}>{statusText(user.status)}</Tag>
 							</div>
-							<div className="text-gray-500 mt-1 flex flex-wrap items-center gap-4">
+							<div className="text-neutral-600 mt-1 flex flex-wrap items-center gap-4">
 								<span>
 									<MailOutlined /> {user.email}
 								</span>

@@ -99,7 +99,7 @@ export default function MembersPage() {
 			render: (_: string, record: MemberRecord) => (
 				<div>
 					<div className="font-medium text-sm">{record.username}</div>
-					<div className="text-xs text-gray-400">{record.userId}</div>
+					<div className="text-xs text-neutral-500">{record.userId}</div>
 				</div>
 			),
 		},

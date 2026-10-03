@@ -81,7 +81,7 @@ export default function StatusPage() {
 									</Tag>
 								</div>
 								{svc.latency && (
-									<p className="mt-2 text-sm text-gray-500">
+									<p className="mt-2 text-sm text-neutral-600">
 										{t('status.latency')}: {svc.latency}ms
 									</p>
 								)}

@@ -109,7 +109,7 @@ export default function ApprovalPage() {
 			ellipsis: true,
 			render: (reason: string) => (
 				<Tooltip title={reason}>
-					<span className="text-sm text-gray-500">{reason}</span>
+					<span className="text-sm text-neutral-600">{reason}</span>
 				</Tooltip>
 			),
 		},

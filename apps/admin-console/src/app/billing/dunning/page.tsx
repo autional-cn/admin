@@ -58,7 +58,7 @@ export default function BillingDunningPage() {
 			</Card>
 
 			{!tenantId ? (
-				<div className="text-gray-400 py-8">{t('dunning.enterTenantIdHint')}</div>
+				<div className="text-neutral-500 py-8">{t('dunning.enterTenantIdHint')}</div>
 			) : isLoading ? (
 				<div className="flex justify-center py-8">
 					<Spin />

@@ -128,7 +128,7 @@ export default function ApplicationsPage() {
 			render: (v: string, record: AppRecord) => (
 				<div>
 					<div className="font-medium text-sm">{v}</div>
-					{record.description && <div className="text-xs text-gray-400">{record.description}</div>}
+					{record.description && <div className="text-xs text-neutral-500">{record.description}</div>}
 				</div>
 			),
 		},
@@ -146,7 +146,7 @@ export default function ApplicationsPage() {
 			key: 'clientId',
 			render: (v: string, record: AppRecord) => (
 				<Space size="small">
-					<code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{v || record.code}</code>
+					<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded">{v || record.code}</code>
 					<Tooltip title={t('applications.copy')}>
 						<Button
 							type="text"

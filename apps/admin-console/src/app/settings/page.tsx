@@ -122,7 +122,7 @@ export default function SettingsPage() {
 					/>
 					<div>
 						<div className="font-medium">{user?.username || t('settings.notLoggedIn')}</div>
-						<div className="text-gray-500 text-sm">{user?.email || ''}</div>
+						<div className="text-neutral-600 text-sm">{user?.email || ''}</div>
 					</div>
 				</div>
 				<Form form={profileForm} layout="vertical" onFinish={handleSaveProfile}>

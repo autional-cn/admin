@@ -84,7 +84,7 @@ export default function BroadcastPage() {
 					</Card>
 				</Col>
 				<Col xs={24} lg={8}>
-					<Card title={t('notifications.broadcast.info')} className="text-sm text-gray-500">
+					<Card title={t('notifications.broadcast.info')} className="text-sm text-neutral-600">
 						<p className="mb-2">{t('notifications.broadcast.infoText')}</p>
 						<p className="mb-2">{t('notifications.broadcast.supportedTypes')}</p>
 						<ul className="list-disc pl-4 space-y-1">

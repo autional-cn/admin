@@ -216,7 +216,7 @@ export default function AuditReportsPage() {
 													</Text>
 												)}
 											</div>
-											<Paragraph className="mb-1 text-gray-600" ellipsis={{ rows: 2 }}>
+											<Paragraph className="mb-1 text-neutral-700" ellipsis={{ rows: 2 }}>
 												{riskDescription(r)}
 											</Paragraph>
 											<Text type="secondary" className="text-xs">
@@ -248,7 +248,7 @@ export default function AuditReportsPage() {
 
 			{!secData && !secLoading && !secError && (
 				<Card>
-					<div className="text-center py-10 text-gray-400">
+					<div className="text-center py-10 text-neutral-500">
 						<FileProtectOutlined className="text-[40px]" />
 						<p className="mt-3">{t('auditReports.securityEmptyHint')}</p>
 					</div>
@@ -352,7 +352,7 @@ export default function AuditReportsPage() {
 												<Text strong>{c.item}</Text>
 												{c.severity && <Tag>{c.severity}</Tag>}
 											</div>
-											<Paragraph className="mb-1 text-gray-600" ellipsis={{ rows: 2 }}>
+											<Paragraph className="mb-1 text-neutral-700" ellipsis={{ rows: 2 }}>
 												{c.description}
 											</Paragraph>
 											{(c.issues?.length ?? 0) > 0 && (
@@ -360,7 +360,7 @@ export default function AuditReportsPage() {
 													<Text type="secondary" className="text-xs mb-1 block">
 														{t('auditReports.issues')}
 													</Text>
-													<ul className="list-disc list-inside text-gray-500 text-sm space-y-0.5">
+													<ul className="list-disc list-inside text-neutral-600 text-sm space-y-0.5">
 														{(c.issues ?? []).map((issue: string, i: number) => (
 															<li key={i}>{issue}</li>
 														))}
@@ -393,7 +393,7 @@ export default function AuditReportsPage() {
 
 			{!compData && !compLoading && !compError && (
 				<Card>
-					<div className="text-center py-10 text-gray-400">
+					<div className="text-center py-10 text-neutral-500">
 						<AuditOutlined className="text-[40px]" />
 						<p className="mt-3">
 							{t('auditReports.complianceEmptyHint')}
