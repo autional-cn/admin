@@ -8,6 +8,8 @@ import { DEFAULT_ERROR_BOUNDARY } from './lib/error-boundary-config';
 import { NavMenu } from './components/layout/NavMenu';
 import { HeaderActions } from './components/layout/HeaderActions';
 import { Breadcrumb } from './components/layout/Breadcrumb';
+import { ImpersonationBanner } from './components/layout/ImpersonationBanner';
+import { consumeImpersonationHash } from './lib/impersonation-handoff';
 import { useUIStore } from './stores/ui-store';
 import { ForbiddenRedirect } from './components/common/ForbiddenRedirect';
 import {
@@ -55,6 +57,10 @@ import { AuditComplianceRoutes } from './routes/audit-compliance';
 import { ConfigRoutes } from './routes/config';
 import { DeveloperRoutes } from './routes/developer';
 
+// 模拟交接消费必须发生在 React 渲染前：RequireAuth 首帧就要看到 store 里的模拟 token，
+// 否则会被判未登录而弹去登录页。函数幂等，无 hash 时零副作用。
+consumeImpersonationHash();
+
 /**
  * 挂载级闸门：/:tenantSlug 交给共享 RequireAuth（含 F-W6/F-W7 未知 slug 闸门）；
  * 首段解析不出 slug 的裸路径（/users、/403 等站内业务段）一律本地 404 ——
@@ -76,32 +82,40 @@ function LayoutWrapper() {
 
 	// 外壳（侧栏框架 + sticky 顶栏 + 移动端抽屉 + 内容滚动容器）来自设计系统，
 	// 本站只提供内容：品牌、菜单、面包屑、折叠按钮、右上角控件。
+	// 模拟横幅须在 shell 之上通栏（AppShell 无横幅槽位且自身 h-screen 固定）：
+	// 外层 flex 列 + shell 强制 h-full 让出横幅高度；横幅为 null 时布局与原先一致。
 	return (
 		<TenantSlugProvider value={tenantSlug}>
-			<AppShell
-				brand={
-					<span className="truncate text-lg font-bold">{collapsed ? 'A' : t('app.brand')}</span>
-				}
-				nav={<NavMenu />}
-				sidebarCollapsed={collapsed}
-				headerLeft={
-					<>
-						<Button
-							type="text"
-							className="hidden lg:inline-flex"
-							icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-							onClick={toggleSidebar}
-							aria-label={collapsed ? t('header.expandSidebar') : t('header.collapseSidebar')}
-							aria-expanded={!collapsed}
-						/>
-						<Breadcrumb />
-					</>
-				}
-				headerRight={<HeaderActions />}
-			>
-				<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
-				<Outlet />
-			</AppShell>
+			<div className="flex h-screen flex-col">
+				<ImpersonationBanner />
+				<div className="min-h-0 flex-1">
+					<AppShell
+						className="!h-full"
+						brand={
+							<span className="truncate text-lg font-bold">{collapsed ? 'A' : t('app.brand')}</span>
+						}
+						nav={<NavMenu />}
+						sidebarCollapsed={collapsed}
+						headerLeft={
+							<>
+								<Button
+									type="text"
+									className="hidden lg:inline-flex"
+									icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+									onClick={toggleSidebar}
+									aria-label={collapsed ? t('header.expandSidebar') : t('header.collapseSidebar')}
+									aria-expanded={!collapsed}
+								/>
+								<Breadcrumb />
+							</>
+						}
+						headerRight={<HeaderActions />}
+					>
+						<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
+						<Outlet />
+					</AppShell>
+				</div>
+			</div>
 		</TenantSlugProvider>
 	);
 }
