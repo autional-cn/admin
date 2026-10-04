@@ -500,7 +500,7 @@ export default function AuditAnomaliesPage() {
 								items={currentRecord.comments.map((c: any) => ({
 									children: (
 										<div>
-											<div className="text-xs text-neutral-500 mb-1">
+											<div className="text-xs text-neutral-600 mb-1">
 												{c.authorName || c.authorId || t('auditAnomalies.unknown')} —{' '}
 												{formatTs(c.createdAt)}
 											</div>
@@ -510,7 +510,7 @@ export default function AuditAnomaliesPage() {
 								}))}
 							/>
 						) : (
-							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noComments')}</div>
+							<div className="text-neutral-600 text-sm py-2">{t('auditAnomalies.noComments')}</div>
 						)}
 						<div className="flex gap-2">
 							<Input.TextArea
@@ -593,7 +593,7 @@ export default function AuditAnomaliesPage() {
 											color: LEVEL_COLORS[evt.level] || 'blue',
 											children: (
 												<div>
-													<div className="text-xs text-neutral-500">
+													<div className="text-xs text-neutral-600">
 														{formatTs(evt.timestamp)}
 														{evt.action && (
 															<Tag className="ml-2" color="blue">
@@ -602,7 +602,7 @@ export default function AuditAnomaliesPage() {
 														)}
 													</div>
 													<div className="text-sm mt-1">{evt.message || '-'}</div>
-													<div className="text-xs text-neutral-500 mt-1">
+													<div className="text-xs text-neutral-600 mt-1">
 														IP: {evt.ip || '-'} | UA: {(evt.userAgent || '').substring(0, 40)}
 														{(evt.userAgent || '').length > 40 ? '...' : ''}
 													</div>
@@ -611,13 +611,13 @@ export default function AuditAnomaliesPage() {
 										}))}
 									/>
 								) : (
-									<div className="text-neutral-500 text-sm py-2">
+									<div className="text-neutral-600 text-sm py-2">
 										{t('auditAnomalies.noTimelineEvents')}
 									</div>
 								)}
 							</div>
 						) : (
-							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noTimelineData')}</div>
+							<div className="text-neutral-600 text-sm py-2">{t('auditAnomalies.noTimelineData')}</div>
 						)}
 
 						<Divider />
@@ -652,7 +652,7 @@ export default function AuditAnomaliesPage() {
 								))}
 							</div>
 						) : (
-							<div className="text-neutral-500 text-sm py-2">{t('auditAnomalies.noRelated')}</div>
+							<div className="text-neutral-600 text-sm py-2">{t('auditAnomalies.noRelated')}</div>
 						)}
 					</div>
 				) : null}

@@ -113,7 +113,7 @@ export function GlobalSearch() {
 									</span>
 									<div className="flex-1 min-w-0">
 										<div className="font-medium text-sm truncate">{name}</div>
-										{detail && <div className="text-xs text-neutral-500 truncate">{detail}</div>}
+										{detail && <div className="text-xs text-neutral-600 truncate">{detail}</div>}
 									</div>
 								</div>
 							),
@@ -194,7 +194,7 @@ export function GlobalSearch() {
 			open={open}
 			onDropdownVisibleChange={setOpen}
 			notFoundContent={
-				<div className="flex items-center justify-center py-4 text-sm text-neutral-500">
+				<div className="flex items-center justify-center py-4 text-sm text-neutral-600">
 					{t('globalSearch.noResults')}
 				</div>
 			}

@@ -459,7 +459,7 @@ export default function RolesPage() {
 													{perm.code}
 												</Text>
 												{perm.description && (
-													<div className="text-xs text-neutral-500 mt-0.5">{perm.description}</div>
+													<div className="text-xs text-neutral-600 mt-0.5">{perm.description}</div>
 												)}
 											</div>
 											<Switch

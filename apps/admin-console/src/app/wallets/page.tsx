@@ -815,7 +815,7 @@ export default function WalletsPage() {
 										scroll={{ x: 800 }}
 									/>
 								) : (
-									<div className="text-center text-neutral-500 py-12">
+									<div className="text-center text-neutral-600 py-12">
 										{t('wallets.selectDateForRecon')}
 									</div>
 								)}
@@ -841,7 +841,7 @@ export default function WalletsPage() {
 									</Space>
 								</div>
 								{!tenantId || !policyAppId ? (
-									<div className="text-center text-neutral-500 py-12">
+									<div className="text-center text-neutral-600 py-12">
 										{t('wallets.enterAppIdForPolicy')}
 									</div>
 								) : policyLoading ? (

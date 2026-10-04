@@ -166,7 +166,7 @@ export default function PayPaymentDetailPage() {
 										</Descriptions.Item>
 									</Descriptions>
 								) : (
-									<div className="text-neutral-500 py-4">{t('paymentDetail.noReceipt')}</div>
+									<div className="text-neutral-600 py-4">{t('paymentDetail.noReceipt')}</div>
 								)}
 							</SectionCard>
 						),

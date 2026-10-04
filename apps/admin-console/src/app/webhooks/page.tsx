@@ -158,7 +158,7 @@ export default function WebhooksPage() {
 						</Tag>
 					)}
 					{record.lastDeliveryAt && (
-						<div className="text-xs text-neutral-500">{record.lastDeliveryAt}</div>
+						<div className="text-xs text-neutral-600">{record.lastDeliveryAt}</div>
 					)}
 				</div>
 			),

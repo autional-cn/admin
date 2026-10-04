@@ -266,7 +266,7 @@ const DashboardPage = memo(function DashboardPage() {
 													: t('dashboard.loginFailure')}
 											</Tag>
 										</div>
-										<div className="text-xs text-neutral-500">
+										<div className="text-xs text-neutral-600">
 											<span className="mr-2">{item.ip || '-'}</span>
 											<span>
 												{item.timestamp ? new Date(item.timestamp).toLocaleString('zh-CN') : '-'}

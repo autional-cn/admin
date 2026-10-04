@@ -127,7 +127,7 @@ export default function BillingCreditBalancePage() {
 			</Card>
 
 			{!lookupId ? (
-				<div className="text-neutral-500 py-8 text-center">{t('creditBalance.enterTenantIdHint')}</div>
+				<div className="text-neutral-600 py-8 text-center">{t('creditBalance.enterTenantIdHint')}</div>
 			) : (
 				<>
 					{balanceError && (
@@ -165,7 +165,7 @@ export default function BillingCreditBalancePage() {
 							</Card>
 						</div>
 					) : (
-						<div className="text-neutral-500 py-4 text-center mb-4">{t('creditBalance.notFound')}</div>
+						<div className="text-neutral-600 py-4 text-center mb-4">{t('creditBalance.notFound')}</div>
 					)}
 
 					{txError && (

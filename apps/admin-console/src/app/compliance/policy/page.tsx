@@ -596,7 +596,7 @@ export default function CompliancePolicyPage() {
 												)}
 											</div>
 										) : (
-											<div className="text-neutral-500 p-5 text-center">
+											<div className="text-neutral-600 p-5 text-center">
 												{t('compliance.policy.checkReadinessHint')}
 											</div>
 										)}

@@ -42,7 +42,7 @@ export default function SessionsPage() {
 
 	const getRiskTag = (score: number | undefined) => {
 		// 根因修复 (2026-08-13): 列表接口无 risk_score 字段，缺失时显示 '-' 而非误标低风险
-		if (score === undefined || score === null) return <span className="text-neutral-500">-</span>;
+		if (score === undefined || score === null) return <span className="text-neutral-600">-</span>;
 		if (score >= 80) return <Tag color="error">{t('sessions.riskHigh')}</Tag>;
 		if (score >= 50) return <Tag color="warning">{t('sessions.riskMedium')}</Tag>;
 		return <Tag color="success">{t('sessions.riskLow')}</Tag>;

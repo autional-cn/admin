@@ -248,7 +248,7 @@ export default function AuditReportsPage() {
 
 			{!secData && !secLoading && !secError && (
 				<Card>
-					<div className="text-center py-10 text-neutral-500">
+					<div className="text-center py-10 text-neutral-600">
 						<FileProtectOutlined className="text-[40px]" />
 						<p className="mt-3">{t('auditReports.securityEmptyHint')}</p>
 					</div>
@@ -393,7 +393,7 @@ export default function AuditReportsPage() {
 
 			{!compData && !compLoading && !compError && (
 				<Card>
-					<div className="text-center py-10 text-neutral-500">
+					<div className="text-center py-10 text-neutral-600">
 						<AuditOutlined className="text-[40px]" />
 						<p className="mt-3">
 							{t('auditReports.complianceEmptyHint')}

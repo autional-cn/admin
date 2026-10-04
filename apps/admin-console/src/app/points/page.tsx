@@ -572,7 +572,7 @@ export default function PointsPage() {
 										scroll={{ x: 800 }}
 									/>
 								) : (
-									<div className="text-center text-neutral-500 py-12">
+									<div className="text-center text-neutral-600 py-12">
 										{t('points.enterUserIdForTx')}
 									</div>
 								)}
@@ -1020,7 +1020,7 @@ function RiskScoreCell({ userId }: { userId: string }) {
 	const { t } = useTranslation();
 	const { data, isLoading } = usePointRiskScore(userId);
 	if (isLoading) return <span className="text-neutral-300">...</span>;
-	if (!data) return <span className="text-neutral-500">-</span>;
+	if (!data) return <span className="text-neutral-600">-</span>;
 	const riskData = data as PointRiskScoreData | undefined;
 	const riskLevel = riskData?.riskLevel || 'low';
 	const riskScore = riskData?.riskScore;

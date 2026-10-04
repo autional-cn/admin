@@ -128,7 +128,7 @@ export default function ApplicationsPage() {
 			render: (v: string, record: AppRecord) => (
 				<div>
 					<div className="font-medium text-sm">{v}</div>
-					{record.description && <div className="text-xs text-neutral-500">{record.description}</div>}
+					{record.description && <div className="text-xs text-neutral-600">{record.description}</div>}
 				</div>
 			),
 		},

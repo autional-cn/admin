@@ -380,7 +380,7 @@ export default function CommunicationPage() {
 											<Tag color={color}>{text}</Tag>
 										</div>
 										{health?.latency && (
-											<div className="text-xs text-neutral-500 mt-1">
+											<div className="text-xs text-neutral-600 mt-1">
 												{t('notifications.stats.readRate')}: {health.latency}
 											</div>
 										)}
