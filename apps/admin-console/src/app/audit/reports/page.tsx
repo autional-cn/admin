@@ -16,7 +16,7 @@ import {
 	Typography,
 } from 'antd';
 import { FileProtectOutlined, AuditOutlined, ReloadOutlined } from '@ant-design/icons';
-import { apiClient, useCurrentTenantId } from '@autional-cn/shared';
+import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditReportsSecurity,
 	adminAuditReportsCompliance,
@@ -72,11 +72,15 @@ export default function AuditReportsPage() {
 		setSecLoading(true);
 		setSecError(null);
 		try {
-			const { data } = await adminAuditReportsSecurity({
+			// A-226（AC-B2-044）：generated 返回 res.data = 拦截器已解包的业务 payload（api/client.ts:105：
+			// `res.data = camelCaseKeys(payload)`；generated/api.ts 直返 res.data）——旧 `const { data } = …;
+			// data?.data ?? data` 取业务对象的 `.data` 键恒 undefined（成功 toast 照发、报告区恒空白）。
+			// 统一走 extractItem（utils/response.ts 唯一形状适配点，单次解包口径）。
+			const res = await adminAuditReportsSecurity({
 				period: secPeriod,
 				tenant_id: tenantId,
 			});
-			setSecData(data?.data ?? data);
+			setSecData(extractItem(res));
 			message.success(t('auditReports.securityGenerated'));
 		} catch (err) {
 			setSecError(t('auditReports.securityGenerateFailed'));
@@ -90,12 +94,13 @@ export default function AuditReportsPage() {
 		setCompLoading(true);
 		setCompError(null);
 		try {
-			const { data } = await adminAuditReportsCompliance({
+			// A-226（AC-B2-044）：同 security 腿——generated 已含拦截器解包，extractItem 单次口径（防双重解包）。
+			const res = await adminAuditReportsCompliance({
 				standard: compStandard,
 				period: compPeriod,
 				tenant_id: tenantId,
 			});
-			setCompData(data?.data ?? data);
+			setCompData(extractItem(res));
 			message.success(t('auditReports.complianceGenerated'));
 		} catch (err) {
 			setCompError(t('auditReports.complianceGenerateFailed'));

@@ -161,6 +161,7 @@ export const queryKeys = {
 	compliance: {
 		status: ['compliance', 'status'] as const,
 		dsars: ['compliance', 'dsars'] as const,
+		erasures: ['compliance', 'erasures'] as const,
 		retentionPolicies: ['compliance', 'retention-policies'] as const,
 		sodRules: ['compliance', 'sod-rules'] as const,
 		isoControls: ['compliance', 'iso-controls'] as const,

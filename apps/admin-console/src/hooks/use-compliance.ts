@@ -7,6 +7,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	getDSARs,
 	updateDSAR,
+	getErasures,
+	createErasure,
 	executeErasure,
 	getRetentionPolicies,
 	getSODRules,
@@ -14,6 +16,7 @@ import {
 } from '@/lib/api.generated';
 import * as Generated from '@autional-cn/shared/generated/api';
 import type {
+	CreateErasureRequest,
 	CreateRetentionPolicyRequest,
 	UpdateRetentionPolicyRequest,
 	CreateConsentRequest,
@@ -22,19 +25,22 @@ import type {
 
 interface DSAR {
 	id: string;
-	requesterEmail: string;
+	// F-AB2-26-a（TASK-AB2-26）：请求人 = wire `user_id`（后端 dsar.go:49 键集无 requester_email）。
+	userId: string;
 	type: string;
 	status: string;
 	createdAt: string;
 	description?: string;
 }
 
+// A-235/A-241（TASK-AB2-27）：键位对齐 wire（dto.go:411-418 policy_id/data_type/
+// retention_period_days/purpose/legal_basis/status；后端不返回 name/id/auto_delete）。
 interface RetentionPolicy {
-	id: string;
-	name: string;
-	resourceType: string;
-	retentionDays: number;
-	actionAfterExpiry: string;
+	policyId: string;
+	dataType: string;
+	retentionPeriodDays: number;
+	purpose: string;
+	legalBasis: string;
 	status: string;
 }
 
@@ -54,15 +60,16 @@ interface ISOControl {
 	complianceStatus: string;
 }
 
+// A-239（TASK-AB2-28）：键位对齐 wire（dto.go:188-197 ConsentItem；consent.go:50-53 列表映射
+// id/user_id/purpose/granted/granted_at/expired_at——scope/ip/version/revokedAt 后端无此键。
+// 注：DTO 的 service/consent_method 两字段 handler 未映射 → wire 恒空串，故列表侧不消费）。
 interface Consent {
 	id: string;
 	userId: string;
-	scope: string;
+	purpose: string;
 	granted: boolean;
-	ipAddress?: string;
-	recordedAt?: string;
-	revokedAt?: string;
-	version?: string;
+	grantedAt?: string;
+	expiredAt?: string;
 }
 
 export function useDSARs() {
@@ -84,11 +91,43 @@ export function useUpdateDSAR() {
 	});
 }
 
+/** 擦除请求记录（wire ErasureItem：id/user_id/status/reason/created_at/completed_at）。 */
+interface ErasureRecord {
+	id: string;
+	userId: string;
+	status: string;
+	reason?: string;
+	createdAt?: string;
+	completedAt?: string;
+}
+
+// A-234（TASK-AB2-26）：擦除请求列表 —— 旧页面无此查询，「执行擦除」亦错接创建端点。
+export function useErasures() {
+	return useQuery({
+		queryKey: queryKeys.compliance.erasures,
+		staleTime: 30000,
+		queryFn: async () => {
+			const res = await getErasures();
+			return extractList<ErasureRecord>(res);
+		},
+	});
+}
+
+export function useCreateErasure() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: (data: CreateErasureRequest) => createErasure(data),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.compliance.erasures }),
+	});
+}
+
+// A-234 修正：executeErasure 映射已归位（POST /right-to-erasure/{id}/execute，路径参数），
+// 失效目标由 dsars 改为 erasures（状态机推进的是擦除请求自身）。
 export function useExecuteErasure() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: (id: string) => executeErasure(id),
-		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.compliance.dsars }),
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.compliance.erasures }),
 	});
 }
 
@@ -128,10 +167,10 @@ export function useISOControls() {
 export function useCreateRetentionPolicy() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data: Record<string, unknown>) =>
-			Generated.adminComplianceRetentionPoliciesPost(
-				data as unknown as CreateRetentionPolicyRequest,
-			),
+		// A-235（TASK-AB2-27）：类型对齐 CreateRetentionPolicyRequest（name/data_type/
+		// retention_period_days/purpose/legal_basis 必填 + auto_delete 可选），去断言炸弹性。
+		mutationFn: (data: CreateRetentionPolicyRequest) =>
+			Generated.adminComplianceRetentionPoliciesPost(data),
 		onSuccess: () =>
 			queryClient.invalidateQueries({ queryKey: queryKeys.compliance.retentionPolicies }),
 	});
@@ -140,11 +179,8 @@ export function useCreateRetentionPolicy() {
 export function useUpdateRetentionPolicy() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-			Generated.adminComplianceRetentionPoliciesByRetentionPoliciesPut(
-				id,
-				data as unknown as UpdateRetentionPolicyRequest,
-			),
+		mutationFn: ({ id, data }: { id: string; data: UpdateRetentionPolicyRequest }) =>
+			Generated.adminComplianceRetentionPoliciesByRetentionPoliciesPut(id, data),
 		onSuccess: () =>
 			queryClient.invalidateQueries({ queryKey: queryKeys.compliance.retentionPolicies }),
 	});
@@ -164,8 +200,9 @@ export function useConsents() {
 export function useCreateConsent() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data: Record<string, unknown>) =>
-			Generated.adminComplianceGdprConsentPost(data as unknown as CreateConsentRequest),
+		// A-239（TASK-AB2-28）：类型对齐 CreateConsentRequest（user_id*/purpose*/service*/granted*
+		// + consent_method?），去断言炸弹性。
+		mutationFn: (data: CreateConsentRequest) => Generated.adminComplianceGdprConsentPost(data),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.compliance.consents }),
 	});
 }
@@ -173,8 +210,8 @@ export function useCreateConsent() {
 export function useRevokeConsent() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data: { userId: string; purpose: string }) =>
-			Generated.adminComplianceGdprConsentDelete(data as unknown as RevokeConsentRequest),
+		// A-236（TASK-AB2-28）：类型对齐 RevokeConsentRequest（user_id*/purpose* + reason?）。
+		mutationFn: (data: RevokeConsentRequest) => Generated.adminComplianceGdprConsentDelete(data),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.compliance.consents }),
 	});
 }

@@ -1,14 +1,13 @@
 'use client';
-// @generated-api-exempt: 3 key(s) [COMPLIANCE.ADMIN_TENANT_SELF_POLICY, COMPLIANCE.ADMIN_TENANT_SELF_READINESS, COMPLIANCE.ADMIN_TENANT_SELF_SCORE] lack generated func
+// @generated-api-exempt: 2 key(s) [COMPLIANCE.ADMIN_TENANT_SELF_POLICY, COMPLIANCE.ADMIN_TENANT_SELF_READINESS] lack generated func
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, Card, Checkbox, Button, Tag, Space, Modal, Form, Input, message, Progress, Row, Col, Statistic, Descriptions } from 'antd';
 import {
 	SafetyCertificateOutlined,
 	CheckCircleOutlined,
 	CloseCircleOutlined,
-	WarningOutlined,
-	SettingOutlined,
+	PlusOutlined,
 	EditOutlined,
 	DeleteOutlined,
 } from '@ant-design/icons';
@@ -19,7 +18,6 @@ import {
 	adminComplianceStandards,
 	adminComplianceTenantsSelfOverrides,
 	adminComplianceTenantsSelfStandardsPut,
-	adminComplianceTenantsSelfGapAnalysisPost,
 	adminComplianceTenantsSelfOverridesByOverridesDelete,
 } from '@autional-cn/shared/generated/api';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
@@ -87,6 +85,43 @@ interface ReadinessItem {
 	recommendations: string[];
 }
 
+// TASK-AB2-30（A-246/A-251）：差距报告全对象（旧代码只取 parameters 丢弃 overallScore）。
+interface GapReport {
+	standards?: string[];
+	parameters: GapItem[];
+	overallScore: number;
+	criticalGaps?: number;
+	highGaps?: number;
+	mediumGaps?: number;
+	lowGaps?: number;
+}
+
+// TASK-AB2-30（ADR-B2-05）：评估基准输入口行 —— resolvedPolicy 参数名/值预填，可增删改。
+interface ConfigRow {
+	key: string;
+	name: string;
+	value: string;
+}
+
+/** 输入口值 → payload 值：JSON.parse 尝试，失败按字符串；空 = 未提供（undefined → 省略该键）。 */
+function parseConfigValue(raw: string): unknown {
+	const s = raw.trim();
+	if (s === '') return undefined;
+	try {
+		return JSON.parse(s);
+	} catch {
+		return raw;
+	}
+}
+
+/** resolvedPolicy 参数值 → 输入口预填字符串（字符串直出；数字/布尔 String；对象/数组 JSON 序列化）。 */
+function configValueToInput(v: unknown): string {
+	if (v == null) return '';
+	if (typeof v === 'string') return v;
+	if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+	return JSON.stringify(v);
+}
+
 export default function CompliancePolicyPage() {
 	const { t } = useTranslation();
 
@@ -116,20 +151,20 @@ export default function CompliancePolicyPage() {
 	const [standards, setStandards] = useState<StandardItem[]>([]);
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [resolvedPolicy, setResolvedPolicy] = useState<Record<string, ResolvedParam>>({});
-	const [gapItems, setGapItems] = useState<GapItem[]>([]);
+	const [gapReport, setGapReport] = useState<GapReport | null>(null);
+	const [configRows, setConfigRows] = useState<ConfigRow[]>([]);
 	const [overrides, setOverrides] = useState<OverrideItem[]>([]);
 	const [readiness, setReadiness] = useState<Record<string, ReadinessItem>>({});
-	const [score, setScore] = useState<number | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [overrideModal, setOverrideModal] = useState(false);
 	const [overrideForm] = Form.useForm();
 	const [resolvedStandards, setResolvedStandards] = useState<string[]>([]);
+	const configRowSeq = useRef(0);
 
 	useEffect(() => {
 		fetchStandards();
 		fetchOverrides();
-		fetchScore();
 	}, []);
 
 	const fetchStandards = async () => {
@@ -146,6 +181,7 @@ export default function CompliancePolicyPage() {
 				setSelectedIds(policy.standards);
 				setResolvedPolicy(policy.parameters || {});
 				setResolvedStandards(policy.standards);
+				seedConfigRows(policy.parameters || {});
 			}
 		} catch (err) {
 			setError(t('compliance.policy.loadFailed'));
@@ -165,16 +201,8 @@ export default function CompliancePolicyPage() {
 		}
 	};
 
-	const fetchScore = async () => {
-		try {
-			const res = await apiClient.get(API_PATHS.COMPLIANCE.ADMIN_TENANT_SELF_SCORE);
-			setScore(extractItem(res.data)?.overallScore ?? null);
-		} catch (err) {
-			if (import.meta.env.DEV) {
-				console.error('Failed to load compliance policy data', err);
-			}
-		}
-	};
+	// TASK-AB2-30（A-251）：fetchScore/score 死代码已删 —— 差距卡头圆环统一读差距报告
+	// gapReport.overallScore（口径收敛，不再并存 GET /score 的安全评分）。
 
 	const handleApply = async () => {
 		try {
@@ -184,9 +212,9 @@ export default function CompliancePolicyPage() {
 			const policy = extractItem(res.data);
 			setResolvedPolicy(policy?.parameters || {});
 			setResolvedStandards(policy?.standards || []);
+			seedConfigRows(policy?.parameters || {});
 			message.success(t('compliance.policy.standardsUpdated'));
 			fetchOverrides();
-			fetchScore();
 		} catch (err) {
 			handleApiError(err, t('compliance.policy.updateFailed'));
 		} finally {
@@ -194,11 +222,52 @@ export default function CompliancePolicyPage() {
 		}
 	};
 
+	const seedConfigRows = (params: Record<string, ResolvedParam>) => {
+		setConfigRows(
+			Object.entries(params).map(([name, p]) => ({
+				key: name,
+				name,
+				value: configValueToInput(p?.value),
+			})),
+		);
+	};
+
+	const addConfigRow = () => {
+		configRowSeq.current += 1;
+		setConfigRows((rows) => [...rows, { key: `custom-${configRowSeq.current}`, name: '', value: '' }]);
+	};
+
+	const updateConfigRow = (key: string, patch: Partial<ConfigRow>) => {
+		setConfigRows((rows) => rows.map((r) => (r.key === key ? { ...r, ...patch } : r)));
+	};
+
+	const removeConfigRow = (key: string) => {
+		setConfigRows((rows) => rows.filter((r) => r.key !== key));
+	};
+
+	/** 输入口 → POST body 的 parameters（空名行忽略；空值行 = 未提供 → 省略键）。 */
+	const buildGapParameters = (): Record<string, unknown> => {
+		const parameters: Record<string, unknown> = {};
+		for (const row of configRows) {
+			const name = row.name.trim();
+			if (!name) continue;
+			const parsed = parseConfigValue(row.value);
+			if (parsed === undefined) continue;
+			parameters[name] = parsed;
+		}
+		return parameters;
+	};
+
 	const handleRunGapAnalysis = async () => {
 		try {
 			setLoading(true);
-			const res = await adminComplianceTenantsSelfGapAnalysisPost();
-			setGapItems(extractItem(res)?.parameters || []);
+			// A-246（ADR-B2-05）：恒发 body —— 有标准时后端 ShouldBindJSON 必读（无 body 必 400）；
+			// parameters = 输入口行，空 = {}（诚实空基准）。
+			const res = await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_TENANT_SELF_GAP_ANALYSIS, {
+				parameters: buildGapParameters(),
+			});
+			// A-251：存全对象，ring 读 overallScore（不再丢弃）。
+			setGapReport(extractItem<GapReport>(res.data));
 			setActiveTab('gaps');
 		} catch (err) {
 			handleApiError(err, t('compliance.policy.gapAnalysisFailed'));
@@ -357,16 +426,69 @@ export default function CompliancePolicyPage() {
 		},
 		{
 			key: 'gaps',
-			label: `${t('compliance.policy.gapsTitle')}${gapItems.length ? ` (${t('compliance.policy.nonCompliantCount', { count: gapItems.filter((g) => !g.compliant).length })})` : ''}`,
+			label: `${t('compliance.policy.gapsTitle')}${gapReport && gapReport.parameters.length ? ` (${t('compliance.policy.nonCompliantCount', { count: gapReport.parameters.filter((g) => !g.compliant).length })})` : ''}`,
 			children: (
 				<div>
-					{gapItems.length === 0 ? (
+					<Card title={t('compliance.policy.gapInputTitle')} className="mb-4">
+						<p className="mb-3 text-neutral-600 text-xs">{t('compliance.policy.gapInputHint')}</p>
+						<DataTable
+							rowKey="key"
+							dataSource={configRows}
+							pagination={false}
+							size="small"
+							columns={[
+								{
+									title: t('compliance.policy.parameter'),
+									dataIndex: 'name',
+									width: 260,
+									render: (_: unknown, row: ConfigRow, index: number) => (
+										<Input
+											id={`gap-param-${index}`}
+											value={row.name}
+											onChange={(e) => updateConfigRow(row.key, { name: e.target.value })}
+										/>
+									),
+								},
+								{
+									title: t('compliance.policy.currentValue'),
+									dataIndex: 'value',
+									render: (_: unknown, row: ConfigRow, index: number) => (
+										<Input
+											id={`gap-value-${index}`}
+											value={row.value}
+											onChange={(e) => updateConfigRow(row.key, { value: e.target.value })}
+										/>
+									),
+								},
+								{
+									title: t('common.actions'),
+									width: 90,
+									render: (_: unknown, row: ConfigRow) => (
+										<Button
+											type="link"
+											danger
+											icon={<DeleteOutlined />}
+											onClick={() => removeConfigRow(row.key)}
+										>
+											{t('compliance.policy.remove')}
+										</Button>
+									),
+								},
+							]}
+						/>
+						<Space className="mt-3">
+							<Button icon={<PlusOutlined />} onClick={addConfigRow}>
+								{t('compliance.policy.addParam')}
+							</Button>
+							<Button type="primary" onClick={handleRunGapAnalysis} loading={loading}>
+								{t('compliance.policy.runGap')}
+							</Button>
+						</Space>
+					</Card>
+					{gapReport === null ? (
 						<Card>
 							<div className="text-center p-10">
 								<p>{t('compliance.policy.runGapHint')}</p>
-								<Button type="primary" onClick={handleRunGapAnalysis}>
-									{t('compliance.policy.runGap')}
-								</Button>
 							</div>
 						</Card>
 					) : (
@@ -374,20 +496,23 @@ export default function CompliancePolicyPage() {
 							title={
 								<Space>
 									<span>{t('compliance.policy.gaps')}</span>
-									{score != null && (
-										<Progress
-											type="circle"
-											percent={Math.round(score)}
-											size={40}
-											status={score >= 80 ? 'success' : score >= 60 ? 'normal' : 'exception'}
-										/>
-									)}
+									<Progress
+										type="circle"
+										percent={Math.round(gapReport.overallScore)}
+										size={40}
+										status={gapReport.overallScore >= 80 ? 'success' : gapReport.overallScore >= 60 ? 'normal' : 'exception'}
+									/>
 								</Space>
 							}
 						>
+							{gapReport.parameters.length === 0 && (
+								<div className="mb-3 text-neutral-600">
+									{t('compliance.policy.noStandardsGapHint')}
+								</div>
+							)}
 							<DataTable
 								rowKey="parameter"
-								dataSource={gapItems}
+								dataSource={gapReport.parameters}
 								columns={[
 									{ title: t('compliance.policy.parameter'), dataIndex: 'parameter', width: 200 },
 									{

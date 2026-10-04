@@ -13,11 +13,13 @@ import {
 } from '@/hooks/use-abac-policies';
 import type { ABACPolicy } from '@/hooks/use-abac-policies';
 import { handleApiError } from '@/lib/error-handler';
+import { useCurrentTenantId, PLATFORM_TENANT_ID } from '@autional-cn/shared';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function AbacPoliciesPage() {
 	const { t } = useTranslation();
+	const currentTenantId = useCurrentTenantId() ?? '';
 	const [modalVisible, setModalVisible] = useState(false);
 	const [editing, setEditing] = useState<ABACPolicy | null>(null);
 	const [keyword, setKeyword] = useState('');
@@ -35,6 +37,12 @@ export default function AbacPoliciesPage() {
 			p.name.toLowerCase().includes(k) || (p.description && p.description.toLowerCase().includes(k))
 		);
 	});
+
+	// A-132f：平台行只读 = 后端 platformPolicyWriteForbidden 的前端镜像（identity abac_handler.go:265-268）
+	// ——平台属主行（tenantId == 平台租户常量）且当前会话非平台租户 → 编辑/删除入口隐藏（点击不可达，
+	// 不再让用户触发注定 403 的写）。平台租户自身会话保留自管（AC-B2-014：不误伤）。
+	const isPlatformReadOnly = (record: ABACPolicy) =>
+		record.tenantId === PLATFORM_TENANT_ID && currentTenantId !== PLATFORM_TENANT_ID;
 
 	const handleSave = async (values: any) => {
 		try {
@@ -75,6 +83,19 @@ export default function AbacPoliciesPage() {
 			title: t('abacPolicies.policyName'),
 			dataIndex: 'name',
 			key: 'name',
+		},
+		{
+			// A-132f 归属列：平台/租户可辨（契约键直读 tenantId，拦截器 camel 后形状）。
+			title: t('abacPolicies.ownership'),
+			key: 'ownership',
+			width: 100,
+			render: (_: any, record: ABACPolicy) => (
+				<Tag color={record.tenantId === PLATFORM_TENANT_ID ? 'purple' : 'blue'}>
+					{record.tenantId === PLATFORM_TENANT_ID
+						? t('abacPolicies.ownershipPlatform')
+						: t('abacPolicies.ownershipTenant')}
+				</Tag>
+			),
 		},
 		{
 			title: t('common.description'),
@@ -124,29 +145,35 @@ export default function AbacPoliciesPage() {
 		{
 			title: t('common.actions'),
 			key: 'action',
-			render: (_: any, record: ABACPolicy) => (
-				<Space size="small">
-					<Button
-						type="link"
-						icon={<EditOutlined />}
-						onClick={() => {
-							setEditing(record);
-							form.setFieldsValue(record);
-							setModalVisible(true);
-						}}
-					>
-						{t('common.edit')}
-					</Button>
-					<Button
-						type="link"
-						danger
-						icon={<DeleteOutlined />}
-						onClick={() => handleDelete(record.id)}
-					>
-						{t('common.delete')}
-					</Button>
-				</Space>
-			),
+			render: (_: any, record: ABACPolicy) => {
+				// 平台行（租户会话）：只读——无任何操作入口，仅示只读标记。
+				if (isPlatformReadOnly(record)) {
+					return <Tag>{t('abacPolicies.platformReadOnly')}</Tag>;
+				}
+				return (
+					<Space size="small">
+						<Button
+							type="link"
+							icon={<EditOutlined />}
+							onClick={() => {
+								setEditing(record);
+								form.setFieldsValue(record);
+								setModalVisible(true);
+							}}
+						>
+							{t('common.edit')}
+						</Button>
+						<Button
+							type="link"
+							danger
+							icon={<DeleteOutlined />}
+							onClick={() => handleDelete(record.id)}
+						>
+							{t('common.delete')}
+						</Button>
+					</Space>
+				);
+			},
 		},
 	];
 

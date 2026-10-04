@@ -314,7 +314,13 @@ export const getPublicBillingPlans = Generated.billingPlans;
 
 export const getDSARs = Generated.adminComplianceGdprDsar;
 export const updateDSAR = Generated.adminComplianceGdprDsarByDsarPut;
-export const executeErasure = Generated.adminComplianceGdprRightToErasurePost;
+// A-234（TASK-AB2-26）：擦除四映射归位。旧 `executeErasure` 误接**创建端点**
+// （adminComplianceGdprRightToErasurePost = POST /right-to-erasure）且调用方把 id 字符串当 body
+// ⇒ 必败 400；真执行端点 = POST /right-to-erasure/{erasure_id}/execute（路径参数，无 body）。
+export const getErasures = Generated.adminComplianceGdprRightToErasure;
+export const createErasure = Generated.adminComplianceGdprRightToErasurePost;
+export const getErasure = Generated.adminComplianceGdprRightToErasureByRightToErasure;
+export const executeErasure = Generated.adminComplianceGdprRightToErasureExecuteByRightToErasurePost;
 export const getRetentionPolicies = Generated.adminComplianceRetentionPolicies;
 export const getComplianceSODRules = Generated.adminComplianceSodRules;
 export const getISOControls = Generated.adminComplianceIso27001Controls;

@@ -12,17 +12,20 @@ import {
 	deleteAbacPolicy,
 } from '@/lib/api.generated';
 
+// TASK-AB2-09（A-132f）：模型 camel 化——响应拦截器已 snake→camel 深转换（client.ts:105
+// camelCaseKeys），契约键直读；禁止 snake 直读（旧声明 tenant_id/created_at 为类型谎言）。
+// wire 锚：service-identity dto/abac_dto.go:22-33 ABACPolicyResponse（tenant_id/created_at/updated_at）。
 export interface ABACPolicy {
 	id: string;
-	tenant_id: string;
+	tenantId: string;
 	name: string;
 	description: string;
 	priority: number;
 	condition: string;
 	effect: 'allow' | 'deny';
 	enabled: boolean;
-	created_at: string;
-	updated_at: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export function useAbacPolicies() {

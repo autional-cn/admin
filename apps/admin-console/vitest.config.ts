@@ -8,6 +8,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // 本机 jsdom+AntD 首渲染 transform/collect 慢（单文件实测 ~10x 常规）且套件并行叠加，
+    // 5s 默认在整跑时误杀重负载契约用例（单跑全绿）；20s 仅放宽失败判定上界，不掩盖断言语义。
+    testTimeout: 20000,
   },
   resolve: {
     alias: {

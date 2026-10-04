@@ -43,6 +43,10 @@ const LEVEL_COLORS: Record<string, string> = {
 	critical: 'magenta',
 };
 
+// A-206：检测默认时间范围。后端 DetectAnomaliesRequest.TimeRange binding:"required"
+// + 白名单 {1h,24h,7d,30d}（service-audit dto.go:847-849）——检测 body 恒含该值。
+const DEFAULT_TIME_RANGE = '24h';
+
 export default function AuditAnomaliesPage() {
 	const { t } = useTranslation();
 
@@ -80,7 +84,8 @@ export default function AuditAnomaliesPage() {
 	const [severity, setSeverity] = useState<string | undefined>();
 	const [status, setStatus] = useState<string | undefined>();
 	const [type, setType] = useState<string | undefined>();
-	const [timeRange, setTimeRange] = useState<string | undefined>();
+	// A-206：默认 '24h'（后端 binding required；空 payload 必 400）。
+	const [timeRange, setTimeRange] = useState<string | undefined>(DEFAULT_TIME_RANGE);
 	const [pagination, setPagination] = useState({ page: 1, pageSize: 20 });
 	const [drawerVisible, setDrawerVisible] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState<any>(null);
@@ -158,13 +163,18 @@ export default function AuditAnomaliesPage() {
 	const handleDetect = useCallback(async () => {
 		try {
 			// wire 锚：service-audit/internal/handler/dto/dto.go:855（json time_range，detect body）
-			const payload: Record<string, string> = {};
-			if (timeRange) payload.timeRange = timeRange;
-			await detectMut.mutateAsync(payload);
+			// A-206：body 恒含 timeRange（binding required；清了筛选也回落默认 24h）——
+			// 旧实现空 {} 直发，默认点击必 400。
+			await detectMut.mutateAsync({ timeRange: timeRange || DEFAULT_TIME_RANGE });
 			message.success(t('auditAnomalies.detectSuccess'));
 			refetch();
 		} catch (err) {
-			handleApiError(err, t('auditAnomalies.detectFailed'));
+			// A-207f：403 = 后端租户守卫（tenant isolation required）→ 专用权限/隔离文案
+			if ((err as { response?: { status?: number } })?.response?.status === 403) {
+				message.error(t('auditAnomalies.forbidden'));
+			} else {
+				handleApiError(err, t('auditAnomalies.detectFailed'));
+			}
 		}
 	}, [detectMut, timeRange, refetch, t]);
 
@@ -309,6 +319,9 @@ export default function AuditAnomaliesPage() {
 	const timelineData = extractItem(timelineQuery.data);
 	const relatedData = relatedQuery.data;
 
+	// A-207f：错误态与空态互斥渲染的判定；403 = 后端租户守卫（tenant isolation required）语义
+	const errorStatus = (error as { response?: { status?: number } } | null)?.response?.status;
+
 	if (isRestricted) {
 		return <AuditStatsOnly title={t('auditAnomalies.title')} />;
 	}
@@ -331,8 +344,14 @@ export default function AuditAnomaliesPage() {
 				}
 			/>
 
+			{/* A-207f：错误态与空态互斥（旧实现 PageError 与空表并存 → 失败伪装「暂无数据」）；
+			    403 = 后端租户守卫（tenant isolation required）→ 专用权限/隔离文案 */}
 			{error && (
-				<PageError message={t('auditAnomalies.loadError')} retry={refetch} className="mb-4" />
+				<PageError
+					message={errorStatus === 403 ? t('auditAnomalies.forbidden') : t('auditAnomalies.loadError')}
+					retry={refetch}
+					className="mb-4"
+				/>
 			)}
 			<div className="mb-4">
 				<Row gutter={16}>
@@ -379,23 +398,25 @@ export default function AuditAnomaliesPage() {
 				</Row>
 			</div>
 
-			<DataTable
-				rowKey="id"
-				columns={columns}
-				dataSource={data?.items || []}
-				loading={isLoading}
-				scroll={{ x: 1100 }}
-				pagination={{
-					current: pagination.page,
-					pageSize: pagination.pageSize,
-					showSizeChanger: true,
-					pageSizeOptions: [20, 50, 100],
-					total: data?.pagination?.total || 0,
-				}}
-				onChange={(pag: DataTablePagination) => {
-					setPagination({ page: pag.current || 1, pageSize: pag.pageSize || 20 });
-				}}
-			/>
+			{!error && (
+				<DataTable
+					rowKey="id"
+					columns={columns}
+					dataSource={data?.items || []}
+					loading={isLoading}
+					scroll={{ x: 1100 }}
+					pagination={{
+						current: pagination.page,
+						pageSize: pagination.pageSize,
+						showSizeChanger: true,
+						pageSizeOptions: [20, 50, 100],
+						total: data?.pagination?.total || 0,
+					}}
+					onChange={(pag: DataTablePagination) => {
+						setPagination({ page: pag.current || 1, pageSize: pag.pageSize || 20 });
+					}}
+				/>
+			)}
 
 			<Drawer
 				title={t('auditAnomalies.detailTitle')}

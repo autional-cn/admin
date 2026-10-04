@@ -2,33 +2,27 @@
 
 import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select } from 'antd';
-import { message, modal } from '@/lib/antd-app';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { message } from '@/lib/antd-app';
+import { CloseOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import {
-	useRoleActivations,
-	useApproveActivation,
-	useRevokeActivation,
-} from '@/hooks/use-role-activations';
+import { useRoleActivations, useRevokeActivation } from '@/hooks/use-role-activations';
 import type { RoleActivation } from '@/hooks/use-role-activations';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
-const STATUS_MAP: Record<string, { color: string; label: string }> = {
-	active: { color: 'green', label: '' },
-	pending: { color: 'orange', label: '' },
-	revoked: { color: 'red', label: '' },
-	expired: { color: 'default', label: '' },
+// A-141f（TASK-AB2-17 / ADR-B2-03）：后端创建即 Active（枚举仅三态，见 pim/role_activation.go:13-15），
+// 本页为「激活记录」视图，无审批流；未知状态兜底原值透出（防存量脏数据吞行）。
+const STATUS_MAP: Record<string, { color: string }> = {
+	active: { color: 'green' },
+	revoked: { color: 'red' },
+	expired: { color: 'default' },
 };
 
 export default function RoleActivationsPage() {
 	const { t } = useTranslation();
 	const [statusFilter, setStatusFilter] = useState<string>('all');
-	const [actionTarget, setActionTarget] = useState<{
-		id: string;
-		type: 'approve' | 'revoke';
-	} | null>(null);
+	const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
 	const [form] = Form.useForm();
 
 	const {
@@ -37,40 +31,29 @@ export default function RoleActivationsPage() {
 		error,
 		refetch,
 	} = useRoleActivations(statusFilter !== 'all' ? statusFilter : undefined);
-	const approveMut = useApproveActivation();
 	const revokeMut = useRevokeActivation();
 
 	const statusLabels: Record<string, string> = {
 		active: t('roleActivations.statusActive'),
-		pending: t('roleActivations.statusPending'),
 		revoked: t('roleActivations.statusRevoked'),
 		expired: t('roleActivations.statusExpired'),
 	};
 
-	const handleAction = async (values: { reason: string }) => {
-		if (!actionTarget) return;
+	const handleRevoke = async (values: { reason: string }) => {
+		if (!revokeTarget) return;
 		try {
-			if (actionTarget.type === 'approve') {
-				await approveMut.mutateAsync({ id: actionTarget.id, reason: values.reason });
-				message.success(t('roleActivations.approveSuccess'));
-			} else {
-				await revokeMut.mutateAsync({ id: actionTarget.id, reason: values.reason });
-				message.success(t('roleActivations.revokeSuccess'));
-			}
-			setActionTarget(null);
+			await revokeMut.mutateAsync({ id: revokeTarget, reason: values.reason });
+			message.success(t('roleActivations.revokeSuccess'));
+			setRevokeTarget(null);
 			form.resetFields();
 		} catch (err) {
 			handleApiError(err, t('roleActivations.operationFailed'));
 		}
 	};
 
-	const confirmAction = (id: string, type: 'approve' | 'revoke') => {
-		setActionTarget({ id, type });
-		const defaultReason =
-			type === 'approve'
-				? t('roleActivations.defaultApproveReason')
-				: t('roleActivations.defaultRevokeReason');
-		form.setFieldsValue({ reason: defaultReason });
+	const confirmRevoke = (id: string) => {
+		setRevokeTarget(id);
+		form.setFieldsValue({ reason: t('roleActivations.defaultRevokeReason') });
 	};
 
 	const truncate = (s: string, len = 8) =>
@@ -101,8 +84,8 @@ export default function RoleActivationsPage() {
 			key: 'status',
 			width: 100,
 			render: (v: string) => {
-				const cfg = STATUS_MAP[v] || { color: 'default', label: v };
-				return <Tag color={cfg.color}>{statusLabels[v] || cfg.label}</Tag>;
+				const cfg = STATUS_MAP[v] || { color: 'default' };
+				return <Tag color={cfg.color}>{statusLabels[v] || v}</Tag>;
 			},
 		},
 		{
@@ -131,23 +114,13 @@ export default function RoleActivationsPage() {
 			width: 120,
 			render: (_: any, record: RoleActivation) => (
 				<Space size="small">
-					{record.status === 'pending' && (
-						<Button
-							type="link"
-							icon={<CheckOutlined />}
-							loading={approveMut.isPending}
-							onClick={() => confirmAction(record.id, 'approve')}
-						>
-							{t('roleActivations.approve')}
-						</Button>
-					)}
 					{record.status === 'active' && (
 						<Button
 							type="link"
 							danger
 							icon={<CloseOutlined />}
 							loading={revokeMut.isPending}
-							onClick={() => confirmAction(record.id, 'revoke')}
+							onClick={() => confirmRevoke(record.id)}
 						>
 							{t('common.revoke')}
 						</Button>
@@ -172,7 +145,6 @@ export default function RoleActivationsPage() {
 					options={[
 						{ label: t('common.all'), value: 'all' },
 						{ label: t('roleActivations.statusActive'), value: 'active' },
-						{ label: t('roleActivations.statusPending'), value: 'pending' },
 						{ label: t('roleActivations.statusRevoked'), value: 'revoked' },
 						{ label: t('roleActivations.statusExpired'), value: 'expired' },
 					]}
@@ -190,21 +162,17 @@ export default function RoleActivationsPage() {
 			/>
 
 			<Modal
-				title={
-					actionTarget?.type === 'approve'
-						? t('roleActivations.modalApproveTitle')
-						: t('roleActivations.modalRevokeTitle')
-				}
-				open={!!actionTarget}
+				title={t('roleActivations.modalRevokeTitle')}
+				open={!!revokeTarget}
 				onCancel={() => {
-					setActionTarget(null);
+					setRevokeTarget(null);
 					form.resetFields();
 				}}
 				onOk={() => form.submit()}
 				destroyOnHidden
 				className="w-full max-w-[560px]"
 			>
-				<Form form={form} layout="vertical" onFinish={handleAction}>
+				<Form form={form} layout="vertical" onFinish={handleRevoke}>
 					<Form.Item
 						name="reason"
 						label={t('roleActivations.reason')}

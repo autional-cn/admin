@@ -12,9 +12,11 @@ import {
 	Descriptions,
 	Modal,
 	Statistic,
+	Popconfirm,
 	Row as AntRow,
 	Col,
 } from 'antd';
+import dayjs from 'dayjs';
 import { message } from '@/lib/antd-app';
 import {
 	EditOutlined,
@@ -28,8 +30,12 @@ import type { RetentionPolicy } from '@/hooks/use-retention-policy';
 import type * as Types from '@autional-cn/shared/generated/types';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
-import { apiClient, extractItem } from '@autional-cn/shared';
-import { adminAuditArchiveStatus, adminAuditArchivePost } from '@autional-cn/shared/generated/api';
+import { apiClient, extractItem, extractListResult } from '@autional-cn/shared';
+import {
+	adminAuditArchiveStatus,
+	adminAuditArchivePost,
+	adminAuditLogs,
+} from '@autional-cn/shared/generated/api';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
@@ -45,6 +51,11 @@ export default function RetentionPolicyPage() {
 	const [archiveLoading, setArchiveLoading] = useState(false);
 	const [archiveNowLoading, setArchiveNowLoading] = useState(false);
 
+	// A-215f：Popconfirm 影响面（ADR-B2-04）——条数/未知态 + 与归档同口径的 before（10 位秒，ADR-B2-10）。
+	const [archiveCount, setArchiveCount] = useState<number | null>(null);
+	const [archiveCountUnknown, setArchiveCountUnknown] = useState(false);
+	const [archiveBefore, setArchiveBefore] = useState<number | null>(null);
+
 	const fetchArchiveStatus = async () => {
 		setArchiveLoading(true);
 		try {
@@ -57,11 +68,29 @@ export default function RetentionPolicyPage() {
 		}
 	};
 
+	/** A-215f：Popconfirm 打开时取影响面条数（ADR-B2-04 = 既有列表 total；失败 → 无法预估但不豁免确认）。 */
+	const prepareArchiveConfirm = async () => {
+		const before = dayjs().unix(); // ADR-B2-10：10 位秒（旧实现 Date.now() 13 位毫秒 → 后端按秒解释 ≈ 全量归档）
+		setArchiveBefore(before);
+		setArchiveCount(null);
+		setArchiveCountUnknown(false);
+		try {
+			// 契约键 snake（generated/adminAuditLogs 的类型即 wire 原样；拦截器幂等直过）——仓内既有风格同款
+			// （use-dashboard-summary `adminSecrets({ page_size: 1 })`、users/[id] `getAuditLogs({ user_id, page_size })`）。
+			const res = await adminAuditLogs({ end_time: before, page_size: 1 });
+			setArchiveCount(extractListResult(res).pagination.total);
+		} catch {
+			// 取数失败不回退为无确认：Popconfirm 仍显示「无法预估条数」+ 不可逆警告
+			setArchiveCountUnknown(true);
+		}
+	};
+
 	const handleArchiveNow = async () => {
 		setArchiveNowLoading(true);
 		try {
+			// A-215f/ADR-B2-10：before 为 10 位秒，且与影响面条数同口径（同一个 before）
 			const res = await adminAuditArchivePost({
-				before: Date.now(),
+				before: archiveBefore ?? dayjs().unix(),
 			});
 			const count = extractItem(res)?.archivedCount || 0;
 			message.success(`Archive completed — ${count} records archived`);
@@ -188,13 +217,32 @@ export default function RetentionPolicyPage() {
 				title={t('auditRetention.archiveTitle')}
 				className="mt-6"
 				extra={
-					<Button
-						icon={<CloudDownloadOutlined />}
-						onClick={handleArchiveNow}
-						loading={archiveNowLoading}
+					<Popconfirm
+						title={t('auditRetention.archiveConfirm.title')}
+						description={
+							<div className="max-w-64">
+								{archiveCountUnknown
+									? t('auditRetention.archiveConfirm.countUnknown')
+									: archiveCount !== null
+										? t('auditRetention.archiveConfirm.count', { count: archiveCount })
+										: null}
+								<div className="mt-1 text-warning-text">
+									{t('auditRetention.archiveConfirm.warning')}
+								</div>
+							</div>
+						}
+						onOpenChange={(open) => {
+							if (open) prepareArchiveConfirm();
+						}}
+						onConfirm={handleArchiveNow}
+						okText={t('auditRetention.archiveConfirm.ok')}
+						cancelText={t('common.cancel')}
+						okButtonProps={{ danger: true }}
 					>
-						{t('auditRetention.archiveNow')}
-					</Button>
+						<Button icon={<CloudDownloadOutlined />} loading={archiveNowLoading}>
+							{t('auditRetention.archiveNow')}
+						</Button>
+					</Popconfirm>
 				}
 			>
 				{archiveLoading ? (

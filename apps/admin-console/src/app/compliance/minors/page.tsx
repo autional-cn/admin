@@ -2,8 +2,8 @@
 // @generated-api-exempt: 2 key(s) [IDENTITY.ADMIN_CONSENTS, TENANT.MINORS_PROTECTION] lack generated func
 
 import React, { useState, useEffect } from 'react';
-import { DataTable } from '@autional-cn/ui/antd';
-import { Card, Form, InputNumber, Switch, Button, message, Spin, TimePicker, Space, Statistic, Row, Col, Tabs, Tag } from 'antd';
+import { DataTable, PageError } from '@autional-cn/ui/antd';
+import { Card, Form, InputNumber, Switch, Button, Spin, TimePicker, Space, Statistic, Row, Col, Tabs, Tag } from 'antd';
 import {
 	SafetyCertificateOutlined,
 	SaveOutlined,
@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
+import { message } from '@/lib/antd-app';
 
 import { apiClient, API_PATHS, extractList, fromPageResult, toPageParams, useCurrentTenantId } from '@autional-cn/shared';
 import { adminUsers } from '@autional-cn/shared/generated/api';
@@ -81,12 +82,16 @@ export default function MinorsProtectionPage() {
 
 	const [config, setConfig] = useState<MinorsProtectionConfig | null>(null);
 	const [loading, setLoading] = useState(true);
+	// A-265f（RC-B2-14 P1）：配置加载失败显式成态——失败绝不伪装成「租户未配置」（空表单+伪 0 统计）。
+	const [configError, setConfigError] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [users, setUsers] = useState<MinorUser[]>([]);
 	const [usersLoading, setUsersLoading] = useState(false);
 	const [userTotal, setUserTotal] = useState(0);
 	const [consents, setConsents] = useState<ConsentRecord[]>([]);
 	const [consentsLoading, setConsentsLoading] = useState(false);
+	// A-268f（RC-B2-14 P2）：失败 ≠ 空态。403 专用文案（权限不足/管理面配置缺失）与通用失败文案分流。
+	const [consentsError, setConsentsError] = useState<'forbidden' | 'failed' | null>(null);
 	const [activeTab, setActiveTab] = useState('config');
 	const [form] = Form.useForm();
 	const tenantId = useCurrentTenantId() ?? '';
@@ -101,6 +106,7 @@ export default function MinorsProtectionPage() {
 			// DataResponse 信封已由拦截器解包 + 深 camel：res.data 即配置对象（契约直读）
 			const d = res.data as MinorsProtectionConfig;
 			setConfig(d);
+			setConfigError(false);
 			form.setFieldsValue({
 				dailyUsageLimitMin: d.dailyUsageLimitMin,
 				monthlySpendLimit: d.monthlySpendLimit,
@@ -117,10 +123,16 @@ export default function MinorsProtectionPage() {
 				minorDataRetentionDays: d.minorDataRetentionDays,
 			});
 		} catch {
-			// 加载配置失败时保持默认设置
+			setConfigError(true);
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	/** 错误态重试：回到加载态再取数（configError 由 loadConfig 成功路径清除）。 */
+	const retryLoadConfig = () => {
+		setLoading(true);
+		loadConfig();
 	};
 
 	const loadUsers = async () => {
@@ -146,8 +158,11 @@ export default function MinorsProtectionPage() {
 				params: toPageParams({ pageSize: 100 }),
 			});
 			setConsents(extractList(res.data));
-		} catch {
-			// 加载同意记录失败时保持空列表
+			setConsentsError(null);
+		} catch (err) {
+			// 403 = 权限不足或管理面配置缺失（TASK-AB2-32 网关声明面）；其余失败走通用文案。
+			const status = (err as { response?: { status?: number } })?.response?.status;
+			setConsentsError(status === 403 ? 'forbidden' : 'failed');
 		} finally {
 			setConsentsLoading(false);
 		}
@@ -178,7 +193,16 @@ export default function MinorsProtectionPage() {
 			message.success(t('compliance.minors.saveSuccess'));
 			loadConfig();
 		} catch (err) {
-			handleApiError(err, t('compliance.minors.saveFailed'));
+			// W0-04（TASK-AB2-04）：空更新被后端显式 422 empty_update 拒绝——承接为可读中文，
+			// 不再让英文 title "Validation Failed" 穿透（extractApiErrorMessage 优先 title）。
+			const emptyUpdate = (
+				err as { response?: { data?: { errors?: Array<{ code?: string }> } } }
+			)?.response?.data?.errors?.some((e) => e?.code === 'empty_update');
+			if (emptyUpdate) {
+				message.error(t('compliance.minors.saveEmptyUpdate'));
+			} else {
+				handleApiError(err, t('compliance.minors.saveFailed'));
+			}
 		} finally {
 			setSaving(false);
 		}
@@ -230,39 +254,42 @@ export default function MinorsProtectionPage() {
 		<div className="p-6">
 			<ConsolePageHeader title={t('compliance.minors.title')} description={t('compliance.minors.subtitle')} />
 
-			<Row gutter={16} className="mb-6">
-				<Col span={8}>
-					<Card>
-						<Statistic
-							title={t('compliance.minors.userCount')}
-							value={userTotal}
-							prefix={<UserOutlined />}
-						/>
-					</Card>
-				</Col>
-				<Col span={8}>
-					<Card>
-						<Statistic
-							title={t('compliance.minors.dailyLimit')}
-							value={config?.dailyUsageLimitMin || 0}
-							suffix={t('compliance.minors.minutes')}
-						/>
-					</Card>
-				</Col>
-				<Col span={8}>
-					<Card>
-						<Statistic
-							title={t('compliance.minors.curfew')}
-							value={
-								config?.nightModeEnabled
-									? `${config.nightModeStart}-${config.nightModeEnd}`
-									: t('compliance.minors.curfewOff')
-							}
-							prefix={<SafetyCertificateOutlined />}
-						/>
-					</Card>
-				</Col>
-			</Row>
+			{/* 配置不可知时统计卡整体退场：绝不呈现伪 0（「0 分钟/关闭」= 把失败伪装成未配置）。 */}
+			{!configError && (
+				<Row gutter={16} className="mb-6">
+					<Col span={8}>
+						<Card>
+							<Statistic
+								title={t('compliance.minors.userCount')}
+								value={userTotal}
+								prefix={<UserOutlined />}
+							/>
+						</Card>
+					</Col>
+					<Col span={8}>
+						<Card>
+							<Statistic
+								title={t('compliance.minors.dailyLimit')}
+								value={config?.dailyUsageLimitMin || 0}
+								suffix={t('compliance.minors.minutes')}
+							/>
+						</Card>
+					</Col>
+					<Col span={8}>
+						<Card>
+							<Statistic
+								title={t('compliance.minors.curfew')}
+								value={
+									config?.nightModeEnabled
+										? `${config.nightModeStart}-${config.nightModeEnd}`
+										: t('compliance.minors.curfewOff')
+								}
+								prefix={<SafetyCertificateOutlined />}
+							/>
+						</Card>
+					</Col>
+				</Row>
+			)}
 
 			<Tabs
 				activeKey={activeTab}
@@ -271,7 +298,12 @@ export default function MinorsProtectionPage() {
 					{
 						key: 'config',
 						label: t('compliance.minors.tabConfig'),
-						children: (
+						children: configError ? (
+							<PageError
+								message={t('compliance.minors.loadConfigFailed')}
+								retry={retryLoadConfig}
+							/>
+						) : (
 							<>
 								<SectionCard title={t('compliance.minors.sectionAntiAddiction')}>
 									<Form form={form} layout="vertical" className="max-w-[600px]">
@@ -398,7 +430,17 @@ export default function MinorsProtectionPage() {
 					{
 						key: 'consents',
 						label: t('compliance.minors.parentalConsentTab'),
-						children: (
+						// 失败 ≠ 空态：错误成全屏占位（含重试），空表仅在真实空数据时出现。
+						children: consentsError ? (
+							<PageError
+								message={
+									consentsError === 'forbidden'
+										? t('compliance.minors.consentsForbidden')
+										: t('compliance.minors.loadConsentsFailed')
+								}
+								retry={loadConsents}
+							/>
+						) : (
 							<DataTable
 								columns={[
 									{

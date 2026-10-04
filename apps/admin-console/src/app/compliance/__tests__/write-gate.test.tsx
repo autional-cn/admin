@@ -19,7 +19,7 @@ vi.mock('@/hooks/use-compliance', () => ({
 		data: [
 			{
 				id: 'd1',
-				requesterEmail: 'a@example.com',
+				userId: 'usr-d1',
 				type: 'access',
 				status: 'pending',
 				createdAt: '2026-01-01',
@@ -28,15 +28,19 @@ vi.mock('@/hooks/use-compliance', () => ({
 		isLoading: false,
 	}),
 	useUpdateDSAR: () => ({ mutateAsync: vi.fn() }),
+	// TASK-AB2-26：新增擦除请求 Tab（列表 + 创建）；DSAR 行「执行删除」改「发起擦除」（A-234）。
+	useErasures: () => ({ data: [], isLoading: false, error: null, refetch: vi.fn() }),
+	useCreateErasure: () => ({ mutateAsync: vi.fn() }),
 	useExecuteErasure: () => ({ mutateAsync: vi.fn() }),
 	useRetentionPolicies: () => ({
 		data: [
 			{
-				id: 'p1',
-				name: '默认留存',
-				resourceType: 'audit_logs',
-				retentionDays: 365,
-				actionAfterExpiry: 'delete',
+				// TASK-AB2-27：留存 wire 键（dto.go:411-418）——name/actionAfterExpiry 后端不返回。
+				policyId: 'p1',
+				dataType: 'audit_logs',
+				retentionPeriodDays: 365,
+				purpose: '安全审计',
+				legalBasis: '合同义务',
 				status: 'active',
 			},
 		],
@@ -51,12 +55,12 @@ vi.mock('@/hooks/use-compliance', () => ({
 	useConsents: () => ({
 		data: [
 			{
+				// TASK-AB2-28：同意 wire 键（dto.go:188-197 / consent.go:50-53）——scope/ip/version 后端不返回。
 				id: 'c1',
 				userId: 'u1',
-				scope: 'marketing',
+				purpose: 'marketing',
 				granted: true,
-				recordedAt: '2026-01-01T00:00:00Z',
-				version: 'v1',
+				grantedAt: '2026-01-01T00:00:00Z',
 			},
 		],
 		isLoading: false,
@@ -182,13 +186,13 @@ describe('AC-AB1-20：写控件角色门', () => {
 			await switchTab('GDPR DSAR');
 			expect(await screen.findByText('详情')).toBeTruthy();
 			expect(screen.queryByText('标记完成')).toBeNull();
-			expect(screen.queryByText('执行删除')).toBeNull();
+			expect(screen.queryByText('发起擦除')).toBeNull();
 		});
 
 		it('留存策略：新建/编辑均不可见（表格只读）', async () => {
 			renderPage();
 			await switchTab('留存策略');
-			expect(await screen.findByText('默认留存')).toBeTruthy();
+			expect(await screen.findByText('audit_logs')).toBeTruthy();
 			expect(screen.queryByText('新建策略')).toBeNull();
 			expect(screen.queryByText('编辑')).toBeNull();
 		});
@@ -212,11 +216,11 @@ describe('AC-AB1-20：写控件角色门', () => {
 			expect(await screen.findByText('管理策略')).toBeTruthy();
 		});
 
-		it('DSAR：标记完成/执行删除可见', async () => {
+		it('DSAR：标记完成/发起擦除可见', async () => {
 			renderPage();
 			await switchTab('GDPR DSAR');
 			expect(await screen.findByText('标记完成')).toBeTruthy();
-			expect(screen.getByText('执行删除')).toBeTruthy();
+			expect(screen.getByText('发起擦除')).toBeTruthy();
 		});
 
 		it('留存策略：新建/编辑均可见', async () => {

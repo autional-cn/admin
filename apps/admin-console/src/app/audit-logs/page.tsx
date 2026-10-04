@@ -1,8 +1,9 @@
 'use client';
-// @generated-api-exempt: 2 key(s) [AUDIT.ADMIN_EXPORT_DOWNLOAD, AUDIT.ADMIN_HASHCHAIN] lack generated func
+// （A-195/A-199 起 hashchain 与 export download 均走 generated 函数，零 raw API_PATHS 引用）
 
 import React, { useState, useEffect } from 'react';
 import { Tag, Button, Input, Space, Select, Card, Row, Col, Modal, Collapse, Typography, Spin, Empty } from 'antd';
+import dayjs from 'dayjs';
 
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -19,11 +20,12 @@ import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/u
 import { handleApiError } from '@/lib/error-handler';
 import { DataTable, DateRangeFilter, Drawer, PageError } from '@autional-cn/ui/antd';
 import type { DataTablePagination, DateRangeValue } from '@autional-cn/ui/antd';
-import { apiClient, API_PATHS, extractItem, extractList, useCurrentTenantId } from '@autional-cn/shared';
+import { extractItem, extractList, useCurrentTenantId } from '@autional-cn/shared';
 import {
+	adminAuditExportDownloadByExport,
 	adminAuditExportJobs,
+	adminAuditHashchainByHashchain,
 	adminAuditMerkleProof,
-	adminAuditVerifications,
 } from '@autional-cn/shared/generated/api';
 import { useTranslation } from 'react-i18next';
 import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
@@ -84,16 +86,16 @@ export default function AuditLogsPage() {
 	const [exportLoading, setExportLoading] = useState(false);
 
 	const [hashChainVisible, setHashChainVisible] = useState(false);
-	const [hashChainData, setHashChainData] = useState<any[]>([]);
+	// A-195：后端 HashChainResponse 为聚合对象（dto.go:181-190），非条目数组
+	const [hashChainData, setHashChainData] = useState<any | null>(null);
 	const [hashChainLoading, setHashChainLoading] = useState(false);
+	// W2 通则①：错误态与空态分离（失败 ≠「暂无数据」）
+	const [hashChainError, setHashChainError] = useState(false);
 
 	const [selectedEntryId, setSelectedEntryId] = useState<string>('');
 	const [merkleVisible, setMerkleVisible] = useState(false);
 	const [merkleData, setMerkleData] = useState<any>(null);
 	const [merkleLoading, setMerkleLoading] = useState(false);
-
-	const [verifications, setVerifications] = useState<any[]>([]);
-	const [verificationsLoading, setVerificationsLoading] = useState(false);
 
 	// 断链报告弹窗（根因修复 2026-08-13: 后端链损坏返回 200 + {valid:false, broken_at}，
 	// 前端展示断链位置而非报 500）
@@ -110,8 +112,14 @@ export default function AuditLogsPage() {
 	if (level) params.level = level;
 	if (module) params.module = module;
 	if (dateRange) {
-		params.startTime = dateRange[0];
-		params.endTime = dateRange[1];
+		// A-194（ADR-B2-10）：wire 契约为 epoch 秒 int64（service-audit dto.go:99-100 form start_time/end_time）；
+		// DateRangeFilter 产出格式化串（format='YYYY-MM-DD HH:mm:ss'）直发 → 后端 int64 解析 400。
+		// 日粒度选择取当日 endOf('day')；精确时刻原样 unix()。禁发格式化串 / 13 位毫秒。
+		params.startTime = dayjs(dateRange[0]).unix();
+		const endStr = dateRange[1];
+		params.endTime = /^\d{4}-\d{2}-\d{2}$/.test(endStr)
+			? dayjs(endStr).endOf('day').unix()
+			: dayjs(endStr).unix();
 	}
 
 	const { data, isLoading, refetch, error } = useAuditLogs(params);
@@ -172,8 +180,10 @@ export default function AuditLogsPage() {
 
 	const handleDownload = async (jobId: string) => {
 		try {
-			const res = await apiClient.get(API_PATHS.AUDIT.ADMIN_EXPORT_DOWNLOAD(jobId));
-			const url = extractItem(res.data)?.downloadUrl;
+			// A-199：路径参数由 generated 收口（旧实现 handleDownload(record.id) → id 键不存在 →
+			// .../export/undefined/download 404）。响应 { data: { download_url } } 经拦截器解包 camel 化。
+			const res = await adminAuditExportDownloadByExport(jobId);
+			const url = extractItem(res)?.downloadUrl;
 			if (url) {
 				window.open(url, '_blank');
 				message.success(t('audit.toast.downloadStart'));
@@ -185,17 +195,28 @@ export default function AuditLogsPage() {
 		}
 	};
 
-	const handleViewHashChain = async () => {
-		setHashChainVisible(true);
+	// A-195/A-196：链状态单一取数点（弹窗「查看」与「租户链状态」卡共用）。
+	// 会话租户替代硬编码 'default'（路径参数 wire 锚：generated api.ts hashchain/${tenantId}）；
+	// 响应为聚合对象（含 isValid/logCount/verifiedAt 等；无 entries 明细字段）——旧实现取
+	// ?.entries || [] 恒空态（弹窗永远「暂无」）。
+	const fetchHashChain = async () => {
 		setHashChainLoading(true);
+		setHashChainError(false);
 		try {
-			const res = await apiClient.get(API_PATHS.AUDIT.ADMIN_HASHCHAIN('default'));
-			setHashChainData(extractItem(res.data)?.entries || []);
+			const res = await adminAuditHashchainByHashchain(tenantId);
+			setHashChainData(extractItem(res));
 		} catch (err) {
 			handleApiError(err, t('audit.toast.hashChainError'));
+			setHashChainData(null);
+			setHashChainError(true);
 		} finally {
 			setHashChainLoading(false);
 		}
+	};
+
+	const handleViewHashChain = () => {
+		setHashChainVisible(true);
+		fetchHashChain();
 	};
 
 	const handleVerifyProof = async () => {
@@ -219,21 +240,17 @@ export default function AuditLogsPage() {
 		}
 	};
 
-	const fetchVerifications = async () => {
-		setVerificationsLoading(true);
-		try {
-			const res = await adminAuditVerifications();
-			setVerifications(extractList(res));
-		} catch (err) {
-			handleApiError(err, t('audit.toast.verificationError'));
-		} finally {
-			setVerificationsLoading(false);
-		}
-	};
-
 	useEffect(() => {
 		fetchExportJobs();
 	}, []);
+
+	// A-196：链状态卡挂载即拉（旧「最近验证」初载不拉恒空；且调平台面 /admin/audit/verifications
+	// 实测跨租户 5702 条泄露——改走本租户 hashchain，平台面端点从此零请求）。
+	useEffect(() => {
+		if (isRestricted || !tenantId) return;
+		fetchHashChain();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [tenantId, isRestricted]);
 
 	const openDetail = (record: any) => {
 		setCurrentRecord(record);
@@ -250,6 +267,14 @@ export default function AuditLogsPage() {
 			return <Tag color="error">{t('audit.status.failure')}</Tag>;
 		}
 		return <Tag>{String(v)}</Tag>;
+	};
+
+	// A-199：导出任务状态映射（wire 值 pending/processing/completed/failed 全集 + 未知值原样兜底）
+	const EXPORT_JOB_STATUS: Record<string, { color: string; label: string }> = {
+		pending: { color: 'default', label: t('audit.exportJobs.status.pending') },
+		processing: { color: 'processing', label: t('audit.exportJobs.status.processing') },
+		completed: { color: 'success', label: t('audit.exportJobs.status.completed') },
+		failed: { color: 'error', label: t('audit.exportJobs.status.failed') },
 	};
 
 	const columns = [
@@ -619,32 +644,33 @@ export default function AuditLogsPage() {
 									</Button>
 								</div>
 								<DataTable
-									rowKey="id"
+									rowKey="jobId"
 									dataSource={exportJobs}
 									loading={exportLoading}
 									pagination={false}
 									size="small"
 									scroll={{ x: 800 }}
 									columns={[
-										{ title: 'ID', dataIndex: 'id', key: 'id', width: 220, ellipsis: true },
-										{ title: t('audit.exportJobs.format'), dataIndex: 'format', key: 'format', width: 80 },
+										{ title: t('audit.exportJobs.jobId'), dataIndex: 'jobId', key: 'jobId', width: 220, ellipsis: true },
+										{ title: t('audit.exportJobs.contentType'), dataIndex: 'contentType', key: 'contentType', width: 110 },
 										{
 											title: t('common.status'),
 											dataIndex: 'status',
 											key: 'status',
 											width: 100,
-											render: (v: string) => (
-												<Tag
-													color={
-														v === 'completed' ? 'success' : v === 'failed' ? 'error' : 'processing'
-													}
-												>
-													{v}
-												</Tag>
-											),
+											render: (v: string) => {
+												const s = EXPORT_JOB_STATUS[v];
+												return <Tag color={s?.color ?? 'default'}>{s?.label ?? v ?? '-'}</Tag>;
+											},
 										},
 										{ title: t('audit.exportJobs.records'), dataIndex: 'recordCount', key: 'recordCount', width: 80 },
-										{ title: t('audit.exportJobs.created'), dataIndex: 'createdAt', key: 'createdAt', width: 170 },
+										{
+											title: t('audit.exportJobs.generatedAt'),
+											dataIndex: 'generatedAt',
+											key: 'generatedAt',
+											width: 170,
+											render: (v: number) => (v ? new Date(v).toLocaleString() : '-'),
+										},
 										{
 											title: t('common.actions'),
 											key: 'action',
@@ -655,7 +681,7 @@ export default function AuditLogsPage() {
 														type="link"
 														size="small"
 														icon={<DownloadOutlined />}
-														onClick={() => handleDownload(record.id)}
+														onClick={() => handleDownload(record.jobId)}
 													>
 														{t('audit.exportJobs.download')}
 													</Button>
@@ -726,45 +752,64 @@ export default function AuditLogsPage() {
 									</Card>
 								</Col>
 								<Col xs={24} md={8}>
+									{/* A-196：租户链状态卡（旧「最近验证」调平台面 /admin/audit/verifications，
+									    实测 5702 条=5702 个不同租户跨租户泄露）→ 改走本租户 hashchain 聚合；
+									    失败 → 错误态（非空卡，W2 通则①）。 */}
 									<Card
-										title={t('audit.merkle.recent')}
+										title={t('audit.merkle.tenantChain')}
 										size="small"
 										extra={
 											<Button
 												size="small"
-												onClick={fetchVerifications}
-												loading={verificationsLoading}
+												onClick={fetchHashChain}
+												loading={hashChainLoading}
 											>
 												{t('common.refresh')}
 											</Button>
 										}
 									>
-										{verificationsLoading ? (
+										{hashChainLoading ? (
 											<Spin />
-										) : verifications.length === 0 ? (
-											<Empty
-												description={t('audit.merkle.noResults')}
-												image={Empty.PRESENTED_IMAGE_SIMPLE}
+										) : hashChainError ? (
+											<PageError
+												message={t('audit.toast.hashChainError')}
+												retry={fetchHashChain}
 											/>
+										) : hashChainData ? (
+											<Space direction="vertical" className="w-full" size={4}>
+												<Row>
+													<Col span={12} className="text-neutral-600">
+														{t('audit.hashChain.chainStatus')}
+													</Col>
+													<Col span={12}>
+														<Tag color={hashChainData.isValid ? 'success' : 'error'}>
+															{hashChainData.isValid
+																? t('audit.hashChain.valid')
+																: t('audit.hashChain.broken')}
+														</Tag>
+													</Col>
+												</Row>
+												<Row>
+													<Col span={12} className="text-neutral-600">
+														{t('audit.hashChain.logCount')}
+													</Col>
+													<Col span={12}>{hashChainData.logCount ?? '-'}</Col>
+												</Row>
+												<Row>
+													<Col span={12} className="text-neutral-600">
+														{t('audit.hashChain.verifiedAt')}
+													</Col>
+													<Col span={12}>
+														{hashChainData.verifiedAt
+															? new Date(hashChainData.verifiedAt).toLocaleString('zh-CN')
+															: '-'}
+													</Col>
+												</Row>
+											</Space>
 										) : (
-											<DataTable
-												rowKey="id"
-												dataSource={verifications}
-												pagination={false}
-												size="small"
-												scroll={{ x: 800 }}
-												columns={[
-													{ title: t('audit.column.timestamp'), dataIndex: 'createdAt', key: 'createdAt', width: 150 },
-													{
-														title: t('audit.column.result'),
-														dataIndex: 'valid',
-														key: 'valid',
-														width: 80,
-														render: (v: boolean) => (
-															<Tag color={v ? 'success' : 'error'}>{v ? t('audit.verification.pass') : t('audit.verification.fail')}</Tag>
-														),
-													},
-												]}
+											<Empty
+												description={t('audit.hashChain.empty')}
+												image={Empty.PRESENTED_IMAGE_SIMPLE}
 											/>
 										)}
 									</Card>
@@ -785,27 +830,77 @@ export default function AuditLogsPage() {
 			>
 				{hashChainLoading ? (
 					<Spin className="flex justify-center py-8" />
-				) : hashChainData.length === 0 ? (
-					<Empty description={t('audit.hashChain.empty')} />
+				) : hashChainError ? (
+					<PageError message={t('audit.toast.hashChainError')} retry={fetchHashChain} />
+				) : hashChainData ? (
+					<div className="space-y-3">
+						<Row>
+							<Col span={8} className="text-neutral-600">
+								{t('audit.hashChain.chainStatus')}
+							</Col>
+							<Col span={16}>
+								<Tag color={hashChainData.isValid ? 'success' : 'error'}>
+									{hashChainData.isValid ? t('audit.hashChain.valid') : t('audit.hashChain.broken')}
+								</Tag>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={8} className="text-neutral-600">
+								{t('audit.hashChain.logCount')}
+							</Col>
+							<Col span={16}>{hashChainData.logCount ?? '-'}</Col>
+						</Row>
+						<Row>
+							<Col span={8} className="text-neutral-600">
+								{t('audit.hashChain.verifiedAt')}
+							</Col>
+							<Col span={16}>
+								{hashChainData.verifiedAt ? new Date(hashChainData.verifiedAt).toLocaleString('zh-CN') : '-'}
+							</Col>
+						</Row>
+						<Row>
+							<Col span={8} className="text-neutral-600">
+								{t('audit.hashChain.startHash')}
+							</Col>
+							<Col span={16}>
+								<Text copyable className="break-all font-mono text-xs">
+									{hashChainData.startHash || '-'}
+								</Text>
+							</Col>
+						</Row>
+						<Row>
+							<Col span={8} className="text-neutral-600">
+								{t('audit.hashChain.endHash')}
+							</Col>
+							<Col span={16}>
+								<Text copyable className="break-all font-mono text-xs">
+									{hashChainData.endHash || '-'}
+								</Text>
+							</Col>
+						</Row>
+						{hashChainData.chainId ? (
+							<Row>
+								<Col span={8} className="text-neutral-600">
+									{t('audit.hashChain.chainId')}
+								</Col>
+								<Col span={16}>
+									<Text className="break-all font-mono text-xs">{hashChainData.chainId}</Text>
+								</Col>
+							</Row>
+						) : null}
+						{hashChainData.message ? (
+							<Row>
+								<Col span={8} className="text-neutral-600">
+									{t('audit.hashChain.message')}
+								</Col>
+								<Col span={16}>
+									<Paragraph className="break-all text-xs">{hashChainData.message}</Paragraph>
+								</Col>
+							</Row>
+						) : null}
+					</div>
 				) : (
-					<DataTable
-						rowKey="id"
-						dataSource={hashChainData}
-						pagination={false}
-						size="small"
-						scroll={{ x: 800 }}
-						columns={[
-							{ title: t('audit.column.sequence'), dataIndex: 'sequence', key: 'sequence', width: 80 },
-							{ title: t('audit.hashChain.hash'), dataIndex: 'hash', key: 'hash', ellipsis: true },
-							{
-								title: t('audit.hashChain.prevHash'),
-								dataIndex: 'previousHash',
-								key: 'previousHash',
-								ellipsis: true,
-							},
-							{ title: t('audit.column.timestamp'), dataIndex: 'createdAt', key: 'createdAt', width: 170 },
-						]}
-					/>
+					<Empty description={t('audit.hashChain.empty')} />
 				)}
 			</Modal>
 
