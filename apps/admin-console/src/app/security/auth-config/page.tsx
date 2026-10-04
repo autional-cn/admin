@@ -13,7 +13,6 @@ import {
 	Switch,
 	Radio,
 	Modal,
-	Alert,
 	Tag,
 } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -25,7 +24,7 @@ import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { Alert, ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 import { COMPLIANCE_PROFILES, type ProfilePreset } from '@/lib/compliance-profiles';
 
@@ -146,12 +145,7 @@ export default function AuthConfigPage() {
 					{selectedProfile !== 'custom' && <Tag color="blue">{t('authConfig.profileActive')}</Tag>}
 				</div>
 				{selectedProfile !== 'custom' && (
-					<Alert
-						message={t('authConfig.profileOverrideNotice')}
-						type="info"
-						showIcon
-						className="mt-2"
-					/>
+					<Alert variant="info" title={t('authConfig.profileOverrideNotice')} className="mt-2" />
 				)}
 			</Card>
 
@@ -170,7 +164,7 @@ export default function AuthConfigPage() {
 						<p className="text-sm text-neutral-600 mb-3">
 							{t(showProfileConfirm.descriptionI18nKey)}
 						</p>
-						<Alert message={t('authConfig.profileOverrideWarning')} type="warning" showIcon />
+						<Alert variant="warning" title={t('authConfig.profileOverrideWarning')} />
 					</div>
 				)}
 			</Modal>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tag, Button, Space, Modal, Form, Input, Select, Popconfirm, Upload, Alert } from 'antd';
+import { Tag, Button, Space, Modal, Form, Input, Select, Popconfirm, Upload } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	PlusOutlined,
@@ -21,7 +21,7 @@ import {
 } from '@/hooks/use-identity-providers';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { Alert, ConsolePageHeader } from '@autional-cn/ui';
 import { createIdpSchema } from '@/lib/validators';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -291,9 +291,8 @@ export default function IdentityProvidersPage() {
 						{ldapHealth.map((h: LdapHealthResponse, i: number) => (
 							<Alert
 								key={h.directoryName || i}
-								type={h.healthy ? 'success' : 'error'}
-								showIcon
-								message={
+								variant={h.healthy ? 'success' : 'danger'}
+								title={
 									<span>
 										<strong>{h.directoryName || `Directory #${i + 1}`}</strong>
 										{' — '}
@@ -303,7 +302,6 @@ export default function IdentityProvidersPage() {
 										{h.error ? `: ${h.error}` : ''}
 									</span>
 								}
-								className="!mb-0"
 							/>
 						))}
 					</Space>
@@ -449,11 +447,10 @@ export default function IdentityProvidersPage() {
 							{/* Test connection result feedback */}
 							{testConnResult && (
 								<Alert
-									type={testConnResult.success ? 'success' : 'error'}
-									showIcon
+									variant={testConnResult.success ? 'success' : 'danger'}
 									closable
 									onClose={() => setTestConnResult(null)}
-									message={
+									title={
 										testConnResult.success
 											? `${t('idp.testSuccess')} (${testConnResult.latencyMs ?? '?'}ms)`
 											: testConnResult.error || t('idp.testFailed')

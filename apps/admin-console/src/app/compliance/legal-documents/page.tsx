@@ -2,12 +2,13 @@
 // @generated-api-exempt: 4 key(s) [COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, COMPLIANCE.ADMIN_LEGAL_DOCUMENT, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_PUBLISH, COMPLIANCE.ADMIN_LEGAL_DOCUMENT_ARCHIVE] lack generated func
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Alert, Button, DatePicker, Empty, Form, Input, Modal, Select, Space, Tag } from 'antd';
+import { Button, DatePicker, Empty, Form, Input, Modal, Select, Space, Tag } from 'antd';
 
 import { PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { message, modal } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
+import { Alert } from '@autional-cn/ui';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { DataTableProps } from '@autional-cn/ui/antd';
 
@@ -356,7 +357,7 @@ export default function LegalDocumentsPage() {
 				<>
 					{/* 守卫 banner（ADR-001）：服务端总数超拉取上限时提示使用筛选 */}
 					{serverTotal > FETCH_LIMIT && (
-						<Alert type="warning" showIcon message={t('legalDocuments.loadSubsetWarning')} />
+						<Alert variant="warning" title={t('legalDocuments.loadSubsetWarning')} />
 					)}
 					<DataTable<LegalDocumentItem>
 						columns={columns}
