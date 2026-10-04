@@ -240,6 +240,18 @@ export default function AuditLogsPage() {
 		setDrawerVisible(true);
 	};
 
+	// 审计库双管道（A-197）：事件管道 status∈{0=成功,1=失败}；请求管道 status 为 HTTP 码（2xx=成功，≥400=失败）。
+	// 与后端 status_class 口径逐字一致（service-audit statusClassOr）；其余数值（如 3xx）原样展示，不猜语义。
+	const renderStatusTag = (v: unknown) => {
+		if (v === 0 || (typeof v === 'number' && v >= 200 && v < 300)) {
+			return <Tag color="success">{t('audit.status.success')}</Tag>;
+		}
+		if (v === 1 || (typeof v === 'number' && v >= 400)) {
+			return <Tag color="error">{t('audit.status.failure')}</Tag>;
+		}
+		return <Tag>{String(v)}</Tag>;
+	};
+
 	const columns = [
 		{ title: t('audit.column.sequence'), dataIndex: 'sequence', key: 'sequence', width: 70 },
 		{
@@ -287,16 +299,7 @@ export default function AuditLogsPage() {
 			dataIndex: 'status',
 			key: 'status',
 			width: 80,
-			render: (v: number) => {
-				// 后端 status 是 HTTP 状态码（200/201/400/500 等），非 0/1 布尔。
-				// 2xx/3xx 视为成功，其余失败（BUG-015：此前 v===0 误判所有 200 为失败）
-				const ok = typeof v === 'number' && v >= 200 && v < 400;
-				return (
-					<Tag color={ok ? 'success' : 'error'}>
-						{ok ? t('audit.status.success') : t('audit.status.failure')}
-					</Tag>
-				);
-			},
+			render: (v: number) => renderStatusTag(v),
 		},
 		{ title: t('audit.column.ip'), dataIndex: 'ip', key: 'ip', width: 130 },
 		{
@@ -532,19 +535,7 @@ export default function AuditLogsPage() {
 							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.result')}
 							</Col>
-							<Col span={16}>
-								<Tag
-									color={
-										currentRecord.status >= 200 && currentRecord.status < 400
-											? 'success'
-											: 'error'
-									}
-								>
-									{currentRecord.status >= 200 && currentRecord.status < 400
-										? t('audit.status.success')
-										: t('audit.status.failure')}
-								</Tag>
-							</Col>
+							<Col span={16}>{renderStatusTag(currentRecord.status)}</Col>
 						</Row>
 						<Row>
 							<Col span={8} className="text-neutral-600">
