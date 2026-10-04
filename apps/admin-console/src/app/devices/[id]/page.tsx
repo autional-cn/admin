@@ -113,14 +113,14 @@ export default function DeviceDetailPage() {
 
 	if (!id) {
 		return (
-			<div className="p-6">
+			<div>
 				<ErrorState title={t('devices.invalidTitle')} message={t('devices.invalidMessage')} />
 			</div>
 		);
 	}
 
 	return (
-		<div className="p-6">
+		<div>
 			<div className="mb-6">
 				<Button
 					type="text"

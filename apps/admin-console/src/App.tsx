@@ -98,12 +98,9 @@ function LayoutWrapper() {
 					</>
 				}
 				headerRight={<HeaderActions />}
-				contentClassName="p-6"
 			>
-				<div className="min-h-[calc(100vh-112px)] rounded-lg bg-[var(--color-bg-surface)] p-6">
-					<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
-					<Outlet />
-				</div>
+				<div aria-live="polite" aria-atomic="true" className="sr-only" id="status-announcer" />
+				<Outlet />
 			</AppShell>
 		</TenantSlugProvider>
 	);

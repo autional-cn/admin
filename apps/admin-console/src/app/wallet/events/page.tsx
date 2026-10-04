@@ -46,7 +46,7 @@ export default function WalletEventsPage() {
 	};
 
 	return (
-		<div className="space-y-6 p-6">
+		<div className="space-y-6">
 			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
 				<Title level={3} className="!mb-0">
 					{t('walletEvents.title')}
