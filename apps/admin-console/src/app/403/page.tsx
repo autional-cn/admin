@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Button, Result } from 'antd';
+import { Button } from 'antd';
+import { Result } from '@autional-cn/ui';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
@@ -14,10 +15,11 @@ export default function ForbiddenPage() {
 
 	return (
 		<Result
-			status="403"
-			title={t('403.title')}
-			subTitle={t('403.subtitle')}
-			extra={
+			variant="warning"
+			className="mx-auto max-w-md"
+			title={<span className="text-4xl font-bold">403</span>}
+			description={t('403.subtitle')}
+			action={
 				<Button type="primary" onClick={() => navigate(buildNavHref('/', tenantSlug))}>
 					{t('403.backHome')}
 				</Button>

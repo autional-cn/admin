@@ -3,7 +3,8 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Input, Button, Typography, Space, Result, Spin, Descriptions } from 'antd';
+import { Card, Input, Button, Typography, Space, Spin, Descriptions } from 'antd';
+import { Result } from '@autional-cn/ui';
 import {
 	SearchOutlined,
 	CheckCircleFilled,
@@ -75,12 +76,13 @@ export default function WalletEventsPage() {
 				</Card>
 			)}
 
-			{error && <Result status="error" title={t('walletEvents.verifyError')} subTitle={error} />}
+			{error && <Result variant="danger" className="mx-auto max-w-md" title={t('walletEvents.verifyError')} description={error} />}
 
 			{result && (
 				<Card>
 					<Result
-						status={result.valid ? 'success' : 'error'}
+						variant={result.valid ? 'success' : 'danger'}
+						className="mx-auto max-w-md"
 						icon={
 							result.valid ? (
 								<CheckCircleFilled className="text-success text-5xl" />
@@ -95,7 +97,7 @@ export default function WalletEventsPage() {
 									: `❌ ${t('walletEvents.resultFail')}`}
 							</span>
 						}
-						subTitle={
+						description={
 							<span>
 								{t('walletEvents.resultWalletPrefix')} <Text code>{result.walletId}</Text> ·{' '}
 								{t('walletEvents.resultTotalEvents', { total: result.total })}
