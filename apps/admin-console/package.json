@@ -18,7 +18,7 @@
     "@autional-cn/shared": "0.1.0-rc.21",
     "@autional-cn/tailwind-preset": "0.1.0-rc.2",
     "@autional-cn/tokens": "0.1.0-rc.5",
-    "@autional-cn/ui": "0.1.0-rc.30",
+    "@autional-cn/ui": "0.1.0-rc.32",
     "@tanstack/react-query": "5.100.9",
     "antd": "6.5.0",
     "axios": "1.16.0",
