@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card, Tabs, Form, Input, Button, Tag, Row, Col, Space, Spin, Statistic, Skeleton } from 'antd';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Card, Tabs, Form, Input, Button, Tag, Row, Col, Space, Spin, Statistic, Skeleton, Select, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
 import { CheckCircleOutlined, SendOutlined, SwapRightOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,21 @@ interface HealthStatus {
 	latency?: string;
 }
 
+const { Option } = Select;
+
+// A-177 补修：页签「渠道配置」表单对齐后端 provider 契约
+// （create = CreateProviderConfigRequest，update = UpdateProviderConfigRequest）。
+const PROVIDER_OPTIONS = [
+	{ value: 'aliyun', labelKey: 'communication.providers.provider.aliyun' },
+	{ value: 'tencent', labelKey: 'communication.providers.provider.tencent' },
+	{ value: 'sendgrid', labelKey: 'communication.providers.provider.sendgrid' },
+	{ value: 'fcm', labelKey: 'communication.providers.provider.fcm' },
+	{ value: 'apns', labelKey: 'communication.providers.provider.apns' },
+];
+
+// 服务端掩码哨兵（maskConfig）：编辑回显原样展示，提交时不得回写（否则销毁真密文）。
+const REDACTED_SENTINEL = '***REDACTED***';
+
 export default function CommunicationPage() {
 	const { t } = useTranslation();
 	const [activeTab, setActiveTab] = useState('dashboard');
@@ -39,11 +54,27 @@ export default function CommunicationPage() {
 	const [emailForm] = Form.useForm();
 	const [smsForm] = Form.useForm();
 	const [pushForm] = Form.useForm();
-	const channelForms: Record<string, ReturnType<typeof Form.useForm>[0]> = {
-		email: emailForm,
-		sms: smsForm,
-		push: pushForm,
-	};
+	const channelForms = useMemo<Record<string, ReturnType<typeof Form.useForm>[0]>>(
+		() => ({ email: emailForm, sms: smsForm, push: pushForm }),
+		[emailForm, smsForm, pushForm],
+	);
+
+	// A-177：渠道行回填（每渠道一次性，防 providers 刷新 clobber 正在编辑的表单）。
+	const prefilledRef = useRef<Set<string>>(new Set());
+	useEffect(() => {
+		const rows = providers as Array<Record<string, unknown>>;
+		for (const row of rows) {
+			const ch = row.channel as string | undefined;
+			const form = ch ? channelForms[ch] : undefined;
+			if (!ch || !form || prefilledRef.current.has(ch)) continue;
+			prefilledRef.current.add(ch);
+			form.setFieldsValue({
+				provider: row.provider,
+				config: (row.config as string) || '{}',
+				priority: (row.priority as number) ?? 0,
+			});
+		}
+	}, [providers, channelForms]);
 
 	const CHANNELS = [
 		{ key: 'email', label: t('communication.channel.email'), icon: '📧' },
@@ -109,11 +140,27 @@ export default function CommunicationPage() {
 			const existing = (providers as Array<{ channel: string; id?: string }>).find(
 				(p) => p.channel === channel,
 			);
-			await saveProviderMut.mutateAsync({
-				id: existing?.id,
-				channel,
-				data: values,
-			});
+			const priority = (values.priority as number | null | undefined) ?? 0;
+			if (existing?.id) {
+				// A-177：update 契约仅接受 {config, is_active, priority}，发 channel 会 400 "no fields to update"。
+				const data: Record<string, unknown> = { priority };
+				const configText = String(values.config ?? '').trim();
+				// 掩码哨兵或留空 = 不改 config（后端非 nil 才覆盖；回写掩码即销毁真密文）。
+				if (configText && configText !== REDACTED_SENTINEL) {
+					data.config = configText;
+				}
+				await saveProviderMut.mutateAsync({ id: existing.id, channel, data });
+			} else {
+				// A-177：create 契约 = {channel, provider, config(JSON 字符串), priority}。
+				await saveProviderMut.mutateAsync({
+					channel,
+					data: {
+						provider: values.provider,
+						config: String(values.config ?? '') || '{}',
+						priority,
+					},
+				});
+			}
 			const chLabel = CHANNELS.find((c) => c.key === channel)?.label;
 			message.success(
 				t('communication.saveConfigSuccess').replace('{channel}', chLabel || channel),
@@ -283,75 +330,90 @@ export default function CommunicationPage() {
 			label: t('communication.dashboard'),
 			children: dashboardTab,
 		},
-		...CHANNELS.map((c) => ({
-			key: c.key,
-			label: c.label,
-			children: (
-				<>
-					<Card
-						title={t('communication.channelConfig').replace('{channel}', c.label)}
-						className="mb-4"
-					>
-						<Form
-							form={channelForms[c.key]}
-							layout="vertical"
-							onFinish={(values: unknown) =>
-								handleSaveConfig(c.key, values as Record<string, unknown>)
-							}
+		...CHANNELS.map((c) => {
+			const row = (providers as Array<Record<string, unknown>>).find((p) => p.channel === c.key);
+			const hasExisting = Boolean(row?.id);
+			return {
+				key: c.key,
+				label: c.label,
+				children: (
+					<>
+						<Card
+							title={t('communication.channelConfig').replace('{channel}', c.label)}
+							className="mb-4"
 						>
-							<Row gutter={16}>
-								<Col xs={24} md={12}>
-									<Form.Item name="host" label={t('communication.serverAddress')}>
-										<Input
-											placeholder={c.key === 'email' ? 'smtp.example.com' : 'api.example.com'}
-										/>
-									</Form.Item>
-								</Col>
-								<Col xs={24} md={12}>
-									<Form.Item name="port" label={t('communication.port')}>
-										<Input placeholder={c.key === 'email' ? '587' : '443'} />
-									</Form.Item>
-								</Col>
-								<Col xs={24} md={12}>
-									<Form.Item name="apiKey" label={t('communication.apiKey')}>
-										<Input.Password placeholder="sk-***" />
-									</Form.Item>
-								</Col>
-								<Col xs={24} md={12}>
-									<Form.Item name="secret" label={t('communication.secret')}>
-										<Input.Password placeholder="***" />
-									</Form.Item>
-								</Col>
-							</Row>
-							<Space>
-								<Button type="primary" htmlType="submit" loading={savingChannel === c.key}>
-									{t('communication.saveConfig')}
-								</Button>
-								<Button
-									icon={<CheckCircleOutlined />}
-									onClick={() => handleCheckHealth(c.key)}
-									loading={checkingHealth[c.key]}
-								>
-									{t('communication.healthCheck')}
-								</Button>
-							</Space>
-						</Form>
-					</Card>
+							<Form
+								name={c.key}
+								form={channelForms[c.key]}
+								layout="vertical"
+								onFinish={(values: unknown) =>
+									handleSaveConfig(c.key, values as Record<string, unknown>)
+								}
+							>
+								<Row gutter={16}>
+									<Col xs={24} md={12}>
+										<Form.Item
+											name="provider"
+											label={t('communication.providers.provider')}
+											rules={[{ required: true }]}
+										>
+											<Select
+												showSearch
+												disabled={hasExisting}
+												placeholder={t('communication.providers.selectProvider')}
+											>
+												{PROVIDER_OPTIONS.map((p) => (
+													<Option key={p.value} value={p.value}>
+														{t(p.labelKey)}
+													</Option>
+												))}
+											</Select>
+										</Form.Item>
+									</Col>
+									<Col xs={24} md={12}>
+										<Form.Item name="priority" label={t('communication.providers.priority')}>
+											<InputNumber min={0} max={100} className="w-full" />
+										</Form.Item>
+									</Col>
+									<Col xs={24}>
+										<Form.Item name="config" label={t('communication.providers.config')}>
+											<Input.TextArea
+												rows={4}
+												placeholder={t('communication.providers.configPlaceholder')}
+											/>
+										</Form.Item>
+									</Col>
+								</Row>
+								<Space>
+									<Button type="primary" htmlType="submit" loading={savingChannel === c.key}>
+										{t('communication.saveConfig')}
+									</Button>
+									<Button
+										icon={<CheckCircleOutlined />}
+										onClick={() => handleCheckHealth(c.key)}
+										loading={checkingHealth[c.key]}
+									>
+										{t('communication.healthCheck')}
+									</Button>
+								</Space>
+							</Form>
+						</Card>
 
-					<Card title={t('communication.sendLogs')}>
-						<Spin spinning={logsLoading}>
-							<DataTable
-								rowKey="id"
-								columns={logColumns}
-								dataSource={logs}
-								pagination={{ pageSize: 10 }}
-								scroll={{ x: 800 }}
-							/>
-						</Spin>
-					</Card>
-				</>
-			),
-		})),
+						<Card title={t('communication.sendLogs')}>
+							<Spin spinning={logsLoading}>
+								<DataTable
+									rowKey="id"
+									columns={logColumns}
+									dataSource={logs}
+									pagination={{ pageSize: 10 }}
+									scroll={{ x: 800 }}
+								/>
+							</Spin>
+						</Card>
+					</>
+				),
+			};
+		}),
 	];
 
 	return (

@@ -115,11 +115,11 @@ export function useSaveCommunicationProvider() {
 			channel: string;
 			data: Record<string, unknown>;
 		}) => {
-			const payload = { ...data, channel };
+			// A-177：update 契约仅接受 {config, is_active, priority}，merge channel 会 400 "no fields to update"。
 			if (id) {
-				return updateCommunicationProvider(id, payload);
+				return updateCommunicationProvider(id, data);
 			}
-			return createCommunicationProvider(payload);
+			return createCommunicationProvider({ ...data, channel });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.communication.providers });
