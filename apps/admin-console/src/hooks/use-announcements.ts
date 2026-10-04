@@ -1,6 +1,6 @@
 'use client';
 
-import { extractListResult } from '@autional-cn/shared';
+import { extractListResult, toPageParams } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,24 +13,27 @@ import {
 	unpublishAnnouncement,
 } from '@/lib/api.generated';
 
+// RC-5（TASK-AB1-27）：契约键 camel 直读（响应拦截器已 snake→camel），禁止 snake 双读。
+// wire 锚：service-notification domain.go:208-210（target_roles/publish_at/expire_at snake json tag）。
 export interface AnnouncementRecord {
 	id: string;
-	tenant_id: string;
+	tenantId: string;
 	title: string;
 	content: string;
 	status: 'draft' | 'scheduled' | 'published' | 'expired';
-	target_roles?: string[];
-	publish_at?: string;
-	expire_at?: string;
+	targetRoles?: string[];
+	publishAt?: string;
+	expireAt?: string;
 	views: number;
 	dismissals: number;
-	created_at: string;
-	updated_at: string;
+	createdAt: string;
+	updatedAt: string;
 }
 
+/** 查询入参（camel 书面；分页键经 toPageParams 单点转 wire snake）。 */
 export interface AnnouncementListParams {
 	page?: number;
-	page_size?: number;
+	pageSize?: number;
 	status?: string;
 	search?: string;
 }
@@ -40,7 +43,11 @@ export function useAnnouncements(params?: AnnouncementListParams) {
 		queryKey: [...queryKeys.announcements.all, params],
 		staleTime: 300000,
 		queryFn: async () => {
-			const res = await getAnnouncements(params);
+			const res = await getAnnouncements({
+				status: params?.status,
+				search: params?.search,
+				...toPageParams({ page: params?.page, pageSize: params?.pageSize }),
+			});
 			return extractListResult<AnnouncementRecord>(res);
 		},
 	});

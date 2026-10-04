@@ -229,7 +229,7 @@ export default function PointsPage() {
 		if (record) {
 			setTransferMode('account');
 			transferForm.resetFields();
-			transferForm.setFieldsValue({ from_user_id: record.userId });
+			transferForm.setFieldsValue({ fromUserId: record.userId });
 			setTransferModal(true);
 		} else {
 			setTransferMode('standalone');
@@ -238,18 +238,20 @@ export default function PointsPage() {
 		}
 	};
 
+	// TASK-AB1-27（RC-5 契约收敛）：表单键与提交体 camel 书面写（拦截器 snake 化上 wire）。
+	// wire 锚：service-point/internal/handler/dto/dto.go:393（ToUserID json:"to_user_id"）
 	const handleTransfer = async (values: {
-		from_user_id: string;
-		to_user_id: string;
+		fromUserId: string;
+		toUserId: string;
 		amount: number;
 		reason: string;
 		description: string;
 	}) => {
 		try {
 			await transferMut.mutateAsync({
-				userId: values.from_user_id,
+				userId: values.fromUserId,
 				data: {
-					to_user_id: values.to_user_id,
+					toUserId: values.toUserId,
 					amount: values.amount,
 					reason: values.reason,
 					description: values.description,
@@ -265,23 +267,25 @@ export default function PointsPage() {
 
 	const openExchangeModal = (record: PointAccount) => {
 		exchangeForm.resetFields();
-		exchangeForm.setFieldsValue({ from_user_id: record.userId });
+		exchangeForm.setFieldsValue({ fromUserId: record.userId });
 		setExchangeModal(true);
 	};
 
+	// TASK-AB1-27（RC-5 契约收敛）：同上（exchange_type 键形）。
+	// wire 锚：service-point/internal/handler/dto/dto.go:377（ExchangeType json:"exchange_type"）
 	const handleExchange = async (values: {
-		from_user_id: string;
+		fromUserId: string;
 		amount: number;
-		exchange_type: string;
+		exchangeType: string;
 		description: string;
 		source: string;
 	}) => {
 		try {
 			await exchangeMut.mutateAsync({
-				userId: values.from_user_id,
+				userId: values.fromUserId,
 				data: {
 					amount: values.amount,
-					exchange_type: values.exchange_type,
+					exchangeType: values.exchangeType,
 					description: values.description,
 					source: values.source,
 				},
@@ -723,14 +727,14 @@ export default function PointsPage() {
 								<Card title={t('points.transferPoints')}>
 									<Form form={transferForm} layout="vertical" onFinish={handleTransfer}>
 										<Form.Item
-											name="from_user_id"
+											name="fromUserId"
 											label={t('points.transfer.fromUserId')}
 											rules={[{ required: true, message: t('points.transfer.fromUserIdRequired') }]}
 										>
 											<Input placeholder={t('points.transfer.userIdPlaceholder')} />
 										</Form.Item>
 										<Form.Item
-											name="to_user_id"
+											name="toUserId"
 											label={t('points.transfer.toUserId')}
 											rules={[{ required: true, message: t('points.transfer.toUserIdRequired') }]}
 										>
@@ -917,7 +921,7 @@ export default function PointsPage() {
 			>
 				<Form form={transferForm} layout="vertical" onFinish={handleTransfer}>
 					<Form.Item
-						name="from_user_id"
+						name="fromUserId"
 						label={t('points.transfer.fromUserId')}
 						rules={[{ required: true }]}
 					>
@@ -927,7 +931,7 @@ export default function PointsPage() {
 						/>
 					</Form.Item>
 					<Form.Item
-						name="to_user_id"
+						name="toUserId"
 						label={t('points.transfer.toUserId')}
 						rules={[{ required: true, message: t('points.transfer.toUserIdRequired') }]}
 					>
@@ -974,7 +978,7 @@ export default function PointsPage() {
 				className="w-full max-w-[560px]"
 			>
 				<Form form={exchangeForm} layout="vertical" onFinish={handleExchange}>
-					<Form.Item name="from_user_id" label={t('points.userId')} rules={[{ required: true }]}>
+					<Form.Item name="fromUserId" label={t('points.userId')} rules={[{ required: true }]}>
 						<Input disabled />
 					</Form.Item>
 					<Form.Item
@@ -989,7 +993,7 @@ export default function PointsPage() {
 						/>
 					</Form.Item>
 					<Form.Item
-						name="exchange_type"
+						name="exchangeType"
 						label={t('points.exchange.type')}
 						rules={[{ required: true, message: t('points.exchange.typeRequired') }]}
 					>

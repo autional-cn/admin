@@ -101,13 +101,24 @@ export default function RolesPage() {
 		}
 	};
 
-	const { data: roles = [], isLoading, error: rolesError, refetch: refetchRoles } = useRoles();
+	// TASK-AB1-18 / A-17：服务端分页单点驱动——useRoles 内以 toPageParams 发 page/page_size，
+	// total 由列表结果（fromPageResult 归一）直接取，删除本地 slice 假分页。
+	const [page, setPage] = useState(1);
+	const pageSize = 10;
 	const {
-		data: allPermissions = [],
+		data: rolesResult,
+		isLoading,
+		error: rolesError,
+		refetch: refetchRoles,
+	} = useRoles({ page, pageSize });
+	const roles = rolesResult?.items ?? [];
+	const {
+		data: permissionsResult,
 		isLoading: permLoading,
 		error: permError,
 		refetch: refetchPerms,
 	} = usePermissions();
+	const allPermissions = permissionsResult?.items ?? [];
 	const { data: rolePerms = [] } = useRolePermissions(currentRole?.id || '');
 
 	const createRoleMut = useCreateRole();
@@ -223,13 +234,15 @@ export default function RolesPage() {
 			});
 
 			const calls: Promise<unknown>[] = [];
+			// TASK-AB1-27（RC-5 契约收敛，消费链补漏）：写入 camel 书面写（拦截器 snake 化上 wire）。
+			// wire 锚：service-rbac/internal/domain/rbac/interfaces.go:121/128（json permission_ids）
 			if (toAdd.length > 0)
 				calls.push(
-					assignMut.mutateAsync({ roleId: currentRole.id, data: { permission_ids: toAdd } }),
+					assignMut.mutateAsync({ roleId: currentRole.id, data: { permissionIds: toAdd } }),
 				);
 			if (toRemove.length > 0)
 				calls.push(
-					removeMut.mutateAsync({ roleId: currentRole.id, data: { permission_ids: toRemove } }),
+					removeMut.mutateAsync({ roleId: currentRole.id, data: { permissionIds: toRemove } }),
 				);
 			await Promise.all(calls);
 
@@ -268,9 +281,11 @@ export default function RolesPage() {
 		},
 		{ title: t('roles.column.name'), dataIndex: 'name', key: 'name' },
 		{
+			// TASK-AB1-27（RC-5 契约收敛，消费链补漏）：契约键 camel 直读（拦截器深 camel 化）。
+			// wire 锚：service-rbac/internal/handler/dto/dto.go:18（json data_scope）
 			title: t('roles.dataScope'),
-			dataIndex: 'data_scope',
-			key: 'data_scope',
+			dataIndex: 'dataScope',
+			key: 'dataScope',
 			render: (v: string) => (
 				<Tag color={DATA_SCOPE_COLORS[v] || 'default'}>
 					{DATA_SCOPE_KEYS[v] ? t(DATA_SCOPE_KEYS[v]) : v || '-'}
@@ -365,7 +380,13 @@ export default function RolesPage() {
 				columns={columns}
 				dataSource={roles}
 				loading={isLoading}
-				pagination={{ pageSize: 10 }}
+				pagination={{
+					current: page,
+					pageSize,
+					total: rolesResult?.total ?? 0,
+					onChange: (p) => setPage(p),
+					showSizeChanger: false,
+				}}
 				locale={{ emptyText: <Empty description={t('roles.noRoles')} /> }}
 				scroll={{ x: 800 }}
 			/>
@@ -389,7 +410,7 @@ export default function RolesPage() {
 					<Form.Item name="name" label={t('roles.column.name')} rules={[{ required: true }]}>
 						<Input placeholder={t('roles.namePlaceholder')} />
 					</Form.Item>
-					<Form.Item name="data_scope" label={t('roles.dataScope')} initialValue="self">
+					<Form.Item name="dataScope" label={t('roles.dataScope')} initialValue="self">
 						<Select
 							options={[
 								{ value: 'all', label: t('roles.dataScopeAll') },

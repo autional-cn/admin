@@ -103,7 +103,8 @@ export function useRelatedAnomalies(id: string | undefined) {
 export function useDetectAnomalies() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (data: { tenant_id?: string; time_range?: string }) => detectAnomalies(data),
+		// TASK-AB1-27（RC-5 契约收敛）：入参 camel 书面写（拦截器 snake 化上 wire）
+		mutationFn: (data: { timeRange?: string }) => detectAnomalies(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['audit-anomalies'] });
 		},

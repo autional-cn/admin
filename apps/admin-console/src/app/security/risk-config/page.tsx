@@ -16,54 +16,30 @@ import { SaveOutlined, UndoOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getRiskConfig, updateRiskConfig, resetRiskConfig } from '@/lib/api.generated';
 import { queryKeys } from '@/lib/query-keys';
-import { snakeCaseKeys } from '@autional-cn/shared';
+// TASK-AB1-27（RC-5 契约收敛，清单外补收敛）：删本地 snake 接口 + 手写回转换（写回 snake 供表单匹配的旧法）；
+// 行契约 = generated RiskConfigResponse/SignalWeights（camel 直读，拦截器深 camel 化）。
+// wire 锚：service-identity/internal/handler/risk_config_handler.go:26-35（json tenant_id/elevated_threshold/
+// signal_weights/...）；权重 service-identity/internal/domain/risk_config.go:31-46（json ip_unknown 等）。
+import type { RiskConfigResponse, SignalWeights } from '@autional-cn/shared/generated/types';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Text } = Typography;
 
-interface SignalWeight {
-	ip_unknown: number;
-	ip_bad_reputation: number;
-	ip_vpn: number;
-	login_failure_high: number;
-	login_failure_moderate: number;
-	new_device_or_ip: number;
-	unknown_device: number;
-	unusual_location: number;
-	unusual_time: number;
-	new_country: number;
-	velocity_anomaly: number;
-	credential_leaked: number;
-	mfa_method_changed: number;
-	session_hijack: number;
-}
-
-interface RiskConfig {
-	tenant_id: string;
-	elevated_threshold: number;
-	moderate_threshold: number;
-	high_threshold: number;
-	critical_threshold: number;
-	signal_weights: SignalWeight;
-	learning_period_days: number;
-	session_risk_enabled: boolean;
-}
-
-const signalLabels: Record<keyof SignalWeight, string> = {
-	ip_unknown: '未知 IP',
-	ip_bad_reputation: 'IP 信誉差',
-	ip_vpn: 'VPN/代理 IP',
-	login_failure_high: '高频登录失败',
-	login_failure_moderate: '中频登录失败',
-	new_device_or_ip: '新设备/IP',
-	unknown_device: '未知设备',
-	unusual_location: '异地登录',
-	unusual_time: '异常时间',
-	new_country: '新国家',
-	velocity_anomaly: '速度异常',
-	credential_leaked: '凭证泄露',
-	mfa_method_changed: 'MFA 方式变更',
-	session_hijack: '会话劫持',
+const signalLabels: Record<keyof SignalWeights, string> = {
+	ipUnknown: '未知 IP',
+	ipBadReputation: 'IP 信誉差',
+	ipVpn: 'VPN/代理 IP',
+	loginFailureHigh: '高频登录失败',
+	loginFailureModerate: '中频登录失败',
+	newDeviceOrIp: '新设备/IP',
+	unknownDevice: '未知设备',
+	unusualLocation: '异地登录',
+	unusualTime: '异常时间',
+	newCountry: '新国家',
+	velocityAnomaly: '速度异常',
+	credentialLeaked: '凭证泄露',
+	mfaMethodChanged: 'MFA 方式变更',
+	sessionHijack: '会话劫持',
 };
 
 export default function RiskConfigPage() {
@@ -73,9 +49,8 @@ export default function RiskConfigPage() {
 		queryKey: queryKeys.security.riskConfig,
 		queryFn: async () => {
 			const res = await getRiskConfig();
-			// apiClient interceptor 已转 camelCase（elevatedThreshold 等），
-			// Form.Item name 用 snake_case，这里转回 snake_case 供 initialValues/表单匹配
-			return snakeCaseKeys(res as Record<string, unknown>) as unknown as RiskConfig;
+			// 拦截器已解包 + 深 camel 化（elevatedThreshold 等），契约键 camel 直读。
+			return res as RiskConfigResponse;
 		},
 	});
 
@@ -91,10 +66,7 @@ export default function RiskConfigPage() {
 	const { mutateAsync: reset, isPending: isResetting } = useMutation({
 		mutationFn: resetRiskConfig,
 		onSuccess: (data) => {
-			queryClient.setQueryData(
-				queryKeys.security.riskConfig,
-				snakeCaseKeys(data as Record<string, unknown>) as unknown as RiskConfig,
-			);
+			queryClient.setQueryData(queryKeys.security.riskConfig, data as RiskConfigResponse);
 			message.success('已恢复默认配置');
 		},
 		onError: () => message.error('重置失败'),
@@ -119,16 +91,16 @@ export default function RiskConfigPage() {
 						五级风险模型：L0 正常 → L1 建议 MFA → L2 需要 SMS → L3 需要 TOTP → L4 阻断登录
 					</Text>
 					<Space wrap>
-						<Form.Item name="elevated_threshold" label="L1 提醒阈值" rules={[{ required: true }]}>
+						<Form.Item name="elevatedThreshold" label="L1 提醒阈值" rules={[{ required: true }]}>
 							<InputNumber min={0} max={100} />
 						</Form.Item>
-						<Form.Item name="moderate_threshold" label="L2 SMS 阈值" rules={[{ required: true }]}>
+						<Form.Item name="moderateThreshold" label="L2 SMS 阈值" rules={[{ required: true }]}>
 							<InputNumber min={0} max={100} />
 						</Form.Item>
-						<Form.Item name="high_threshold" label="L3 TOTP 阈值" rules={[{ required: true }]}>
+						<Form.Item name="highThreshold" label="L3 TOTP 阈值" rules={[{ required: true }]}>
 							<InputNumber min={0} max={100} />
 						</Form.Item>
-						<Form.Item name="critical_threshold" label="L4 阻断阈值" rules={[{ required: true }]}>
+						<Form.Item name="criticalThreshold" label="L4 阻断阈值" rules={[{ required: true }]}>
 							<InputNumber min={0} max={100} />
 						</Form.Item>
 					</Space>
@@ -141,7 +113,7 @@ export default function RiskConfigPage() {
 					{Object.entries(signalLabels).map(([key, label]) => (
 						<Form.Item
 							key={key}
-							name={['signal_weights', key]}
+							name={['signalWeights', key]}
 							label={`${label} (${key})`}
 							style={{ display: 'inline-block', width: 280, marginRight: 16 }}
 						>
@@ -151,10 +123,10 @@ export default function RiskConfigPage() {
 				</Card>
 
 				<Card title="通用设置" style={{ marginBottom: 16 }}>
-					<Form.Item name="learning_period_days" label="新用户学习期 (天)">
+					<Form.Item name="learningPeriodDays" label="新用户学习期 (天)">
 						<InputNumber min={0} max={90} />
 					</Form.Item>
-					<Form.Item name="session_risk_enabled" label="会话持续风险监控" valuePropName="checked">
+					<Form.Item name="sessionRiskEnabled" label="会话持续风险监控" valuePropName="checked">
 						<Switch />
 					</Form.Item>
 				</Card>

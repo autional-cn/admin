@@ -79,10 +79,18 @@ export const inviteMemberSchema = z.object({
 	role: z.string().min(1, '请选择角色'),
 });
 
+// A-151（TASK-AB1-25）：按 service-notification CreateTemplateRequest 实读契约重写
+// （dto.go:312-320：code/name/type/subject/content 必填，format/variables 可选；
+// type ∈ system/user/alert/reminder/promotion）。旧 schema 仅校 name/channel（表单无 code/subject/type）
+// ⇒ 放行必 400 的请求体，模板创建恒失败。
 export const createNotificationTemplateSchema = z.object({
-	name: z.string().min(1, '模板名称不能为空').max(128),
-	subject: z.string().max(256).optional(),
-	channel: z.enum(['email', 'sms', 'push', 'inapp'], { message: '无效的渠道' }),
+	code: z.string().min(1, '模板代码不能为空').max(128, '模板代码最多128个字符'),
+	name: z.string().min(1, '模板名称不能为空').max(128, '模板名称最多128个字符'),
+	type: z.enum(['system', 'user', 'alert', 'reminder', 'promotion'], { message: '无效的通知类型' }),
+	subject: z.string().min(1, '主题不能为空').max(256, '主题最多256个字符'),
+	content: z.string().min(1, '内容不能为空'),
+	format: z.string().optional(),
+	variables: z.array(z.string()).optional(),
 });
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;

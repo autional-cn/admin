@@ -9,7 +9,8 @@ import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/sh
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractItem, extractList } from '@autional-cn/shared';
+import type { DeviceInfo } from '@autional-cn/shared/generated/types';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
@@ -17,17 +18,10 @@ import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
 
 
-interface DeviceRecord {
-	id: string;
-	name: string;
-	type: string;
-	workload_subtype: string;
-	hardware_id: string;
-	firmware_ver: string;
-	manufacturer: string;
-	owner_name: string;
-	created_at: string;
-}
+// TASK-AB1-27（RC-5 契约收敛）：契约类型直读（generated types，键名 camel）。
+// wire 锚：service-identity device/domain/device.go:86-89（workload_subtype/hardware_id/firmware_ver snake json tag）
+// 经响应拦截器深 camel 化；主键 = identityId（契约无 id）。
+type DeviceRecord = DeviceInfo;
 
 const TYPE_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
 	pet: 'info',
@@ -55,21 +49,8 @@ function formatDate(iso: string): string {
 
 async function fetchDevices(): Promise<DeviceRecord[]> {
 	const res = await apiClient.get(API_PATHS.IDENTITY.ADMIN_DEVICES);
-	const data = extractItem(res.data);
-	const items = data?.items ?? (Array.isArray(data) ? data : []);
-	// API 返回 camelCase（workloadSubtype/hardwareId/firmwareVer/manufacturer/ownerName/createdAt），
-	// 映射为页面接口期望的 snake_case 字段
-	return (items as Record<string, unknown>[]).map((d) => ({
-		id: (d.identityId ?? d.id ?? d.identity_id ?? '') as string,
-		name: (d.name as string) || '',
-		type: (d.type as string) || '',
-		workload_subtype: (d.workloadSubtype ?? d.workload_subtype ?? '') as string,
-		hardware_id: (d.hardwareId ?? d.hardware_id ?? '') as string,
-		firmware_ver: (d.firmwareVer ?? d.firmware_ver ?? '') as string,
-		manufacturer: (d.manufacturer ?? '') as string,
-		owner_name: (d.ownerId ?? d.owner_id ?? d.ownerName ?? d.owner_name ?? '') as string,
-		created_at: (d.createdAt ?? d.created_at ?? '') as string,
-	}));
+	// 列表归一单点 = extractList（信封 items 分支；键名已由拦截器 camel）
+	return extractList<DeviceRecord>(res.data);
 }
 
 async function createDevice(values: Record<string, unknown>): Promise<DeviceRecord> {
@@ -138,15 +119,15 @@ export default function DevicesPage() {
 			dataIndex: 'name',
 			key: 'name',
 			render: (v: string, record: DeviceRecord) => (
-				<a onClick={() => navigate(buildNavHref(`/devices/${record.id}`, tenantSlug))} className="font-medium">
+				<a onClick={() => navigate(buildNavHref(`/devices/${record.identityId ?? ''}`, tenantSlug))} className="font-medium">
 					{v}
 				</a>
 			),
 		},
 		{
 			title: t('devices.column.type'),
-			dataIndex: 'workload_subtype',
-			key: 'type',
+			dataIndex: 'workloadSubtype',
+			key: 'workloadSubtype',
 			render: (v: string) => (
 				<StatusBadge variant={typeVariant(v)}>
 					{t(`devices.type.${v}`, { defaultValue: TYPE_LABELS[v] || v }) || '-'}
@@ -155,26 +136,26 @@ export default function DevicesPage() {
 		},
 		{
 			title: t('devices.column.owner'),
-			dataIndex: 'owner_name',
-			key: 'owner_name',
+			dataIndex: 'ownerId',
+			key: 'ownerId',
 			render: (v: string) => v || '-',
 		},
 		{
 			title: t('devices.column.hardwareId'),
-			dataIndex: 'hardware_id',
-			key: 'hardware_id',
+			dataIndex: 'hardwareId',
+			key: 'hardwareId',
 			render: (v: string) => (v ? <code className="text-xs">{v}</code> : '-'),
 		},
 		{
 			title: t('devices.column.firmware'),
-			dataIndex: 'firmware_ver',
-			key: 'firmware_ver',
+			dataIndex: 'firmwareVer',
+			key: 'firmwareVer',
 			render: (v: string) => v || '-',
 		},
 		{
 			title: t('devices.column.created'),
-			dataIndex: 'created_at',
-			key: 'created_at',
+			dataIndex: 'createdAt',
+			key: 'createdAt',
 			render: (v: string) => formatDate(v),
 		},
 		{
@@ -187,7 +168,7 @@ export default function DevicesPage() {
 						icon={<EditOutlined />}
 						onClick={(e) => {
 							e.stopPropagation();
-							navigate(buildNavHref(`/devices/${record.id}`, tenantSlug));
+							navigate(buildNavHref(`/devices/${record.identityId ?? ''}`, tenantSlug));
 						}}
 					>
 						{t('common.edit')}
@@ -195,7 +176,7 @@ export default function DevicesPage() {
 					<Popconfirm
 						title={t('devices.confirmDelete')}
 						description={t('devices.deleteWarning')}
-						onConfirm={() => handleDelete(record.id)}
+						onConfirm={() => handleDelete(record.identityId ?? '')}
 						okText={t('common.delete')}
 						okButtonProps={{ danger: true }}
 						cancelText={t('common.cancel')}
@@ -267,13 +248,13 @@ export default function DevicesPage() {
 
 			{!isLoading && !error && devices.length > 0 && (
 				<DataTable
-					rowKey="id"
+					rowKey="identityId"
 					columns={columns}
 					dataSource={devices}
 					pagination={{ pageSize: 10 }}
 					scroll={{ x: 800 }}
 					onRow={(record) => ({
-						onClick: () => navigate(buildNavHref(`/devices/${record.id}`, tenantSlug)),
+						onClick: () => navigate(buildNavHref(`/devices/${record.identityId ?? ''}`, tenantSlug)),
 						style: { cursor: 'pointer' },
 					})}
 				/>
@@ -296,7 +277,7 @@ export default function DevicesPage() {
 						<Input placeholder={t('devices.form.namePlaceholder')} />
 					</Form.Item>
 					<Form.Item
-						name="workload_subtype"
+						name="workloadSubtype"
 						label={t('devices.form.subtype')}
 						rules={[{ required: true }]}
 						initialValue="sensor"
@@ -310,10 +291,10 @@ export default function DevicesPage() {
 							]}
 						/>
 					</Form.Item>
-					<Form.Item name="hardware_id" label={t('devices.form.hardwareId')}>
+					<Form.Item name="hardwareId" label={t('devices.form.hardwareId')}>
 						<Input placeholder={t('devices.form.hardwareIdPlaceholder')} />
 					</Form.Item>
-					<Form.Item name="firmware_ver" label={t('devices.form.firmware')}>
+					<Form.Item name="firmwareVer" label={t('devices.form.firmware')}>
 						<Input placeholder={t('devices.form.firmwarePlaceholder')} />
 					</Form.Item>
 					<Form.Item name="manufacturer" label={t('devices.form.manufacturer')}>

@@ -31,6 +31,7 @@ import { apiClient, API_PATHS, useIsAuditRestricted, AuditStatsOnly, extractItem
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { buildNavHref } from '@/lib/nav';
 import { useNavigate } from 'react-router';
+import { useIsAdminRole } from '@/hooks/use-is-admin-role';
 
 interface DSARRecord {
 	id: string;
@@ -80,6 +81,8 @@ interface ConsentRecord {
 export default function CompliancePage() {
 	const { t } = useTranslation();
 	const isRestricted = useIsAuditRestricted();
+	// A-232/A-233（TASK-AB1-15）：写控件按精确角色门控（admin/super_admin 可见；security_admin 只读）
+	const isAdminRole = useIsAdminRole();
 	const [activeTab, setActiveTab] = useState('dashboard');
 	const [complianceScore, setComplianceScore] = useState<number | null>(null);
 	const [standardCount, setStandardCount] = useState(0);
@@ -244,12 +247,16 @@ export default function CompliancePage() {
 					>
 						{t('compliance.dsar.viewDetail')}
 					</Button>
-					<Button type="link" onClick={() => handleProcessDsar(record.id, 'completed')}>
-						{t('compliance.dsar.markComplete')}
-					</Button>
-					<Button type="link" danger onClick={() => handleExecuteErasure(record.id)}>
-						{t('compliance.dsar.executeErasure')}
-					</Button>
+					{isAdminRole && (
+						<Button type="link" onClick={() => handleProcessDsar(record.id, 'completed')}>
+							{t('compliance.dsar.markComplete')}
+						</Button>
+					)}
+					{isAdminRole && (
+						<Button type="link" danger onClick={() => handleExecuteErasure(record.id)}>
+							{t('compliance.dsar.executeErasure')}
+						</Button>
+					)}
 				</Space>
 			),
 		},
@@ -281,21 +288,22 @@ export default function CompliancePage() {
 		{
 			title: t('common.actions'),
 			key: 'action',
-			render: (_: any, record: RetentionPolicy) => (
-				<Space size="small">
-					<Button
-						type="link"
-						icon={<EditOutlined />}
-						onClick={() => {
-							setEditingPolicy(record);
-							policyForm.setFieldsValue(record);
-							setPolicyModal(true);
-						}}
-					>
-						{t('common.edit')}
-					</Button>
-				</Space>
-			),
+			render: (_: any, record: RetentionPolicy) =>
+				isAdminRole ? (
+					<Space size="small">
+						<Button
+							type="link"
+							icon={<EditOutlined />}
+							onClick={() => {
+								setEditingPolicy(record);
+								policyForm.setFieldsValue(record);
+								setPolicyModal(true);
+							}}
+						>
+							{t('common.edit')}
+						</Button>
+					</Space>
+				) : null,
 		},
 	];
 
@@ -361,7 +369,7 @@ export default function CompliancePage() {
 			title: t('common.actions'),
 			key: 'action',
 			render: (_: any, record: ConsentRecord) =>
-				record.granted ? (
+				record.granted && isAdminRole ? (
 					<Button type="link" danger onClick={() => handleRevokeConsent(record)}>
 						{t('compliance.consent.revoke')}
 					</Button>
@@ -411,14 +419,16 @@ export default function CompliancePage() {
 											value={standardCount}
 											suffix={t('compliance.standardsUnit')}
 										/>
-										<Button
-											type="link"
-											size="small"
-											icon={<SettingOutlined />}
-											onClick={() => navigate(buildNavHref('/compliance/policy', tenantSlug))}
-										>
-											{t('compliance.managePolicy')}
-										</Button>
+										{isAdminRole && (
+											<Button
+												type="link"
+												size="small"
+												icon={<SettingOutlined />}
+												onClick={() => navigate(buildNavHref('/compliance/policy', tenantSlug))}
+											>
+												{t('compliance.managePolicy')}
+											</Button>
+										)}
 									</Card>
 								</Col>
 								<Col xs={24} md={6}>
@@ -457,18 +467,20 @@ export default function CompliancePage() {
 						label: t('compliance.tabConsent'),
 						children: (
 							<>
-								<div className="flex justify-end mb-4">
-									<Button
-										type="primary"
-										icon={<PlusOutlined />}
-										onClick={() => {
-											consentForm.resetFields();
-											setConsentModal(true);
-										}}
-									>
-										{t('compliance.consent.newConsent')}
-									</Button>
-								</div>
+								{isAdminRole && (
+									<div className="flex justify-end mb-4">
+										<Button
+											type="primary"
+											icon={<PlusOutlined />}
+											onClick={() => {
+												consentForm.resetFields();
+												setConsentModal(true);
+											}}
+										>
+											{t('compliance.consent.newConsent')}
+										</Button>
+									</div>
+								)}
 								<DataTable
 									rowKey="id"
 									columns={consentColumns}
@@ -485,19 +497,21 @@ export default function CompliancePage() {
 						label: t('compliance.tabRetention'),
 						children: (
 							<>
-								<div className="flex justify-end mb-4">
-									<Button
-										type="primary"
-										icon={<PlusOutlined />}
-										onClick={() => {
-											setEditingPolicy(null);
-											policyForm.resetFields();
-											setPolicyModal(true);
-										}}
-									>
-										{t('compliance.retention.createBtn')}
-									</Button>
-								</div>
+								{isAdminRole && (
+									<div className="flex justify-end mb-4">
+										<Button
+											type="primary"
+											icon={<PlusOutlined />}
+											onClick={() => {
+												setEditingPolicy(null);
+												policyForm.resetFields();
+												setPolicyModal(true);
+											}}
+										>
+											{t('compliance.retention.createBtn')}
+										</Button>
+									</div>
+								)}
 
 								{error && (
 									<PageError message={t('compliance.loadError')} retry={refetch} className="mb-4" />

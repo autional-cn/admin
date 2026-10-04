@@ -48,9 +48,10 @@ export default function AnnouncementsPage() {
 	const [search, setSearch] = useState('');
 	const [form] = Form.useForm();
 
+	// RC-5（TASK-AB1-27）：查询入参 camel 书面写（分页键经 hook 内 toPageParams 单点转 wire snake）
 	const { data, isLoading, error, refetch } = useAnnouncements({
 		page,
-		page_size: pageSize,
+		pageSize,
 		status: statusFilter,
 		search: search || undefined,
 	});
@@ -87,22 +88,23 @@ export default function AnnouncementsPage() {
 		form.setFieldsValue({
 			title: record.title,
 			content: record.content,
-			target_roles: record.target_roles ?? [],
-			publish_at: record.publish_at ? dayjs(record.publish_at) : undefined,
-			expire_at: record.expire_at ? dayjs(record.expire_at) : undefined,
+			targetRoles: record.targetRoles ?? [],
+			publishAt: record.publishAt ? dayjs(record.publishAt) : undefined,
+			expireAt: record.expireAt ? dayjs(record.expireAt) : undefined,
 		});
 		setModalVisible(true);
 	};
 
 	const handleSave = async (values: any) => {
 		try {
+			// 提交侧 camel 书面写（拦截器 snake 化上 wire；wire 锚：domain.go:208-210 target_roles/publish_at/expire_at）
 			const payload: Record<string, unknown> = {
 				title: values.title,
 				content: values.content,
-				target_roles: values.target_roles ?? [],
+				targetRoles: values.targetRoles ?? [],
 			};
-			if (values.publish_at) payload.publish_at = values.publish_at.toISOString();
-			if (values.expire_at) payload.expire_at = values.expire_at.toISOString();
+			if (values.publishAt) payload.publishAt = values.publishAt.toISOString();
+			if (values.expireAt) payload.expireAt = values.expireAt.toISOString();
 
 			if (editing) {
 				await updateMut.mutateAsync({ id: editing.id, data: payload });
@@ -157,8 +159,8 @@ export default function AnnouncementsPage() {
 		},
 		{
 			title: t('notifications.announcements.targetRoles'),
-			dataIndex: 'target_roles',
-			key: 'target_roles',
+			dataIndex: 'targetRoles',
+			key: 'targetRoles',
 			width: 200,
 			render: (roles?: string[]) =>
 				roles && roles.length > 0 ? (
@@ -173,8 +175,8 @@ export default function AnnouncementsPage() {
 		},
 		{
 			title: t('notifications.announcements.publishAt'),
-			dataIndex: 'publish_at',
-			key: 'publish_at',
+			dataIndex: 'publishAt',
+			key: 'publishAt',
 			width: 180,
 			render: formatTime,
 		},
@@ -186,8 +188,8 @@ export default function AnnouncementsPage() {
 		},
 		{
 			title: t('notifications.announcements.updatedAt'),
-			dataIndex: 'updated_at',
-			key: 'updated_at',
+			dataIndex: 'updatedAt',
+			key: 'updatedAt',
 			width: 180,
 			render: formatTime,
 		},
@@ -336,17 +338,17 @@ export default function AnnouncementsPage() {
 					>
 						<TextArea rows={6} placeholder={t('notifications.announcements.contentPlaceholder')} />
 					</Form.Item>
-					<Form.Item name="target_roles" label={t('notifications.announcements.targetRoles')}>
+					<Form.Item name="targetRoles" label={t('notifications.announcements.targetRoles')}>
 						<Select
 							mode="tags"
 							placeholder={t('notifications.announcements.targetRolesPlaceholder')}
 							options={[]}
 						/>
 					</Form.Item>
-					<Form.Item name="publish_at" label={t('notifications.announcements.publishAt')}>
+					<Form.Item name="publishAt" label={t('notifications.announcements.publishAt')}>
 						<DatePicker showTime className="w-full" />
 					</Form.Item>
-					<Form.Item name="expire_at" label={t('notifications.announcements.expireAt')}>
+					<Form.Item name="expireAt" label={t('notifications.announcements.expireAt')}>
 						<DatePicker showTime className="w-full" />
 					</Form.Item>
 				</Form>

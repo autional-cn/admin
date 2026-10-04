@@ -3,10 +3,30 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Tag, Space, Button, Modal, Form, Input, InputNumber, message, Switch, Empty } from 'antd';
-import { getAccessToken, getPortalUrl, API_BASE_URL, PLATFORM_TENANT_ID, useCurrentTenantId } from '@autional-cn/shared';
+import {
+	extractList,
+	getAccessToken,
+	getPortalUrl,
+	PLATFORM_TENANT_ID,
+	useCurrentTenantId,
+} from '@autional-cn/shared';
+import type { ApplicationResponse } from '@autional-cn/shared/generated/types';
 import { useTranslation } from 'react-i18next';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
+import {
+	getApplications,
+	updateApplication,
+	activateApplication,
+	suspendApplication,
+} from '@/lib/api.generated';
+
+// TASK-AB1-27（RC-5 契约收敛）：行契约 = ApplicationResponse（wire 锚 service-tenant dto.go:1248-1271）。
+// 残留观察：该契约无 config 字段（后端 handler 未映射 db 侧 config）⇒ allowedRoles / oauthClient
+// 两列当前数据面恒 '-'（保留展示位不删列）；扩展 config 仅为这两列的读取形状。
+type PlatformPortalRecord = ApplicationResponse & {
+	config?: { portal?: { allowedRoles?: string[]; host?: string } };
+};
 
 export default function PlatformPortalsPage() {
 	const { t } = useTranslation();
@@ -16,7 +36,7 @@ export default function PlatformPortalsPage() {
 	const isPlatformTenant = tenantId === PLATFORM_TENANT_ID;
 	const queryClient = useQueryClient();
 	const [modalVisible, setModalVisible] = useState(false);
-	const [editingApp, setEditingApp] = useState<any>(null);
+	const [editingApp, setEditingApp] = useState<PlatformPortalRecord | null>(null);
 	const [form] = Form.useForm();
 
 	const {
@@ -27,14 +47,16 @@ export default function PlatformPortalsPage() {
 	} = useQuery({
 		queryKey: ['platform-portals'],
 		queryFn: async () => {
-			const res = await fetch(
-				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications?type=portal&is_platform=true`,
-				{ headers: { Authorization: `Bearer ${token}` } },
-			).then((r) => r.json());
-			if (res.code !== 0) {
-				throw new Error(res.message || 'Failed to load platform portals');
-			}
-			return Array.isArray(res.data) ? res.data : [];
+			// TASK-AB1-27（RC-5 契约收敛）：raw fetch → generated + 拦截器单点。
+			// 请求参数 camel 书面写（拦截器 snake 化上 wire）；is_platform 未入 generated 签名（params 类型未收编）故收窄直传。
+			// wire 锚：service-tenant/internal/handler/dto/dto.go:1200（form is_platform）；响应 = 扁平 ListResponse（http_handler_app.go:300）。
+			const res = await getApplications(PLATFORM_TENANT_ID, {
+				type: 'portal',
+				isPlatform: true,
+			} as unknown as { type?: string; is_platform?: boolean });
+			// 根因修复：旧 raw fetch 手读 res.data（后端实际返回扁平 items）恒 undefined ⇒ 页面恒空表；
+			// 拦截器已解包 {items,total,pagination} ⇒ extractList 契约直取。
+			return extractList<PlatformPortalRecord>(res);
 		},
 		enabled: !!token && isPlatformTenant,
 		staleTime: 60000,
@@ -42,22 +64,12 @@ export default function PlatformPortalsPage() {
 
 	const updateMutation = useMutation({
 		mutationFn: async (data: { id: string; name: string; description: string; order: number }) => {
-			const res = await fetch(
-				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications/${data.id}`,
-				{
-					method: 'PUT',
-					headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-					body: JSON.stringify({
-						name: data.name,
-						description: data.description,
-						order: data.order,
-					}),
-				},
-			).then((r) => r.json());
-			if (res.code !== 0) {
-				throw new Error(res.message || 'Failed to save portal');
-			}
-			return res;
+			// TASK-AB1-27（RC-5 契约收敛）：PUT generated 端点；body camel 书面写（拦截器 snake 化上 wire）。
+			return updateApplication(PLATFORM_TENANT_ID, data.id, {
+				name: data.name,
+				description: data.description,
+				order: data.order,
+			});
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['platform-portals'] });
@@ -69,18 +81,11 @@ export default function PlatformPortalsPage() {
 
 	const statusMutation = useMutation({
 		mutationFn: async (data: { id: string; active: boolean }) => {
-			const res = await fetch(
-				`${API_BASE_URL}/tenant/api/v1/admin/tenants/${PLATFORM_TENANT_ID}/applications/${data.id}/${data.active ? 'activate' : 'suspend'}`,
-				{
-					method: 'POST',
-					headers: { Authorization: `Bearer ${token}` },
-					body: JSON.stringify({ reason: data.active ? '' : 'suspended by admin' }),
-				},
-			).then((r) => r.json());
-			if (res.code !== 0) {
-				throw new Error(res.message || 'Failed to update portal status');
-			}
-			return res;
+			// TASK-AB1-27（RC-5 契约收敛）：激活/暂停 = 两枚 generated 端点。
+			// activate 无请求体（wire 锚 http_handler_app.go:504）；suspend body { reason }（同上 :558-572）。
+			return data.active
+				? activateApplication(PLATFORM_TENANT_ID, data.id)
+				: suspendApplication(PLATFORM_TENANT_ID, data.id, { reason: 'suspended by admin' });
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['platform-portals'] });
@@ -89,7 +94,7 @@ export default function PlatformPortalsPage() {
 		onError: () => message.error(t('applications.statusFailed', '状态更新失败')),
 	});
 
-	const openEdit = (app: any) => {
+	const openEdit = (app: PlatformPortalRecord) => {
 		setEditingApp(app);
 		form.setFieldsValue({ name: app.name, description: app.description, order: app.order });
 		setModalVisible(true);
@@ -97,11 +102,12 @@ export default function PlatformPortalsPage() {
 
 	const handleSave = async () => {
 		const values = await form.validateFields();
-		updateMutation.mutate({ id: editingApp.id, ...values });
+		if (!editingApp) return;
+		updateMutation.mutate({ id: editingApp.id ?? '', ...values });
 	};
 
-	const handleToggleStatus = (app: any) => {
-		statusMutation.mutate({ id: app.id, active: app.status !== 'active' });
+	const handleToggleStatus = (app: PlatformPortalRecord) => {
+		statusMutation.mutate({ id: app.id ?? '', active: app.status !== 'active' });
 	};
 
 	const columns = [
@@ -110,7 +116,7 @@ export default function PlatformPortalsPage() {
 			title: t('applications.column.name'),
 			dataIndex: 'name',
 			key: 'name',
-			render: (_: any, record: any) => (
+			render: (_: any, record: PlatformPortalRecord) => (
 				<Button type="link" size="small" onClick={() => openEdit(record)} className="p-0">
 					{record.name}
 				</Button>
@@ -119,8 +125,8 @@ export default function PlatformPortalsPage() {
 		{
 			title: t('applications.column.url'),
 			key: 'url',
-			render: (_: any, record: any) => {
-				const url = getPortalUrl(record.code);
+			render: (_: any, record: PlatformPortalRecord) => {
+				const url = getPortalUrl(record.code ?? '');
 				return url ? (
 					<a href={url} target="_blank" className="text-xs text-info-text hover:underline">
 						{url}
@@ -135,7 +141,7 @@ export default function PlatformPortalsPage() {
 			dataIndex: 'status',
 			key: 'status',
 			width: 80,
-			render: (_: any, record: any) => (
+			render: (_: any, record: PlatformPortalRecord) => (
 				<Switch
 					checked={record.status === 'active'}
 					size="small"
@@ -154,8 +160,10 @@ export default function PlatformPortalsPage() {
 			title: t('applications.column.allowedRoles'),
 			key: 'roles',
 			width: 180,
-			render: (_: any, record: any) => {
-				const roles = record.config?.portal?.allowed_roles;
+			render: (_: any, record: PlatformPortalRecord) => {
+				// TASK-AB1-27（RC-5 契约收敛）：snake 直读 → camel 键（拦截器深 camel 化）。
+				// 残留观察：ApplicationResponse 契约无 config（dto.go:1248-1271 实读）⇒ 本列数据面恒 '-'（保留展示位）。
+				const roles = record.config?.portal?.allowedRoles;
 				return roles ? (
 					<Space size={4} wrap>
 						{roles.map((r: string) => (
@@ -171,7 +179,7 @@ export default function PlatformPortalsPage() {
 			title: t('applications.column.oauthClient'),
 			key: 'oauth',
 			width: 140,
-			render: (_: any, record: any) => {
+			render: (_: any, record: PlatformPortalRecord) => {
 				const clientId = record.config?.portal?.host ? `portal-${record.code}` : '';
 				return clientId ? <code className="text-xs">{clientId}</code> : '-';
 			},

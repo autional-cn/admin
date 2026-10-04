@@ -44,7 +44,12 @@ describe('useRoles', () => {
 		const { result } = renderHook(() => useRoles(), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(roles.map((r) => ({ ...r, permissionCount: 0 })));
+		// TASK-AB1-18 起：列表返回 { items, total }（A-17 服务端分页单点）；
+		// permission_count 契约直读（驼峰）缺省回退 0。
+		expect(result.current.data).toEqual({
+			items: roles.map((r) => ({ ...r, permissionCount: 0 })),
+			total: 0,
+		});
 	});
 
 	it('falls back to data directly if items missing', async () => {
@@ -54,16 +59,19 @@ describe('useRoles', () => {
 		const { result } = renderHook(() => useRoles(), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(roles.map((r) => ({ ...r, permissionCount: 0 })));
+		expect(result.current.data).toEqual({
+			items: roles.map((r) => ({ ...r, permissionCount: 0 })),
+			total: 0,
+		});
 	});
 
-	it('returns empty array when no data', async () => {
+	it('returns empty list when no data', async () => {
 		mockedGetRoles.mockResolvedValueOnce({} as any);
 
 		const { result } = renderHook(() => useRoles(), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual([]);
+		expect(result.current.data).toEqual({ items: [], total: 0 });
 	});
 });
 

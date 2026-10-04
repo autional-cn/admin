@@ -262,6 +262,27 @@ export function useTaxExport(params?: Record<string, unknown>) {
 	});
 }
 
+// TASK-AB1-22 / A-423：用量告警 channels 形状适配单点（数组 ⇄ wire 逗号串）。
+// wire 契约 = `notification_channels string`（service-billing dto/dto.go:905/:918/:961，服务端按 ',' split 校验）；
+// 表单多选值是 string[]。手写 split/join 只允许出现在本文件这两个函数内（页面零手写互转）。
+export function alertChannelsToCsv(channels: unknown): string {
+	if (Array.isArray(channels)) {
+		return channels
+			.map((c) => String(c).trim())
+			.filter(Boolean)
+			.join(',');
+	}
+	return typeof channels === 'string' ? channels : '';
+}
+
+export function alertChannelsFromCsv(csv?: string): string[] {
+	if (!csv) return [];
+	return csv
+		.split(',')
+		.map((c) => c.trim())
+		.filter(Boolean);
+}
+
 // U316：用量告警读写改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
 export function useBillingAlerts(params?: Record<string, unknown>) {
 	return useQuery({
@@ -276,7 +297,12 @@ export function useBillingAlerts(params?: Record<string, unknown>) {
 export function useCreateBillingAlert() {
 	const qc = useQueryClient();
 	return useMutation({
-		mutationFn: (data: Record<string, unknown>) => Generated.adminBillingAlertsPost(data),
+		// A-423：表单多选 string[] → wire 逗号串（提交边界单点转换；旧行为直传数组 → JSON 入 Go string 字段 400）
+		mutationFn: (data: Record<string, unknown>) =>
+			Generated.adminBillingAlertsPost({
+				...data,
+				notificationChannels: alertChannelsToCsv(data.notificationChannels),
+			}),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ['billing-admin', 'alerts'] }),
 	});
 }
@@ -284,8 +310,14 @@ export function useCreateBillingAlert() {
 export function useUpdateBillingAlert() {
 	const qc = useQueryClient();
 	return useMutation({
+		// A-423：同 create —— 仅在表单携带该键时转换（缺省不注入空串，避免误清渠道）
 		mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-			Generated.adminBillingAlertsByAlertsPut(id, data),
+			Generated.adminBillingAlertsByAlertsPut(id, {
+				...data,
+				...(data.notificationChannels !== undefined
+					? { notificationChannels: alertChannelsToCsv(data.notificationChannels) }
+					: {}),
+			}),
 		onSuccess: () => qc.invalidateQueries({ queryKey: ['billing-admin', 'alerts'] }),
 	});
 }

@@ -6,17 +6,19 @@ import { queryKeys } from '@/lib/query-keys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getRoleActivations, approveActivation, revokeActivation } from '@/lib/api.generated';
 
+// RC-5（TASK-AB1-27 补）：契约键 camel 直读（响应拦截器已 snake→camel），禁止 snake 双读。
+// wire 锚：service-rbac interfaces.go:134-138 / dto.go:126（user_id/role_id/expire_at/created_at snake json tag）。
 export interface RoleActivation {
 	id: string;
-	tenant_id: string;
-	user_id: string;
-	role_id: string;
+	tenantId: string;
+	userId: string;
+	roleId: string;
 	status: 'active' | 'pending' | 'revoked' | 'expired';
 	justification: string;
-	activated_at: string;
-	expire_at: string;
-	revoked_at: string;
-	created_at: string;
+	activatedAt: string;
+	expireAt: string;
+	revokedAt: string;
+	createdAt: string;
 }
 
 export function useRoleActivations(status?: string) {

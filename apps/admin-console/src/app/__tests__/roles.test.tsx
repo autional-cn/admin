@@ -90,14 +90,17 @@ function renderRoles() {
 describe('RolesPage', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: [] }) as any);
+		// TASK-AB1-18 起：useRoles/usePermissions 返回 { items, total }（服务端分页单点）
+		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: { items: [], total: 0 } }) as any);
 		mockedUseCreateRole.mockReturnValue(defaultMutationResult() as any);
 		mockedUseUpdateRole.mockReturnValue(defaultMutationResult() as any);
 		mockedUseDeleteRole.mockReturnValue(defaultMutationResult() as any);
 		mockedUseRolePermissions.mockReturnValue(defaultQueryResult({ data: [] }) as any);
 		mockedUseAssignRolePermissions.mockReturnValue(defaultMutationResult() as any);
 		mockedUseRemoveRolePermissions.mockReturnValue(defaultMutationResult() as any);
-		mockedUsePermissions.mockReturnValue(defaultQueryResult({ data: [] }) as any);
+		mockedUsePermissions.mockReturnValue(
+			defaultQueryResult({ data: { items: [], total: 0 } }) as any,
+		);
 		mockedUseCloneRole.mockReturnValue(defaultMutationResult() as any);
 	});
 
@@ -118,7 +121,9 @@ describe('RolesPage', () => {
 			{ id: '1', code: 'admin', name: '管理员', description: '系统管理员', permissionCount: 5 },
 			{ id: '2', code: 'editor', name: '编辑', description: '内容编辑', permissionCount: 3 },
 		];
-		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: roles }) as any);
+		mockedUseRoles.mockReturnValue(
+			defaultQueryResult({ data: { items: roles, total: roles.length } }) as any,
+		);
 
 		renderRoles();
 
@@ -131,7 +136,9 @@ describe('RolesPage', () => {
 		const roles = [
 			{ id: '1', code: 'admin', name: '管理员', description: '系统管理员', permissionCount: 5 },
 		];
-		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: roles }) as any);
+		mockedUseRoles.mockReturnValue(
+			defaultQueryResult({ data: { items: roles, total: roles.length } }) as any,
+		);
 
 		renderRoles();
 
@@ -162,7 +169,9 @@ describe('RolesPage', () => {
 		const roles = [
 			{ id: '1', code: 'admin', name: '管理员', description: '系统管理员', permissionCount: 5 },
 		];
-		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: roles }) as any);
+		mockedUseRoles.mockReturnValue(
+			defaultQueryResult({ data: { items: roles, total: roles.length } }) as any,
+		);
 
 		renderRoles();
 

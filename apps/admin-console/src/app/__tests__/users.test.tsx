@@ -64,7 +64,7 @@ function renderUsers() {
 describe('UsersPage', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: [] }) as any);
+		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: { items: [], total: 0 } }) as any);
 		mockedUseDeleteUser.mockReturnValue(defaultMutationResult() as any);
 		mockedUseCreateUser.mockReturnValue(defaultMutationResult() as any);
 		mockedUseUpdateUser.mockReturnValue(defaultMutationResult() as any);
@@ -100,7 +100,7 @@ describe('UsersPage', () => {
 				createdAt: '2026-02-01',
 			},
 		];
-		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: users }) as any);
+		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: { items: users, total: users.length } }) as any);
 
 		renderUsers();
 
@@ -118,7 +118,7 @@ describe('UsersPage', () => {
 				createdAt: '2026-01-01',
 			},
 		];
-		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: users }) as any);
+		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: { items: users, total: users.length } }) as any);
 
 		renderUsers();
 
@@ -155,7 +155,7 @@ describe('UsersPage', () => {
 				createdAt: '2026-01-01',
 			},
 		];
-		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: users }) as any);
+		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: { items: users, total: users.length } }) as any);
 
 		renderUsers();
 

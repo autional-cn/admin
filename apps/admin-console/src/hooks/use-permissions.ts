@@ -1,6 +1,6 @@
 'use client';
 
-import { extractList, useCurrentTenantId } from '@autional-cn/shared';
+import { fromPageResult, toPageParams, useCurrentTenantId } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 
@@ -20,14 +20,32 @@ export interface PermissionItem {
 	category: string;
 }
 
-export function usePermissions() {
+/** permissions 列表页结果（A-14：服务端分页驱动，total 来自服务端分页结果）。 */
+export interface PermissionListResult {
+	items: PermissionItem[];
+	total: number;
+}
+
+/** 查询入参（camel 书面；分页键经 toPageParams 单点转 wire snake）。 */
+export interface PermissionsQuery {
+	page?: number;
+	pageSize?: number;
+}
+
+export function usePermissions(params?: PermissionsQuery) {
 	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
-		queryKey: queryKeys.permissions.all(tenantId),
+		queryKey: queryKeys.permissions.list(tenantId, params),
 		staleTime: 300000,
 		queryFn: async ({ signal }) => {
-			const res = await getPermissions(undefined, signal);
-			return extractList<PermissionItem>(res);
+			// TASK-AB1-18 / A-14：请求侧 toPageParams（page/page_size），响应侧 fromPageResult 归一
+			// items/total（拦截器已 camel 化 + 解包信封）。
+			const res = await getPermissions(
+				{ ...toPageParams({ page: params?.page, pageSize: params?.pageSize }) },
+				signal,
+			);
+			const page = fromPageResult<PermissionItem>(res);
+			return { items: page.items, total: page.total } as PermissionListResult;
 		},
 	});
 }

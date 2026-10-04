@@ -109,9 +109,10 @@ export default function RetentionPolicyPage() {
 	if (error) return <PageError message={t('auditRetention.loadError')} retry={refetch} />;
 
 	// P3-2: 归档状态字段真实化 — 后端 ArchiveStatusResponse 无 status/totalArchived 字段（plan.md ADR-2/3/4）
-	const archiveEnabled = archiveStatus?.enabled ?? archiveStatus?.Enabled;
-	const rawLastArchive =
-		archiveStatus?.lastArchive ?? archiveStatus?.last_archive ?? archiveStatus?.LastArchiveTime;
+	// TASK-AB1-27（RC-5 契约收敛）：契约键 camel 直读（拦截器深 camel 化），删 snake/Pascal 双读回退。
+	// wire 锚：service-audit/internal/handler/dto/dto.go:642-647（enabled/days/bucket/last_archive）
+	const archiveEnabled = archiveStatus?.enabled;
+	const rawLastArchive = archiveStatus?.lastArchive;
 	let lastArchiveNum: number = NaN;
 	if (typeof rawLastArchive === 'number') {
 		lastArchiveNum = rawLastArchive;
@@ -226,7 +227,7 @@ export default function RetentionPolicyPage() {
 						<Col span={8}>
 							<Statistic
 								title={t('auditRetention.desc.retentionDays')}
-								value={archiveStatus.days ?? archiveStatus.Days ?? 0}
+								value={archiveStatus.days ?? 0}
 							/>
 						</Col>
 					</AntRow>

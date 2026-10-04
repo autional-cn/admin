@@ -10,7 +10,13 @@ import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/sh
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractList } from '@autional-cn/shared';
+import type {
+	AgentInfo,
+	AgentActivityInfo,
+	AgentCredentialInfo,
+	AgentPermissionInfo,
+} from '@autional-cn/shared/generated/types';
 import {
 	adminAgentsByAgents,
 	adminAgentsCredentialsByAgents,
@@ -22,40 +28,12 @@ import { queryKeys } from '@/lib/query-keys';
 
 import { useTranslation } from 'react-i18next';
 
-interface AgentDetail {
-	id: string;
-	name: string;
-	description: string;
-	workload_subtype: string;
-	status: string;
-	owner_name: string;
-	rotation_days: number;
-	jit_ttl: string;
-	created_at: string;
-	updated_at: string;
-}
-
-interface CredentialRecord {
-	id: string;
-	name: string;
-	type: string;
-	status: string;
-	last_used_at: string;
-	expires_at: string;
-}
-
-interface ActivityRecord {
-	id: string;
-	action: string;
-	detail: string;
-	timestamp: string;
-}
-
-interface PermissionRecord {
-	id: string;
-	resource: string;
-	action: string;
-}
+// TASK-AB1-27（RC-5 契约收敛）：契约类型直读（generated types，键名 camel），删除手写 snake 接口。
+// wire 锚：service-identity agent/domain/agent.go:76-135 经响应拦截器 camel 化（identityId/workloadSubtype/…）。
+type AgentDetail = AgentInfo;
+type CredentialRecord = AgentCredentialInfo;
+type ActivityRecord = AgentActivityInfo;
+type PermissionRecord = AgentPermissionInfo;
 
 const SUBTYPE_LABELS: Record<string, string> = {
 	agent: 'Agent',
@@ -87,37 +65,20 @@ function formatDate(iso: string): string {
 
 async function fetchAgent(id: string): Promise<AgentDetail> {
 	const res = await adminAgentsByAgents(id);
-	const d = (res as Record<string, unknown>) ?? {};
-	// generated 返回 camelCase（workloadSubtype/ownerName/rotationDays/createdAt 等），映射为接口 snake_case
-	return {
-		id: (d.identityId ?? d.id ?? d.identity_id ?? '') as string,
-		name: (d.name as string) || '',
-		description: (d.description as string) || '',
-		workload_subtype: (d.workloadSubtype ?? d.workload_subtype ?? '') as string,
-		status: (d.status as string) || '',
-		owner_name: (d.ownerId ?? d.owner_id ?? d.ownerName ?? d.owner_name ?? '') as string,
-		rotation_days: (d.rotationDays ?? d.rotation_days ?? 0) as number,
-		jit_ttl: (d.jitTtl ?? d.jit_ttl ?? '') as string,
-		created_at: (d.createdAt ?? d.created_at ?? '') as string,
-		updated_at: (d.updatedAt ?? d.updated_at ?? '') as string,
-	};
+	// RC-5：generated 已解包 + 拦截器深 camel ⇒ res 即 AgentInfo（契约直读，禁止 snake 双读兼容）
+	return (res ?? {}) as AgentDetail;
 }
 
 async function fetchCredentials(id: string): Promise<CredentialRecord[]> {
 	const res = await adminAgentsCredentialsByAgents(id);
-	const data = res; // generated 函数已返回解包后的 payload（camelCase）
-	if (data?.items) return data.items;
-	if (Array.isArray(data)) return data;
-	return [];
+	// 列表归一单点 = extractList（信封 items 分支；键名已由拦截器 camel）
+	return extractList<CredentialRecord>(res);
 }
 
 async function fetchActivity(id: string): Promise<ActivityRecord[]> {
 	try {
 		const res = await apiClient.get(API_PATHS.IDENTITY.ADMIN_AGENTS_ACTIVITY(id));
-		const data = extractItem(res.data);
-		if (data?.items) return data.items;
-		if (Array.isArray(data)) return data;
-		return [];
+		return extractList<ActivityRecord>(res.data);
 	} catch (err: any) {
 		// 后端暂无该端点 → 404，降级为空列表；其它错误继续抛出
 		if (err?.response?.status === 404 || err?.status === 404) return [];
@@ -128,10 +89,7 @@ async function fetchActivity(id: string): Promise<ActivityRecord[]> {
 async function fetchPermissions(id: string): Promise<PermissionRecord[]> {
 	try {
 		const res = await apiClient.get(API_PATHS.IDENTITY.ADMIN_AGENTS_PERMISSIONS(id));
-		const data = extractItem(res.data);
-		if (data?.items) return data.items;
-		if (Array.isArray(data)) return data;
-		return [];
+		return extractList<PermissionRecord>(res.data);
 	} catch (err: any) {
 		// 后端暂无该端点 → 404，降级为空列表；其它错误继续抛出
 		if (err?.response?.status === 404 || err?.status === 404) return [];
@@ -141,7 +99,9 @@ async function fetchPermissions(id: string): Promise<PermissionRecord[]> {
 
 async function updateAgent(id: string, values: Record<string, unknown>): Promise<AgentDetail> {
 	const res = await adminAgentsByAgentsPut(id, values);
-	return res; // generated 函数已返回解包后的 payload（camelCase）
+	// generated 已解包 + 拦截器 camel ⇒ res 即 AgentInfo；PUT 契约 UpdateAgentRequest 仅
+	// {name,description,callbackUrl}（identity agent.go:104-108），其余提交键后端静默忽略。
+	return res as AgentDetail;
 }
 
 export default function AgentDetailPage() {
@@ -218,9 +178,9 @@ export default function AgentDetailPage() {
 		form.setFieldsValue({
 			name: agent.name,
 			description: agent.description,
-			workload_subtype: agent.workload_subtype,
-			rotation_days: agent.rotation_days,
-			jit_ttl: agent.jit_ttl,
+			workloadSubtype: agent.workloadSubtype,
+			rotationDays: agent.rotationDays,
+			jitTtl: agent.jitTtl,
 		});
 		setEditVisible(true);
 	};
@@ -229,8 +189,8 @@ export default function AgentDetailPage() {
 		{ title: t('agents.detail.column.name'), dataIndex: 'name', key: 'name' },
 		{
 			title: t('agents.detail.column.type'),
-			dataIndex: 'type',
-			key: 'type',
+			dataIndex: 'credType',
+			key: 'credType',
 			render: (v: string) => <Tag>{v || '-'}</Tag>,
 		},
 		{
@@ -243,16 +203,18 @@ export default function AgentDetailPage() {
 				</StatusBadge>
 			),
 		},
+		// 注：AgentCredentialInfo（generated types.ts:4072-4080）未下发 lastUsedAt/expiresAt，
+		// 契约键直读后两列恒 '-'（backend agent.go 无该字段——残留观察，非本 TASK 收敛范围）
 		{
 			title: t('agents.detail.column.lastUsed'),
-			dataIndex: 'last_used_at',
-			key: 'last_used_at',
+			dataIndex: 'lastUsedAt',
+			key: 'lastUsedAt',
 			render: (v: string) => formatDate(v),
 		},
 		{
 			title: t('agents.detail.column.expires'),
-			dataIndex: 'expires_at',
-			key: 'expires_at',
+			dataIndex: 'expiresAt',
+			key: 'expiresAt',
 			render: (v: string) => formatDate(v),
 		},
 	];
@@ -272,8 +234,8 @@ export default function AgentDetailPage() {
 		},
 		{
 			title: t('agents.detail.column.time'),
-			dataIndex: 'timestamp',
-			key: 'timestamp',
+			dataIndex: 'createdAt',
+			key: 'createdAt',
 			render: (v: string) => formatDate(v),
 		},
 	];
@@ -342,31 +304,31 @@ export default function AgentDetailPage() {
 					<Descriptions column={2} bordered size="small">
 						<Descriptions.Item label={t('agents.detail.label.name')}>{agent.name}</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.status')}>
-							<StatusBadge variant={statusVariant(agent.status)}>
+							<StatusBadge variant={statusVariant(agent.status || '')}>
 								{t(`agents.status.${agent.status}`, { defaultValue: agent.status })}
 							</StatusBadge>
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.subtype')}>
-							<Tag color={SUBTYPE_COLORS[agent.workload_subtype] || 'default'}>
-								{t(`agents.type.${agent.workload_subtype}`, {
-									defaultValue: SUBTYPE_LABELS[agent.workload_subtype] || agent.workload_subtype,
+							<Tag color={SUBTYPE_COLORS[agent.workloadSubtype || ''] || 'default'}>
+								{t(`agents.type.${agent.workloadSubtype}`, {
+									defaultValue: SUBTYPE_LABELS[agent.workloadSubtype || ''] || agent.workloadSubtype,
 								})}
 							</Tag>
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.owner')}>
-							{agent.owner_name || '-'}
+							{agent.ownerId || '-'}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.rotationDays')}>
-							{agent.rotation_days ?? '-'}
+							{agent.rotationDays ?? '-'}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.jitTtl')}>
-							{agent.jit_ttl || '-'}
+							{agent.jitTtl || '-'}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.created')}>
-							{formatDate(agent.created_at)}
+							{formatDate(agent.createdAt || '')}
 						</Descriptions.Item>
 						<Descriptions.Item label={t('agents.detail.label.updated')}>
-							{formatDate(agent.updated_at)}
+							{formatDate(agent.updatedAt || '')}
 						</Descriptions.Item>
 					</Descriptions>
 				</SectionCard>
@@ -401,7 +363,7 @@ export default function AgentDetailPage() {
 							/>
 						) : (
 							<DataTable
-								rowKey="id"
+								rowKey="createdAt"
 								columns={activityColumns}
 								dataSource={activity}
 								pagination={false}
@@ -421,7 +383,7 @@ export default function AgentDetailPage() {
 							/>
 						) : (
 							<DataTable
-								rowKey="id"
+								rowKey="code"
 								columns={permissionColumns}
 								dataSource={permissions}
 								pagination={false}
@@ -457,7 +419,7 @@ export default function AgentDetailPage() {
 						<Input.TextArea rows={3} placeholder={t('agents.detail.form.descriptionPlaceholder')} />
 					</Form.Item>
 					<Form.Item
-						name="workload_subtype"
+						name="workloadSubtype"
 						label={t('agents.detail.form.subtype')}
 						rules={[{ required: true }]}
 					>
@@ -469,10 +431,10 @@ export default function AgentDetailPage() {
 							]}
 						/>
 					</Form.Item>
-					<Form.Item name="rotation_days" label={t('agents.detail.form.rotationDays')}>
+					<Form.Item name="rotationDays" label={t('agents.detail.form.rotationDays')}>
 						<Input type="number" placeholder="90" />
 					</Form.Item>
-					<Form.Item name="jit_ttl" label={t('agents.detail.form.jitTtl')}>
+					<Form.Item name="jitTtl" label={t('agents.detail.form.jitTtl')}>
 						<Input placeholder={t('agents.detail.form.jitTtlPlaceholder')} />
 					</Form.Item>
 				</Form>

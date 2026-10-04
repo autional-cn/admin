@@ -30,9 +30,10 @@ export default function WalletCouponsPage() {
 
 	const handleSave = async (values: Record<string, unknown>) => {
 		try {
+			// TASK-AB1-27（RC-5 契约收敛）：提交 body camel 书面写（拦截器 snake 化上 wire），
+			// 删除手写 validFrom→valid_from / validUntil→valid_until 映射。
+			// wire 锚：service-wallet/internal/handler/dto/dto.go:270-271（json valid_from/valid_until）
 			const data = { ...values };
-			if (data.validFrom) data.valid_from = data.validFrom;
-			if (data.validUntil) data.valid_until = data.validUntil;
 			if (editing) {
 				await updateMut.mutateAsync({ id: editing.id, data });
 				message.success(t('walletCoupons.updateSuccess'));

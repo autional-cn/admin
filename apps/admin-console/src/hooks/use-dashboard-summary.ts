@@ -45,8 +45,9 @@ export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
 	});
 	const memberCount = typeof memberTotal === 'number' ? memberTotal : 0;
 
+	// TASK-AB1-18：useRoles 改返回 { items, total }（服务端分页结果），总数直接取 total。
 	const { data: rolesData } = useRoles();
-	const rolesCount = Array.isArray(rolesData) ? rolesData.length : 0;
+	const rolesCount = rolesData?.total ?? 0;
 
 	const { data: activeSessions } = useActiveSessions();
 

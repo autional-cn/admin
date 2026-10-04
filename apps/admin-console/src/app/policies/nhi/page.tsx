@@ -8,29 +8,28 @@ import { ConsolePageHeader, ErrorState, SectionCard } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient, extractItem } from '@autional-cn/shared';
 import { adminPoliciesNhi, adminPoliciesNhiPut } from '@autional-cn/shared/generated/api';
+import type { NHIPolicyRequest } from '@autional-cn/shared/generated/types';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
 import { useTranslation } from 'react-i18next';
 
-interface NhiPolicy {
-	agent_max_count?: number;
-	agent_default_ttl?: string;
-	robot_max_count?: number;
-	device_max_per_owner?: number;
-	rotation_days_default?: number;
-}
+/**
+ * TASK-AB1-20 / A-94：表单契约 = 生成类型 NHIPolicyRequest（camel 书面键）。
+ * Form.Item name 与契约键对齐 —— setFieldsValue(响应 camel) 回显命中；提交 camel 经拦截器 snake 化上 wire。
+ */
+type NhiPolicy = NHIPolicyRequest;
 
 async function fetchNhiPolicy(): Promise<NhiPolicy> {
 	const res = await adminPoliciesNhi();
 	// 根因修复 (2026-08-13): generated 已解包，extractItem(res.data) → null → 表单永远空
-	const data = extractItem(res);
+	const data = extractItem<NhiPolicy>(res);
 	return data ?? {};
 }
 
 async function saveNhiPolicy(values: NhiPolicy): Promise<NhiPolicy> {
 	const res = await adminPoliciesNhiPut(values);
-	return extractItem(res) ?? {};
+	return extractItem<NhiPolicy>(res) ?? {};
 }
 
 export default function NhiPolicyPage() {
@@ -105,23 +104,23 @@ export default function NhiPolicyPage() {
 				layout="vertical"
 				onFinish={handleSave}
 				initialValues={{
-					agent_max_count: 100,
-					agent_default_ttl: '1h',
-					robot_max_count: 50,
-					device_max_per_owner: 10,
-					rotation_days_default: 90,
+					agentMaxCount: 100,
+					agentDefaultTtl: '1h',
+					robotMaxCount: 50,
+					deviceMaxPerOwner: 10,
+					rotationDaysDefault: 90,
 				}}
 			>
 				<SectionCard title={t('nhiPolicy.section.agentDefaults')}>
 					<Form.Item
-						name="agent_max_count"
+						name="agentMaxCount"
 						label={t('nhiPolicy.agentMaxCount')}
 						rules={[{ required: true, message: t('nhiPolicy.required') }]}
 					>
 						<InputNumber min={1} max={10000} className="w-50" />
 					</Form.Item>
 					<Form.Item
-						name="agent_default_ttl"
+						name="agentDefaultTtl"
 						label={t('nhiPolicy.agentDefaultTtl')}
 						rules={[{ required: true, message: t('nhiPolicy.required') }]}
 					>
@@ -139,7 +138,7 @@ export default function NhiPolicyPage() {
 
 				<SectionCard title={t('nhiPolicy.section.robotDefaults')} className="mt-6">
 					<Form.Item
-						name="robot_max_count"
+						name="robotMaxCount"
 						label={t('nhiPolicy.robotMaxCount')}
 						rules={[{ required: true, message: t('nhiPolicy.required') }]}
 					>
@@ -149,7 +148,7 @@ export default function NhiPolicyPage() {
 
 				<SectionCard title={t('nhiPolicy.section.deviceDefaults')} className="mt-6">
 					<Form.Item
-						name="device_max_per_owner"
+						name="deviceMaxPerOwner"
 						label={t('nhiPolicy.deviceMaxPerOwner')}
 						rules={[{ required: true, message: t('nhiPolicy.required') }]}
 					>
@@ -159,7 +158,7 @@ export default function NhiPolicyPage() {
 
 				<SectionCard title={t('nhiPolicy.section.securityDefaults')} className="mt-6">
 					<Form.Item
-						name="rotation_days_default"
+						name="rotationDaysDefault"
 						label={t('nhiPolicy.rotationDaysDefault')}
 						rules={[{ required: true, message: t('nhiPolicy.required') }]}
 					>

@@ -1,6 +1,11 @@
 'use client';
 
-import { extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import {
+	extractItem,
+	fromPageResult,
+	toPageParams,
+	useCurrentTenantId,
+} from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 
@@ -39,29 +44,52 @@ export interface UserDetail {
 	mfaEnabled?: boolean;
 }
 
+/** users 列表页结果（H008：total 由服务端分页结果驱动，无独立二次请求）。 */
+export interface UserListResult {
+	items: UserRecord[];
+	total: number;
+}
+
+/** 查询入参（camel 书面；分页键经 toPageParams 单点转 wire snake）。 */
+export interface UsersQuery {
+	search?: string;
+	page?: number;
+	pageSize?: number;
+}
+
+/** 响应已被 api/client.ts 响应拦截器深 camel 化：契约键直读，无 snake 双读兼容。 */
 function derivePasswordStatus(u: Record<string, unknown>): 'normal' | 'must_change' {
-	if (u.must_change_password) return 'must_change';
-	if (!u.password_changed_at) return 'must_change';
+	if (u.mustChangePassword) return 'must_change';
+	if (!u.passwordChangedAt) return 'must_change';
 	return 'normal';
 }
 
-export function useUsers(params?: Record<string, unknown>) {
+function toUserRecord(u: Record<string, unknown>): UserRecord {
+	return {
+		id: String(u.id ?? ''),
+		username: (u.username as string) ?? '',
+		email: (u.email as string) ?? '',
+		status: (u.status as string) ?? '',
+		createdAt: (u.createdAt as string) ?? '',
+		mustChangePassword: u.mustChangePassword as boolean,
+		passwordChangedAt: (u.passwordChangedAt as string) ?? undefined,
+		passwordStatus: derivePasswordStatus(u),
+	};
+}
+
+export function useUsers(params?: UsersQuery) {
 	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.users.list(tenantId, params),
 		queryFn: async ({ signal }) => {
-			const res = await getUsers(params, signal);
-			const raw = extractList<Record<string, unknown>>(res);
-			return raw.map((u) => ({
-				id: String(u.id ?? ''),
-				username: (u.username as string) ?? '',
-				email: (u.email as string) ?? '',
-				status: (u.status as string) ?? '',
-				createdAt: (u.created_at as string) ?? '',
-				mustChangePassword: u.must_change_password as boolean,
-				passwordChangedAt: (u.password_changed_at as string) ?? undefined,
-				passwordStatus: derivePasswordStatus(u),
-			})) as UserRecord[];
+			// 请求侧：分页键经 toPageParams 单点产出 wire snake（page/page_size，H008）；
+			// 响应侧：items/total 经 fromPageResult 单点归一（拦截器已 camel 化+解包信封）。
+			const res = await getUsers(
+				{ search: params?.search, ...toPageParams({ page: params?.page, pageSize: params?.pageSize }) },
+				signal,
+			);
+			const page = fromPageResult<Record<string, unknown>>(res);
+			return { items: page.items.map(toUserRecord), total: page.total } as UserListResult;
 		},
 	});
 }

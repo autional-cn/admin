@@ -126,7 +126,10 @@ export function usePointTransactions(userId: string) {
 		staleTime: 60000,
 		queryFn: async () => {
 			// U316：改接 admin 面（user 面 point 族在 admin 平面被入口平面门禁拒 403）。
-			const res = await Generated.adminPointsTransactions({ user_id: userId });
+			// TASK-AB1-27：camel 书面写（拦截器 snake 化）；generated 该端点入参类型仍为 snake 字面量（签名未收编）故收窄直传
+			const res = await Generated.adminPointsTransactions({ userId } as unknown as {
+				user_id?: string;
+			});
 			return extractList<PointTransaction>(res);
 		},
 		enabled: !!userId,
@@ -228,26 +231,16 @@ export function useUpdateAccountStatus() {
 	});
 }
 
-export interface TransferPointsRequest {
-	amount: number;
-	to_user_id: string;
-	description?: string;
-	reason?: string;
-	source?: string;
-}
-
-export interface ExchangePointsRequest {
-	amount: number;
-	exchange_type?: string;
-	description?: string;
-	source?: string;
-}
+// TASK-AB1-27（RC-5 契约收敛）：请求类型直读 generated 契约（camel 书面写；拦截器 snake 化上 wire），
+// 本地 snake 形状接口与 `as unknown as` 谎报 cast 删除。
+// wire 锚：service-point/internal/handler/dto/dto.go:377（ExchangeType json:"exchange_type"）
+// / :393（ToUserID json:"to_user_id" binding:"required"）
 
 export function useTransferPoints() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ userId, data }: { userId: string; data: TransferPointsRequest }) =>
-			transferPoints(userId, data as unknown as GenTransferPointsRequest),
+		mutationFn: ({ userId, data }: { userId: string; data: GenTransferPointsRequest }) =>
+			transferPoints(userId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.points.accounts });
 			queryClient.invalidateQueries({ queryKey: ['point-transactions'] });
@@ -258,8 +251,8 @@ export function useTransferPoints() {
 export function useExchangePoints() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: ({ userId, data }: { userId: string; data: ExchangePointsRequest }) =>
-			exchangePoints(userId, data as unknown as GenExchangePointsRequest),
+		mutationFn: ({ userId, data }: { userId: string; data: GenExchangePointsRequest }) =>
+			exchangePoints(userId, data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: queryKeys.points.accounts });
 			queryClient.invalidateQueries({ queryKey: ['point-transactions'] });

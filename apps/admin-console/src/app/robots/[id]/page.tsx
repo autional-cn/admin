@@ -77,7 +77,9 @@ async function decommissionRobot(id: string): Promise<void> {
 async function issueIntentToken(
 	id: string,
 	data: Record<string, unknown>,
-): Promise<{ intent_token?: string }> {
+): Promise<{ intentToken?: string }> {
+	// TASK-AB1-27（RC-5 契约收敛）：响应键 camel 直读（拦截器深 camel 化）。
+	// wire 锚：service-identity/internal/robot/handler/robot_handler.go:230（json intent_token）
 	const res = await apiClient.post(API_PATHS.IDENTITY.ADMIN_ROBOT_INTENT(id), data);
 	return extractItem(res.data) ?? {};
 }
@@ -204,7 +206,7 @@ export default function RobotDetailPage() {
 		if (!id) return;
 		try {
 			const result = await intentMut.mutateAsync({ id, data: values });
-			setIntentResult(result.intent_token ?? null);
+			setIntentResult(result.intentToken ?? null);
 			message.success(t('robotDetail.intentSuccess'));
 		} catch (err) {
 			handleApiError(err, t('robotDetail.intentFailed'));

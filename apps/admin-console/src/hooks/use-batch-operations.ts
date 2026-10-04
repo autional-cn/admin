@@ -37,7 +37,9 @@ export function useBatchAssignRoles() {
 				userIds: data.userIds,
 				roleIds: data.roleIds,
 			};
-			if (data.sodOverride) payload.sod_override = true;
+			// TASK-AB1-27（RC-5 契约收敛）：写入 camel 书面写（拦截器 snake 化上 wire）。
+			// wire 锚：service-rbac/internal/domain/rbac/interfaces.go:140（json sod_override）
+			if (data.sodOverride) payload.sodOverride = true;
 			const res = await batchAssignRoles(payload);
 			return extractBatchResult(res);
 		},

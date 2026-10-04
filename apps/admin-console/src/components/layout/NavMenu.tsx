@@ -378,17 +378,20 @@ export function NavMenu() {
 					{
 						key: '/verifications',
 						label: t('nav.verifications'),
-						permission: 'tenant:compliance:read',
+						// 无映射源 = admin-only，对齐后端（A-263：security_admin 不入口）
+						permission: 'tenant:verification:read',
 					},
 					{
 						key: '/compliance/policy',
 						label: t('nav.compliancePolicy'),
-						permission: 'tenant:compliance:read',
+						// 无映射源 = admin-only，对齐后端（A-263）
+						permission: 'tenant:compliance:policy',
 					},
 					{
 						key: '/compliance/minors',
 						label: t('nav.minorsProtection'),
-						permission: 'tenant:compliance:read',
+						// 无映射源 = admin-only，对齐后端（A-263）
+						permission: 'tenant:compliance:minors',
 					},
 					{
 						key: '/compliance/legal-documents',

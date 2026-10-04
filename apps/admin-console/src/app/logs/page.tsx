@@ -1,27 +1,40 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input, DatePicker, Space, Button, Spin, Empty, Card } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Input, Space, Button, Spin, Empty } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
+import { fromPageResult, toPageParams } from '@autional-cn/shared';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
+/** /auth/me/audit-logs 行契约（service-identity dto.AuditLogResponse 实读，经拦截器深 camel 化）。 */
+interface AuditLogItem {
+	id: string;
+	action: string;
+	status?: string;
+	details?: string;
+	createdAt: string;
+}
+
 export default function LogsPage() {
 	const { t } = useTranslation();
-	const [params, setParams] = useState<Record<string, unknown>>({});
+	// TASK-AB1-19 / A-66：服务端分页单点驱动——toPageParams 发 page/page_size，
+	// total 由列表结果（fromPageResult 归一）直接取，删除前端本地假分页。
+	const [page, setPage] = useState(1);
+	const pageSize = 10;
+	const [keyword, setKeyword] = useState<string | undefined>();
 
+	const queryParams = { ...toPageParams({ page, pageSize }), ...(keyword ? { keyword } : {}) };
 	const { data, isLoading, error, refetch } = useQuery({
-		queryKey: queryKeys.myAuditLogs.all(params),
-		queryFn: () => getMyAuditLogs(params),
+		queryKey: queryKeys.myAuditLogs.all({ page, pageSize, keyword }),
+		queryFn: async () => fromPageResult<AuditLogItem>(await getMyAuditLogs(queryParams)),
 	});
-
-	// ADM-005: apiClient 已把 { code, items } unwrap 成 { items, total }（无 data 字段），
-	// 取 items 而非 data
-	const logs = Array.isArray(data) ? data : ((data as any)?.items ?? []);
+	const logs = data?.items ?? [];
+	const total = data?.total ?? 0;
 
 	const columns = [
 		{
@@ -44,7 +57,7 @@ export default function LogsPage() {
 						<Space>
 							<Input.Search
 								placeholder={t('logs.search')}
-								onSearch={(v) => setParams((p) => ({ ...p, keyword: v || undefined }))}
+								onSearch={(v) => setKeyword(v || undefined)}
 								style={{ width: 240 }}
 							/>
 							<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
@@ -66,7 +79,13 @@ export default function LogsPage() {
 					rowKey="id"
 					columns={columns}
 					dataSource={logs}
-					pagination={{ pageSize: 20 }}
+					pagination={{
+						current: page,
+						pageSize,
+						total,
+						onChange: (p) => setPage(p),
+						showSizeChanger: false,
+					}}
 					scroll={{ x: 800 }}
 				/>
 			)}

@@ -9,6 +9,7 @@ import {
 	useCreateBillingAlert,
 	useUpdateBillingAlert,
 	useDeleteBillingAlert,
+	alertChannelsFromCsv,
 	type BillingAlertItem,
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
@@ -104,10 +105,12 @@ export default function BillingAlertsPage() {
 			key: 'notificationChannels',
 			width: 160,
 			render: (v: string) => {
-				if (!v) return '-';
-				return v.split(',').map((ch) => (
+				// TASK-AB1-22 / A-423：wire 逗号串 → 数组的转换单点在 hook（本页不手写 split）
+				const channels = alertChannelsFromCsv(v);
+				if (channels.length === 0) return '-';
+				return channels.map((ch) => (
 					<Tag key={ch} className="mb-0.5">
-						{CHANNEL_OPTIONS.find((o) => o.value === ch.trim())?.label ?? ch.trim()}
+						{CHANNEL_OPTIONS.find((o) => o.value === ch)?.label ?? ch}
 					</Tag>
 				));
 			},
@@ -151,7 +154,8 @@ export default function BillingAlertsPage() {
 								name: record.name,
 								resourceType: record.resourceType,
 								thresholdPercent: record.thresholdPercent,
-								notificationChannels: record.notificationChannels,
+								// TASK-AB1-22 / A-423：CSV → string[] 回显（否则多选显单 tag，且后续改动产生混合值）
+								notificationChannels: alertChannelsFromCsv(record.notificationChannels),
 								status: record.status,
 							});
 							setModalOpen(true);

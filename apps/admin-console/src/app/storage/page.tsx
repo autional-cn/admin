@@ -105,7 +105,8 @@ export default function StoragePage() {
 
 	const handleDownload = async (record: FileRecord) => {
 		try {
-			const res = await downloadFile(record.id);
+			// TASK-AB1-21 / A-294：行标识取 fileId（wire file_id）
+			const res = await downloadFile(record.fileId);
 			const blob = res.data instanceof Blob ? res.data : new Blob([res.data]);
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
@@ -135,13 +136,13 @@ export default function StoragePage() {
 		}
 	};
 
-	const handleDeleteFile = (id: string) => {
+	const handleDeleteFile = (fileId: string) => {
 		modal.confirm({
 			title: t('storage.confirmDeleteTitle'),
 			content: t('storage.confirmDeleteContent'),
 			onOk: async () => {
 				try {
-					await deleteFileMut.mutateAsync(id);
+					await deleteFileMut.mutateAsync(fileId);
 					message.success(t('storage.fileMovedToTrash'));
 				} catch (err) {
 					handleApiError(err, t('storage.deleteFailed'));
@@ -150,23 +151,23 @@ export default function StoragePage() {
 		});
 	};
 
-	const handleRestore = async (id: string) => {
+	const handleRestore = async (fileId: string) => {
 		try {
-			await restoreMut.mutateAsync(id);
+			await restoreMut.mutateAsync(fileId);
 			message.success(t('storage.restoreSuccess'));
 		} catch (err) {
 			handleApiError(err, t('storage.restoreFailed'));
 		}
 	};
 
-	const handlePermanentDelete = async (id: string) => {
+	const handlePermanentDelete = async (fileId: string) => {
 		modal.confirm({
 			title: t('storage.permanentDeleteTitle'),
 			content: t('storage.permanentDeleteContent'),
 			okButtonProps: { danger: true },
 			onOk: async () => {
 				try {
-					await deleteTrashMut.mutateAsync(id);
+					await deleteTrashMut.mutateAsync(fileId);
 					message.success(t('storage.permanentlyDeleted'));
 				} catch (err) {
 					handleApiError(err, t('storage.deleteFailed'));
@@ -228,7 +229,7 @@ export default function StoragePage() {
 						type="link"
 						danger
 						icon={<DeleteOutlined />}
-						onClick={() => handleDeleteFile(record.id)}
+						onClick={() => handleDeleteFile(record.fileId)}
 					>
 						{t('storage.delete')}
 					</Button>
@@ -262,14 +263,14 @@ export default function StoragePage() {
 			key: 'action',
 			render: (_: any, record: TrashRecord) => (
 				<Space size="small">
-					<Button type="link" icon={<UndoOutlined />} onClick={() => handleRestore(record.id)}>
+					<Button type="link" icon={<UndoOutlined />} onClick={() => handleRestore(record.fileId)}>
 						{t('storage.restore')}
 					</Button>
 					<Button
 						type="link"
 						danger
 						icon={<DeleteOutlined />}
-						onClick={() => handlePermanentDelete(record.id)}
+						onClick={() => handlePermanentDelete(record.fileId)}
 					>
 						{t('storage.permanentDelete')}
 					</Button>
@@ -350,7 +351,7 @@ export default function StoragePage() {
 								</div>
 								<div className="flex-1 min-w-0">
 									<DataTable
-										rowKey="id"
+										rowKey="fileId"
 										columns={fileColumns}
 										dataSource={files}
 										loading={filesLoading}
@@ -366,7 +367,7 @@ export default function StoragePage() {
 						label: t('storage.recycleBin'),
 						children: (
 							<DataTable
-								rowKey="id"
+								rowKey="fileId"
 								columns={trashColumns}
 								dataSource={trash}
 								loading={trashLoading}

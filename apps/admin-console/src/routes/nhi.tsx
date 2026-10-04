@@ -12,14 +12,16 @@ import DevicesPage from '../app/devices/page';
 import DeviceDetailPage from '../app/devices/[id]/page';
 import NhiPolicyPage from '../app/policies/nhi/page';
 
-const Admin = ['super_admin', 'admin'] as const;
+// A-444①（TASK-AB1-14）：NHI 只读面 7 路由对 security_admin 开放（后端读面拆分见 TASK-AB1-07）；
+// 原两角色白名单常量随 7 路由全部换用后失引，已删。
+const SecurityRead = ['super_admin', 'admin', 'security_admin'] as const;
 
 export const NhiRoutes = (
 	<>
 		<Route
 			path="agents"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<AgentsPage />
 					</ErrorBoundary>
@@ -29,7 +31,7 @@ export const NhiRoutes = (
 		<Route
 			path="agents/:id"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<AgentDetailPage />
 				</RequireAuth>
 			}
@@ -37,7 +39,7 @@ export const NhiRoutes = (
 		<Route
 			path="robots"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<RobotsPage />
 					</ErrorBoundary>
@@ -47,7 +49,7 @@ export const NhiRoutes = (
 		<Route
 			path="robots/:id"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<RobotDetailPage />
 				</RequireAuth>
 			}
@@ -55,7 +57,7 @@ export const NhiRoutes = (
 		<Route
 			path="devices"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<DevicesPage />
 					</ErrorBoundary>
@@ -65,7 +67,7 @@ export const NhiRoutes = (
 		<Route
 			path="devices/:id"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<DeviceDetailPage />
 				</RequireAuth>
 			}
@@ -73,7 +75,7 @@ export const NhiRoutes = (
 		<Route
 			path="policies/nhi"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<NhiPolicyPage />
 					</ErrorBoundary>

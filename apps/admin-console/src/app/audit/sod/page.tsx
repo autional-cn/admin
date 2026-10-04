@@ -12,8 +12,10 @@ import { PageError } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
+// TASK-AB1-27（RC-5 契约收敛）：表单键 camel 契约直读（拦截器深 camel 化；写入 camel 书面写。
+// wire 锚：service-tenant/internal/handler/dto/dto.go:1983/1988 + domain/sod_config.go:12（json sod_mode）
 interface SodConfigData {
-	sod_mode: 'single' | 'strict';
+	sodMode: 'single' | 'strict';
 }
 
 export default function SodConfigPage() {
@@ -31,12 +33,10 @@ export default function SodConfigPage() {
 		setError(null);
 		try {
 			const res = await apiClient.get(API_PATHS.TENANT.SOD_CONFIG(tenantId));
-			// U99：响应经 camelCaseKeys 拦截器（client.ts），读取侧键为 sodMode；
-			// 写入侧仍用 snake_case（请求经 snakeCaseKeys，幂等）。
 			const item = extractItem<{ sodMode?: string }>(res);
 			if (item) {
 				setCurrentMode(item.sodMode ?? 'single');
-				form.setFieldsValue({ sod_mode: item.sodMode as 'single' | 'strict' });
+				form.setFieldsValue({ sodMode: item.sodMode as 'single' | 'strict' });
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err : new Error(String(err)));
@@ -54,8 +54,8 @@ export default function SodConfigPage() {
 		if (!tenantId) return;
 		setSaving(true);
 		try {
-			await apiClient.put(API_PATHS.TENANT.SOD_CONFIG(tenantId), { sod_mode: values.sod_mode });
-			setCurrentMode(values.sod_mode);
+			await apiClient.put(API_PATHS.TENANT.SOD_CONFIG(tenantId), { sodMode: values.sodMode });
+			setCurrentMode(values.sodMode);
 			message.success(t('sod.saveSuccess'));
 		} catch (err) {
 			handleApiError(err, t('sod.saveFailed'));
@@ -112,11 +112,11 @@ export default function SodConfigPage() {
 						form={form}
 						layout="vertical"
 						onFinish={handleSave}
-						initialValues={{ sod_mode: 'single' }}
+						initialValues={{ sodMode: 'single' }}
 					>
 						<Form.Item
 							label={t('sod.modeLabel')}
-							name="sod_mode"
+							name="sodMode"
 							rules={[{ required: true, message: t('sod.modeRequired') }]}
 						>
 							<Select>

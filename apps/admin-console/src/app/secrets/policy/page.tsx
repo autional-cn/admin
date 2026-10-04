@@ -11,16 +11,11 @@ import {
 	adminSecretsPolicyDelete,
 } from '@autional-cn/shared/generated/api';
 import { useTranslation } from 'react-i18next';
+import type { SecretPolicyResponse } from '@autional-cn/shared/generated/types';
 
-interface SecretPolicyResponse {
-	tenant_id: string;
-	default_ttl: string;
-	max_ttl: string;
-	auto_rotate_days: number;
-	notification_days_before: number;
-	max_versions: number;
-	require_rotation_for_fallback_keys: boolean;
-}
+// TASK-AB1-27（RC-5 契约收敛）：契约类型直读（generated types，键名 camel），旧本地 snake 接口删除。
+// wire 锚：service-secret dto/dto.go:261-270 SecretPolicyResponse（tenant_id/default_ttl/max_ttl… snake json tag）
+// 经响应拦截器深 camel 化；GET/PUT 均为 DataResponse 信封（admin_handler.go:370-402），拦截器已解包。
 
 // 根因修复 (2026-08-13): 后端 default_ttl/max_ttl 是 time.Duration 纳秒
 // （如 31536000000000000 = 8760h），此前表单 Input 原样显示纳秒、保存原样提交。
@@ -57,21 +52,17 @@ export default function SecretPolicyPage() {
 		setError(null);
 		adminSecretsPolicy()
 			.then((res) => {
-				const policy = extractItem(res) as SecretPolicyResponse;
+				// 契约直读（拦截器深 camel；generated 已解包 payload）——旧 snake/camel 双读链删除
+				const policy = extractItem<SecretPolicyResponse>(res);
 				if (policy) {
 					form.setFieldsValue({
-					// 纳秒 → 小时显示（placeholder 已是 "0h"/"8760h"）
-					// camelCase/snake_case 双兼容：generated 客户端可能驼峰化，后端 DTO 为 snake_case
-					default_ttl: nsToHours((policy as any).defaultTtl ?? (policy as any).default_ttl),
-					max_ttl: nsToHours((policy as any).maxTtl ?? (policy as any).max_ttl),
-					auto_rotate_days: (policy as any).autoRotateDays ?? (policy as any).auto_rotate_days,
-					notification_days_before:
-						(policy as any).notificationDaysBefore ?? (policy as any).notification_days_before ?? 7,
-					max_versions: (policy as any).maxVersions ?? (policy as any).max_versions ?? 100,
-					require_rotation_for_fallback_keys:
-						(policy as any).requireRotationForFallbackKeys ??
-						(policy as any).require_rotation_for_fallback_keys ??
-						false,
+						// 纳秒 → 小时显示（placeholder 已是 "0h"/"8760h"）
+						defaultTtl: nsToHours(policy.defaultTtl),
+						maxTtl: nsToHours(policy.maxTtl),
+						autoRotateDays: policy.autoRotateDays,
+						notificationDaysBefore: policy.notificationDaysBefore ?? 7,
+						maxVersions: policy.maxVersions ?? 100,
+						requireRotationForFallbackKeys: policy.requireRotationForFallbackKeys ?? false,
 					});
 				}
 			})
@@ -88,13 +79,14 @@ export default function SecretPolicyPage() {
 	const handleSave = async (values: Record<string, unknown>) => {
 		setSaving(true);
 		try {
-			// 小时 → 纳秒转回（后端契约 time.Duration）
+			// 小时 → 纳秒转回（后端契约 time.Duration，dto.go:253-254）；提交侧 camel 书面写，
+			// 拦截器 snake 化上 wire（default_ttl/max_ttl/auto_rotate_days…）
 			const payload: Record<string, unknown> = { ...values };
-			if (payload.default_ttl != null && payload.default_ttl !== '') {
-				payload.default_ttl = hoursToNs(payload.default_ttl as string);
+			if (payload.defaultTtl != null && payload.defaultTtl !== '') {
+				payload.defaultTtl = hoursToNs(payload.defaultTtl as string);
 			}
-			if (payload.max_ttl != null && payload.max_ttl !== '') {
-				payload.max_ttl = hoursToNs(payload.max_ttl as string);
+			if (payload.maxTtl != null && payload.maxTtl !== '') {
+				payload.maxTtl = hoursToNs(payload.maxTtl as string);
 			}
 			await adminSecretsPolicyPut(payload);
 			message.success(t('secrets.policy.saveSuccess'));
@@ -129,7 +121,7 @@ export default function SecretPolicyPage() {
 				<Form form={form} layout="vertical" onFinish={handleSave}>
 					<SectionCard title={t('secrets.policy.title')}>
 						<Form.Item
-							name="default_ttl"
+							name="defaultTtl"
 							label={t('secrets.policy.defaultTtl')}
 							extra={t('secrets.policy.defaultTtlHint')}
 						>
@@ -137,19 +129,19 @@ export default function SecretPolicyPage() {
 						</Form.Item>
 
 						<Form.Item
-							name="max_ttl"
+							name="maxTtl"
 							label={t('secrets.policy.maxTtl')}
 							extra={t('secrets.policy.maxTtlHint')}
 						>
 							<Input placeholder="8760h" className="w-60" />
 						</Form.Item>
 
-						<Form.Item name="auto_rotate_days" label={t('secrets.policy.autoRotate')}>
+						<Form.Item name="autoRotateDays" label={t('secrets.policy.autoRotate')}>
 							<InputNumber min={0} className="w-60" />
 						</Form.Item>
 
 						<Form.Item
-							name="notification_days_before"
+							name="notificationDaysBefore"
 							label={t('secrets.policy.notifyBefore')}
 							initialValue={7}
 						>
@@ -157,7 +149,7 @@ export default function SecretPolicyPage() {
 						</Form.Item>
 
 						<Form.Item
-							name="max_versions"
+							name="maxVersions"
 							label={t('secrets.policy.maxVersions')}
 							initialValue={100}
 						>
@@ -165,7 +157,7 @@ export default function SecretPolicyPage() {
 						</Form.Item>
 
 						<Form.Item
-							name="require_rotation_for_fallback_keys"
+							name="requireRotationForFallbackKeys"
 							label={t('secrets.policy.requireRotation')}
 							valuePropName="checked"
 						>

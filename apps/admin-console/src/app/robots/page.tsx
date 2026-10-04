@@ -8,7 +8,8 @@ import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/sh
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient, extractItem } from '@autional-cn/shared';
+import { apiClient, extractItem, extractList } from '@autional-cn/shared';
+import type { RobotInfo } from '@autional-cn/shared/generated/types';
 import {
 	adminRobots,
 	adminRobotsPost,
@@ -21,17 +22,10 @@ import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
 
 
-interface RobotRecord {
-	id: string;
-	name: string;
-	model: string;
-	location: string;
-	status: string;
-	workload_subtype: string;
-	firmware_ver: string;
-	owner_name: string;
-	created_at: string;
-}
+// TASK-AB1-27（RC-5 契约收敛）：契约类型直读（generated types，键名 camel）。
+// wire 锚：service-identity robot/domain/robot.go:90-92（workload_subtype/firmware_ver snake json tag）
+// 经响应拦截器深 camel 化；主键 = identityId（契约无 id）。
+type RobotRecord = RobotInfo;
 
 const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
 	active: 'success',
@@ -51,20 +45,8 @@ function formatDate(iso: string): string {
 
 async function fetchRobots(): Promise<RobotRecord[]> {
 	const res = await adminRobots();
-	const data = res?.data ?? res;
-	const items = (data as any)?.items ?? (Array.isArray(data) ? data : []);
-	// generated 返回 camelCase，映射为接口 snake_case
-	return (items as Record<string, unknown>[]).map((d) => ({
-		id: (d.identityId ?? d.id ?? d.identity_id ?? '') as string,
-		name: (d.name as string) || '',
-		model: (d.model as string) || '',
-		location: (d.location as string) || '',
-		status: (d.status as string) || '',
-		workload_subtype: (d.workloadSubtype ?? d.workload_subtype ?? '') as string,
-		firmware_ver: (d.firmwareVer ?? d.firmware_ver ?? '') as string,
-		owner_name: (d.ownerId ?? d.owner_id ?? d.ownerName ?? d.owner_name ?? '') as string,
-		created_at: (d.createdAt ?? d.created_at ?? '') as string,
-	}));
+	// generated 已解包 + 拦截器 camel：列表归一单点 = extractList
+	return extractList<RobotRecord>(res);
 }
 
 async function createRobot(values: Record<string, unknown>): Promise<RobotRecord> {
@@ -133,7 +115,7 @@ export default function RobotsPage() {
 			dataIndex: 'name',
 			key: 'name',
 			render: (v: string, record: RobotRecord) => (
-				<a onClick={() => navigate(buildNavHref(`/robots/${record.id}`, tenantSlug))} className="font-medium">
+				<a onClick={() => navigate(buildNavHref(`/robots/${record.identityId ?? ''}`, tenantSlug))} className="font-medium">
 					{v}
 				</a>
 			),
@@ -162,14 +144,14 @@ export default function RobotsPage() {
 		},
 		{
 			title: t('robots.column.owner'),
-			dataIndex: 'owner_name',
-			key: 'owner_name',
+			dataIndex: 'ownerId',
+			key: 'ownerId',
 			render: (v: string) => v || '-',
 		},
 		{
 			title: t('robots.column.created'),
-			dataIndex: 'created_at',
-			key: 'created_at',
+			dataIndex: 'createdAt',
+			key: 'createdAt',
 			render: (v: string) => formatDate(v),
 		},
 		{
@@ -182,7 +164,7 @@ export default function RobotsPage() {
 						icon={<EditOutlined />}
 						onClick={(e) => {
 							e.stopPropagation();
-							navigate(buildNavHref(`/robots/${record.id}`, tenantSlug));
+							navigate(buildNavHref(`/robots/${record.identityId ?? ''}`, tenantSlug));
 						}}
 					>
 						{t('common.edit')}
@@ -190,7 +172,7 @@ export default function RobotsPage() {
 					<Popconfirm
 						title={t('robots.confirmDelete')}
 						description={t('robots.deleteWarning')}
-						onConfirm={() => handleDelete(record.id)}
+						onConfirm={() => handleDelete(record.identityId ?? '')}
 						okText={t('common.delete')}
 						okButtonProps={{ danger: true }}
 						cancelText={t('common.cancel')}
@@ -262,13 +244,13 @@ export default function RobotsPage() {
 
 			{!isLoading && !error && robots.length > 0 && (
 				<DataTable
-					rowKey="id"
+					rowKey="identityId"
 					columns={columns}
 					dataSource={robots}
 					pagination={{ pageSize: 10 }}
 					scroll={{ x: 800 }}
 					onRow={(record) => ({
-						onClick: () => navigate(buildNavHref(`/robots/${record.id}`, tenantSlug)),
+						onClick: () => navigate(buildNavHref(`/robots/${record.identityId ?? ''}`, tenantSlug)),
 						style: { cursor: 'pointer' },
 					})}
 				/>
@@ -297,7 +279,7 @@ export default function RobotsPage() {
 						<Input placeholder={t('robots.form.locationPlaceholder')} />
 					</Form.Item>
 					<Form.Item
-						name="workload_subtype"
+						name="workloadSubtype"
 						label={t('robots.form.subtype')}
 						rules={[{ required: true }]}
 						initialValue="industrial"
@@ -310,7 +292,7 @@ export default function RobotsPage() {
 							]}
 						/>
 					</Form.Item>
-					<Form.Item name="firmware_ver" label={t('robots.form.firmware')}>
+					<Form.Item name="firmwareVer" label={t('robots.form.firmware')}>
 						<Input placeholder={t('robots.form.firmwarePlaceholder')} />
 					</Form.Item>
 				</Form>

@@ -21,6 +21,7 @@ export const queryKeys = {
 	},
 	roles: {
 		all: (tenantId: string) => ['roles', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['roles', tenantId, { params }] as const,
 		detail: (tenantId: string, id: string) => ['roles', tenantId, id] as const,
 		permissions: (tenantId: string, roleId: string) =>
 			['roles', tenantId, roleId, 'permissions'] as const,
@@ -32,6 +33,7 @@ export const queryKeys = {
 	},
 	permissions: {
 		all: (tenantId: string) => ['permissions', tenantId] as const,
+		list: (tenantId: string, params?: unknown) => ['permissions', tenantId, { params }] as const,
 	},
 	secrets: {
 		all: (tenantId: string) => ['secrets', tenantId] as const,
@@ -95,6 +97,8 @@ export const queryKeys = {
 	},
 	notifications: {
 		all: ['notification-templates'] as const,
+		// A-164（TASK-AB1-26）：选择器专用数据源（/available twin），与列表 all 键分槽防缓存互踩
+		availableTemplates: ['notification-templates-available'] as const,
 		stats: ['notification-stats'] as const,
 		trend: (days: number) => ['notification-trend', days] as const,
 		eventMappings: ['event-mappings'] as const,

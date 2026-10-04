@@ -17,9 +17,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
-import { useQuery } from '@tanstack/react-query';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from '@/hooks/use-users';
-import { getUsers } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -48,21 +46,14 @@ export default function UsersPage() {
 	const [createForm] = Form.useForm();
 	const [editForm] = Form.useForm();
 
-	// ADM-002: 接入后端分页（后端 adminUsers 参数为 page/limit），
-	// 单独查询 total，避免前端假分页只显示前 20 条
+	// ADM-002 / H008（TASK-AB1-17）：服务端分页单点驱动——useUsers 内以 toPageParams 发
+	// page/page_size，total 由列表结果（fromPageResult 归一）直接取，不再发独立 total 二次请求。
 	const [page, setPage] = useState(1);
 	const pageSize = 10;
 	const { data, isLoading, error, refetch } = useUsers({
 		search: searchKeyword,
 		page,
-		limit: pageSize,
-	});
-	const { data: totalData } = useQuery({
-		queryKey: ['users-total', searchKeyword],
-		queryFn: async () => {
-			const res = await getUsers({ search: searchKeyword, page: 1, limit: 1 });
-			return (res as any)?.total ?? (res as any)?.pagination?.total ?? 0;
-		},
+		pageSize,
 	});
 	const deleteUserMutation = useDeleteUser();
 	const createUserMutation = useCreateUser();
@@ -284,12 +275,12 @@ export default function UsersPage() {
 					<DataTable
 						rowKey="id"
 						columns={columns}
-						dataSource={data || []}
+						dataSource={data?.items || []}
 						rowSelection={rowSelection}
 						pagination={{
 							current: page,
 							pageSize,
-							total: totalData,
+							total: data?.total ?? 0,
 							onChange: (p) => setPage(p),
 							showSizeChanger: false,
 						}}

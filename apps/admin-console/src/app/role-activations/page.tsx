@@ -79,8 +79,8 @@ export default function RoleActivationsPage() {
 	const columns = [
 		{
 			title: t('roleActivations.columnUserId'),
-			dataIndex: 'user_id',
-			key: 'user_id',
+			dataIndex: 'userId',
+			key: 'userId',
 			width: 200,
 			render: (v: string) => (
 				<code className="text-xs bg-neutral-200 px-1 rounded">{truncate(v)}</code>
@@ -88,8 +88,8 @@ export default function RoleActivationsPage() {
 		},
 		{
 			title: t('roleActivations.columnRoleId'),
-			dataIndex: 'role_id',
-			key: 'role_id',
+			dataIndex: 'roleId',
+			key: 'roleId',
 			width: 200,
 			render: (v: string) => (
 				<code className="text-xs bg-neutral-200 px-1 rounded">{truncate(v)}</code>
@@ -113,15 +113,15 @@ export default function RoleActivationsPage() {
 		},
 		{
 			title: t('roleActivations.columnExpireAt'),
-			dataIndex: 'expire_at',
-			key: 'expire_at',
+			dataIndex: 'expireAt',
+			key: 'expireAt',
 			width: 140,
 			render: (v: string) => (v ? new Date(v).toLocaleDateString('zh-CN') : '-'),
 		},
 		{
 			title: t('roleActivations.columnCreatedAt'),
-			dataIndex: 'created_at',
-			key: 'created_at',
+			dataIndex: 'createdAt',
+			key: 'createdAt',
 			width: 140,
 			render: (v: string) => (v ? new Date(v).toLocaleDateString('zh-CN') : '-'),
 		},

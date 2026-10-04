@@ -5,7 +5,12 @@
  */
 
 import * as Generated from '@autional-cn/shared/generated/api';
-import type { ExchangePointsRequest, TransferPointsRequest } from '@autional-cn/shared/generated/types';
+import type {
+	CloneTemplateToLocaleRequest as GeneratedCloneTemplateToLocaleRequest,
+	CreateTemplateRequest as GeneratedCreateTemplateRequest,
+	ExchangePointsRequest,
+	TransferPointsRequest,
+} from '@autional-cn/shared/generated/types';
 import { apiClient } from '@autional-cn/shared';
 
 export const getUsers = (params?: Record<string, unknown>, _signal?: AbortSignal) =>
@@ -435,7 +440,46 @@ export const exchangePoints = async (
 
 // U316：通知读取族改接 admin 面（user 面在 admin 平面被入口平面门禁拒 403）
 export const getNotificationTemplates = Generated.adminNotificationsTemplates;
-export const createNotificationTemplate = Generated.adminNotificationsTemplatesPost;
+// A-164（TASK-AB1-26）：/available admin twin（TASK-AB1-08 后端已注册 adminRead twin），shared generated
+// 尚未含 admin 路径（待下轮 swagger 重生成），此处自写（apiClient 直调 admin 路径；user 面同路径在 admin 平面 403）。
+// 事件映射选择器数据源：条目含 code（列表端点 TemplateResponse 无 code = 旧数据源缺失的根因）。
+export const getAvailableNotificationTemplates = async (_signal?: AbortSignal) => {
+	const res = await apiClient.get('/notification/api/v1/admin/notifications/templates/available', {
+		signal: _signal,
+	});
+	return res.data;
+};
+// A-151/A-155（TASK-AB1-25）：通知模板 create/clone 的 wire 契约以 service-notification 后端 DTO
+// 实读为准（dto.go:312-320 CreateTemplateRequest：code/name/type/subject/content 必填；
+// dto.go:902-907 CloneTemplateToLocaleRequest：target_locale 必填 + title/content 可选）。
+// shared generated 的同名类型系 communication 面复用（create 多 channel 缺 type、clone 缺 title），
+// 类型不实，此处按后端形状收口后再复用 generated 端点函数（URL 不复制；生成物刷新后可整体替换）。
+export interface NotificationTemplateCreateRequest {
+	code: string;
+	name: string;
+	type: string; // system | user | alert | reminder | promotion
+	subject: string;
+	content: string;
+	format?: string;
+	variables?: string[];
+}
+
+export interface NotificationTemplateCloneToLocaleRequest {
+	targetLocale: string; // 拦截器转 target_locale
+	title?: string;
+	content?: string;
+}
+
+export const createNotificationTemplate = (data: NotificationTemplateCreateRequest) =>
+	Generated.adminNotificationsTemplatesPost(data as unknown as GeneratedCreateTemplateRequest);
+export const cloneNotificationTemplateToLocale = (
+	id: string,
+	data: NotificationTemplateCloneToLocaleRequest,
+) =>
+	Generated.adminNotificationsTemplatesCloneToLocaleByTemplatesPost(
+		id,
+		data as unknown as GeneratedCloneTemplateToLocaleRequest,
+	);
 export const updateNotificationTemplate = Generated.adminNotificationsTemplatesByTemplatesPut;
 export const deleteNotificationTemplate = Generated.adminNotificationsTemplatesByTemplatesDelete;
 export const testNotification = Generated.adminNotificationsTestPost;

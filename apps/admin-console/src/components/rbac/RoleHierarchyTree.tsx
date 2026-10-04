@@ -20,7 +20,9 @@ function buildTreeNode(role: RoleRecord): DataNode {
 }
 
 export function RoleHierarchyTree() {
-	const { data: roles = [], isLoading, refetch: refetchRoles } = useRoles();
+	// TASK-AB1-18：useRoles 返回 { items, total }（服务端分页结果），树取当前页 items。
+	const { data: rolesResult, isLoading, refetch: refetchRoles } = useRoles();
+	const roles = rolesResult?.items ?? [];
 	const { t } = useTranslation();
 	const [searchText, setSearchText] = useState('');
 	const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);

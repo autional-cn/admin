@@ -109,10 +109,11 @@ export const AuditComplianceRoutes = (
 				</RequireAuth>
 			}
 		/>
+		{/* A-277（D1c 显式加）：法务文书为合规只读面，security_admin 同权（页面内写操作另有裁决） */}
 		<Route
 			path="compliance/legal-documents"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<LegalDocumentsPage />
 					</ErrorBoundary>

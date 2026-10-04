@@ -15,8 +15,10 @@ import {
 } from '@/lib/api.generated';
 import * as Generated from '@autional-cn/shared/generated/api';
 
+// TASK-AB1-21 / A-294：行标识 = wire 契约键 file_id（generated FileMetadataResponse，经拦截器 camel 为 fileId）；
+// 删除 `id` 回退分支（旧代码按行对象的 id 键取标识恒 undefined → 行操作 URL 带 "undefined"）。
 export interface FileRecord {
-	id: string;
+	fileId: string;
 	name: string;
 	type: string;
 	size: number;
@@ -26,7 +28,7 @@ export interface FileRecord {
 }
 
 export interface TrashRecord {
-	id: string;
+	fileId: string;
 	name: string;
 	type: string;
 	size: number;
@@ -127,7 +129,8 @@ export function useCreateFolder() {
 export function useDeleteFile() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: (id: string) => Generated.adminStorageFilesByFilesDelete(id),
+		// TASK-AB1-21 / A-294：参数即 FileRecord.fileId（wire file_id）
+		mutationFn: (fileId: string) => Generated.adminStorageFilesByFilesDelete(fileId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['files'] });
 			queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });

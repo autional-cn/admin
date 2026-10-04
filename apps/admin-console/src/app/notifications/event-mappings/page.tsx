@@ -14,7 +14,8 @@ import {
 	useUpdateEventMapping,
 	useDeleteEventMapping,
 } from '@/hooks/use-event-mappings';
-import { useNotificationTemplates } from '@/hooks/use-notifications';
+// A-164（TASK-AB1-26）：选择器数据源切 /available admin twin（列表端点 TemplateResponse 无 code 字段）
+import { useAvailableNotificationTemplates } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -48,7 +49,7 @@ export default function EventMappingsPage() {
 	const tenantSlug = useTenantSlug();
 
 	const { data = [], isLoading, error, refetch } = useEventMappings();
-	const { data: templates = [] } = useNotificationTemplates();
+	const { data: templates = [] } = useAvailableNotificationTemplates();
 	const createMut = useCreateEventMapping();
 	const updateMut = useUpdateEventMapping();
 	const deleteMut = useDeleteEventMapping();
@@ -56,7 +57,7 @@ export default function EventMappingsPage() {
 	const filteredData = useMemo(() => {
 		if (sourceFilter === 'all') return data;
 		return (data as Array<Record<string, unknown>>).filter((item) => {
-			const et = item.event_type as string | undefined;
+			const et = item.eventType as string | undefined;
 			return et && et.startsWith(sourceFilter + '.');
 		});
 	}, [data, sourceFilter]);
@@ -94,14 +95,14 @@ export default function EventMappingsPage() {
 	const columns = [
 		{
 			title: t('notifications.eventMappings.eventType'),
-			dataIndex: 'event_type',
-			key: 'event_type',
+			dataIndex: 'eventType',
+			key: 'eventType',
 			width: 220,
 		},
 		{
 			title: t('notifications.eventMappings.templateCode'),
-			dataIndex: 'template_code',
-			key: 'template_code',
+			dataIndex: 'templateCode',
+			key: 'templateCode',
 			width: 180,
 			render: (v: string) => (
 				<Button
@@ -130,8 +131,8 @@ export default function EventMappingsPage() {
 		},
 		{
 			title: t('common.status'),
-			dataIndex: 'is_enabled',
-			key: 'is_enabled',
+			dataIndex: 'isEnabled',
+			key: 'isEnabled',
 			width: 100,
 			render: (v: boolean, record: Record<string, unknown>) => (
 				<Switch
@@ -140,7 +141,8 @@ export default function EventMappingsPage() {
 						try {
 							await updateMut.mutateAsync({
 								id: record.id as string,
-								data: { is_enabled: checked },
+								// RC-5（TASK-AB1-27）：提交侧 camel 书面写（拦截器 snake 化上 wire）
+								data: { isEnabled: checked },
 							});
 							message.success(
 								checked
@@ -246,7 +248,7 @@ export default function EventMappingsPage() {
 			>
 				<Form form={form} layout="vertical" onFinish={handleSave}>
 					<Form.Item
-						name="event_type"
+						name="eventType"
 						label={t('notifications.eventMappings.eventType')}
 						rules={[{ required: true }]}
 					>
@@ -259,18 +261,17 @@ export default function EventMappingsPage() {
 						</Select>
 					</Form.Item>
 					<Form.Item
-						name="template_code"
+						name="templateCode"
 						label={t('notifications.eventMappings.notificationTemplate')}
 						rules={[{ required: true }]}
 					>
+						{/* A-164（TASK-AB1-26）：数据源 = /available admin twin（条目含 code），value = code */}
 						<Select showSearch placeholder={t('notifications.eventMappings.selectTemplate')}>
-							{(templates as unknown as Array<Record<string, unknown>>).map(
-								(tpl: Record<string, unknown>) => (
-									<Option key={tpl.code as string} value={tpl.code as string}>
-										{tpl.name as string}
-									</Option>
-								),
-							)}
+							{templates.map((tpl) => (
+								<Option key={tpl.code} value={tpl.code}>
+									{tpl.name}
+								</Option>
+							))}
 						</Select>
 					</Form.Item>
 					<Form.Item name="channel" label={t('notifications.eventMappings.channel')}>

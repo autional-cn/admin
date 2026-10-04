@@ -4,7 +4,13 @@ import { queryKeys } from '@/lib/query-keys';
 
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import {
+	extractList,
+	extractItem,
+	fromPageResult,
+	toPageParams,
+	useCurrentTenantId,
+} from '@autional-cn/shared';
 import {
 	getRoles,
 	getRole,
@@ -21,29 +27,46 @@ export interface RoleRecord {
 	code: string;
 	name: string;
 	description: string;
-	data_scope: string;
+	// TASK-AB1-27（RC-5 契约收敛）：契约键 camel 直读（拦截器深 camel 化）。
+	// wire 锚：service-rbac/internal/handler/dto/dto.go:18（json data_scope）
+	dataScope: string;
 	permissionCount?: number;
-	permission_count?: number;
+}
+
+/** roles 列表页结果（A-17：服务端分页驱动，total 来自服务端分页结果）。 */
+export interface RoleListResult {
+	items: RoleRecord[];
+	total: number;
+}
+
+/** 查询入参（camel 书面；分页键经 toPageParams 单点转 wire snake）。 */
+export interface RolesQuery {
+	page?: number;
+	pageSize?: number;
 }
 
 export type RoleDetail = Record<string, unknown>;
 
 export type RolePermission = Record<string, unknown>;
 
-export function useRoles() {
+export function useRoles(params?: RolesQuery) {
 	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
-		queryKey: queryKeys.roles.all(tenantId),
+		queryKey: queryKeys.roles.list(tenantId, params),
 		staleTime: 300000,
 		queryFn: async ({ signal }) => {
-			const res = await getRoles(undefined, signal);
-			const list = extractList<RoleRecord>(res);
-			return list.map((r) => ({
+			// TASK-AB1-18 / A-17：请求侧 toPageParams（page/page_size），响应侧 fromPageResult 归一
+			// items/total。后端 permission_count 已由响应拦截器深 camel 化，契约键直读（无 snake 双读）。
+			const res = await getRoles(
+				{ ...toPageParams({ page: params?.page, pageSize: params?.pageSize }) },
+				signal,
+			);
+			const page = fromPageResult<RoleRecord>(res);
+			const items = page.items.map((r) => ({
 				...r,
-				// 后端返回 permission_count（rbac RoleResponse），映射到 permissionCount 供表格展示
-				permissionCount:
-					r.permissionCount ?? (typeof r.permission_count === 'number' ? r.permission_count : 0),
+				permissionCount: typeof r.permissionCount === 'number' ? r.permissionCount : 0,
 			}));
+			return { items, total: page.total } as RoleListResult;
 		},
 	});
 }

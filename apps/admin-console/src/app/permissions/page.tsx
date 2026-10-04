@@ -31,7 +31,17 @@ export default function PermissionsPage() {
 	const [keyword, setKeyword] = useState('');
 	const [form] = Form.useForm();
 
-	const { data = [], isLoading, error, refetch } = usePermissions();
+	// TASK-AB1-18 / A-14：服务端分页单点驱动——usePermissions 内以 toPageParams 发 page/page_size，
+	// total 由列表结果（fromPageResult 归一）直接取，删除本地 slice 假分页。
+	const [page, setPage] = useState(1);
+	const pageSize = 10;
+	const {
+		data: permissionsResult,
+		isLoading,
+		error,
+		refetch,
+	} = usePermissions({ page, pageSize });
+	const data = permissionsResult?.items ?? [];
 	const createMut = useCreatePermission();
 	const updateMut = useUpdatePermission();
 	const deleteMut = useDeletePermission();
@@ -194,7 +204,13 @@ export default function PermissionsPage() {
 				columns={columns}
 				dataSource={filteredData}
 				loading={isLoading}
-				pagination={{ pageSize: 10 }}
+				pagination={{
+					current: page,
+					pageSize,
+					total: permissionsResult?.total ?? 0,
+					onChange: (p) => setPage(p),
+					showSizeChanger: false,
+				}}
 			/>
 
 			<Modal

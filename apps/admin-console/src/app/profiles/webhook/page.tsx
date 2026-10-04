@@ -33,11 +33,13 @@ export default function WebhookPage() {
 			.then((res) => {
 				const d = (res as any) ?? null;
 				if (d) {
+					// TASK-AB1-27（RC-5 契约收敛）：表单键 camel 契约直读（拦截器深 camel 化）。
+					// wire 锚：service-profile/internal/handler/dto/dto.go:497/504（is_enabled）
 					form.setFieldsValue({
 						url: d.url ?? '',
 						secret: d.secret ?? '',
 						events: d.events ?? [],
-						is_enabled: d.isEnabled ?? true,
+						isEnabled: d.isEnabled ?? true,
 					});
 				}
 			})
@@ -76,7 +78,7 @@ export default function WebhookPage() {
 					form={form}
 					layout="vertical"
 					onFinish={handleSave}
-					initialValues={{ is_enabled: true }}
+					initialValues={{ isEnabled: true }}
 				>
 					<Form.Item
 						name="url"
@@ -100,7 +102,7 @@ export default function WebhookPage() {
 						/>
 					</Form.Item>
 					<Form.Item
-						name="is_enabled"
+						name="isEnabled"
 						label={t('profileWebhook.form.enabled')}
 						valuePropName="checked"
 					>

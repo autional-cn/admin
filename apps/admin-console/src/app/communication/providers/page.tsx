@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +23,11 @@ interface ProviderRecord {
 	channel?: string;
 	provider?: string;
 	apiKey?: string;
-	config?: Record<string, unknown>;
+	// A-177（TASK-AB1-09）：服务端 ProviderConfigResponse.config 为字符串（脱敏 JSON 串），
+	// 编辑回填按字符串展示；提交时原样透传为 string，不再 JSON.parse 成对象。
+	config?: string;
 	isActive?: boolean;
+	priority?: number;
 	updatedAt?: string;
 }
 
@@ -64,17 +67,26 @@ export default function CommunicationProvidersPage() {
 
 	const handleSave = async (values: any) => {
 		try {
-			const payload = {
-				channel: values.channel,
-				provider: values.provider,
-				config: values.config ? JSON.parse(values.config) : {},
-				isActive: values.isActive !== false,
-			};
+			// A-177（TASK-AB1-09）：请求体对齐后端 DTO ——
+			// create = CreateProviderConfigRequest{channel, provider, config(JSON 字符串), priority}；
+			// update = UpdateProviderConfigRequest{config, is_active, priority}（再发 channel/provider
+			// 会命中后端 "no fields to update"）。键名一律 camel 书面写，camel→snake 由 shared
+			// apiClient 请求拦截器承担（isActive→is_active）。
+			const configText: string = values.config || '{}';
+			const priority: number = values.priority ?? 0;
 			if (editing?.id) {
-				await updateMut.mutateAsync({ id: editing.id, data: payload });
+				await updateMut.mutateAsync({
+					id: editing.id,
+					data: { config: configText, isActive: values.isActive !== false, priority },
+				});
 				message.success(t('communication.providers.updateSuccess'));
 			} else {
-				await createMut.mutateAsync(payload);
+				await createMut.mutateAsync({
+					channel: values.channel,
+					provider: values.provider,
+					config: configText,
+					priority,
+				});
 				message.success(t('communication.providers.createSuccess'));
 			}
 			setModalVisible(false);
@@ -137,8 +149,10 @@ export default function CommunicationProvidersPage() {
 							form.setFieldsValue({
 								channel: record.channel,
 								provider: record.provider,
-								config: record.config ? JSON.stringify(record.config, null, 2) : '{}',
+								// A-177：config 为字符串（服务端脱敏 JSON 串）→ 原样展示
+								config: record.config || '{}',
 								isActive: record.isActive,
+								priority: record.priority ?? 0,
 							});
 							setModalVisible(true);
 						}}
@@ -216,7 +230,7 @@ export default function CommunicationProvidersPage() {
 					form={form}
 					layout="vertical"
 					onFinish={handleSave}
-					initialValues={{ channel: 'email' }}
+					initialValues={{ channel: 'email', priority: 0 }}
 				>
 					<Form.Item
 						name="channel"
@@ -250,6 +264,14 @@ export default function CommunicationProvidersPage() {
 						rules={[{ required: true }]}
 					>
 						<TextArea rows={6} placeholder={t('communication.providers.configPlaceholder')} />
+					</Form.Item>
+					{/* A-177：priority 对齐后端 DTO（min0 max100，dto.go:582） */}
+					<Form.Item
+						name="priority"
+						label={t('communication.providers.priority')}
+						rules={[{ type: 'number', min: 0, max: 100 }]}
+					>
+						<InputNumber min={0} max={100} className="w-full" />
 					</Form.Item>
 				</Form>
 			</Modal>

@@ -1,6 +1,6 @@
 'use client';
 
-import { extractList } from '@autional-cn/shared';
+import { extractList, toPageParams } from '@autional-cn/shared';
 import type { LdapHealthResponse, SamlProviderItem } from '@autional-cn/shared/generated/types';
 import { queryKeys } from '@/lib/query-keys';
 
@@ -59,7 +59,8 @@ export function useIdentityProviders() {
 			// 聚合两个来源: identity-service (OAuth providers) + saml-service (SAML IdP)
 			const [identityRes, samlRes] = await Promise.allSettled([
 				getIdentityProviders(),
-				getSamlProviders({ page: 1, page_size: 100 }),
+				// TASK-AB1-27（RC-5 契约收敛）：分页参数经 toPageParams 单点转 wire snake（禁手写字面量）。
+				getSamlProviders({ ...toPageParams({ page: 1, pageSize: 100 }) }),
 			]);
 			const identityItems =
 				identityRes.status === 'fulfilled' ? extractList<IdPRecord>(identityRes.value) : [];

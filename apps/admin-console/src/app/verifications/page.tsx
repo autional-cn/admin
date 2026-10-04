@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { extractList, apiClient, useTenantSlug } from '@autional-cn/shared';
+import { extractList, apiClient, useTenantSlug, toPageParams } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Input, Space, Card, Statistic, Row, Col, Select, Modal, Form, Empty, Skeleton } from 'antd';
@@ -70,10 +70,10 @@ export default function VerificationsPage() {
 	const [overrideRecord, setOverrideRecord] = useState<VerificationRecord | null>(null);
 	const [overrideForm] = Form.useForm();
 
+	// TASK-AB1-27（RC-5 契约收敛）：分页参数经 toPageParams 单点转 wire snake（禁手写字面量）。
 	const queryParams = useMemo(
 		() => ({
-			page: pagination.page,
-			page_size: pagination.pageSize,
+			...toPageParams({ page: pagination.page, pageSize: pagination.pageSize }),
 			...(statusFilter && { status: statusFilter }),
 			...(keyword && { search: keyword }),
 		}),

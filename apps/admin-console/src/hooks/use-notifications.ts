@@ -2,18 +2,25 @@
 
 import { extractItem, extractList } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
-import type { NotificationStatsResponse, ReadReportResponse } from '@autional-cn/shared/generated/types';
+import type {
+	NotificationStatsResponse,
+	ReadReportResponse,
+	AvailableTemplateResponse,
+} from '@autional-cn/shared/generated/types';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	getNotificationTemplates,
+	getAvailableNotificationTemplates,
 	getNotificationStats,
 	createNotificationTemplate,
 	updateNotificationTemplate,
 	deleteNotificationTemplate,
+	cloneNotificationTemplateToLocale,
 	testNotification,
 	getNotificationsReadReport,
 	broadcastNotification,
+	type NotificationTemplateCloneToLocaleRequest,
 } from '@/lib/api.generated';
 import * as Generated from '@autional-cn/shared/generated/api';
 
@@ -23,14 +30,17 @@ export interface TrendPoint {
 	read: number;
 }
 
+// A-152 行模型对齐：service-notification TemplateResponse（dto.go:262-270，wire snake，
+// 响应拦截器深 camelCase）—— 旧接口 id/channel/status/contentZh/contentEn 与响应全不交叉，
+// rowKey 与三操作 id 恒 undefined（TASK-AB1-25 的行内克隆入口亦依赖 templateId 才可用）。
 export interface NotificationTemplateRecord {
-	id: string;
+	templateId: string;
 	name: string;
-	channel: 'inapp' | 'email' | 'sms' | 'push';
-	status: 'active' | 'inactive';
-	updatedAt: string;
-	contentZh?: string;
-	contentEn?: string;
+	type: string; // system | user | alert | reminder | promotion
+	subject: string;
+	content: string;
+	variables?: string[];
+	createdAt: string;
 }
 
 export function useNotificationStats() {
@@ -56,6 +66,19 @@ export function useNotificationTemplates() {
 	});
 }
 
+// A-164（TASK-AB1-26）：事件映射选择器数据源 = /available admin twin（条目含 code；列表端点 TemplateResponse
+// 无 code 字段，旧实现 tpl.code 恒 undefined = 数据源缺失）。响应形状 AvailableTemplateListResponse。
+export function useAvailableNotificationTemplates() {
+	return useQuery({
+		queryKey: queryKeys.notifications.availableTemplates,
+		staleTime: 60000,
+		queryFn: async () => {
+			const res = await getAvailableNotificationTemplates();
+			return extractList<AvailableTemplateResponse>(res);
+		},
+	});
+}
+
 export function useCreateNotificationTemplate() {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -77,6 +100,16 @@ export function useDeleteNotificationTemplate() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: deleteNotificationTemplate,
+		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all }),
+	});
+}
+
+// A-155（TASK-AB1-25）：克隆到语言（POST /admin/notifications/templates/:id/clone-to-locale）。
+export function useCloneNotificationTemplateToLocale() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: ({ id, data }: { id: string; data: NotificationTemplateCloneToLocaleRequest }) =>
+			cloneNotificationTemplateToLocale(id, data),
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all }),
 	});
 }

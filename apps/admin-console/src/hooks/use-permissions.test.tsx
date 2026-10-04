@@ -43,14 +43,15 @@ describe('usePermissions', () => {
 
 		const { result } = renderHook(() => usePermissions(), { wrapper: createWrapper() });
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual(perms);
+		// TASK-AB1-18 起：列表返回 { items, total }（A-14 服务端分页单点）。
+		expect(result.current.data).toEqual({ items: perms, total: 0 });
 	});
 
-	it('returns empty array when no data', async () => {
+	it('returns empty list when no data', async () => {
 		mockedGetPermissions.mockResolvedValueOnce({} as any);
 		const { result } = renderHook(() => usePermissions(), { wrapper: createWrapper() });
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		expect(result.current.data).toEqual([]);
+		expect(result.current.data).toEqual({ items: [], total: 0 });
 	});
 });
 

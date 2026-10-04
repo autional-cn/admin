@@ -18,7 +18,6 @@ import VerificationsPage from '../app/verifications/page';
 import VerificationDetailPage from '../app/verifications/[id]/page';
 
 const Admin = ['super_admin', 'admin'] as const;
-const SecurityRead = ['super_admin', 'admin', 'security_admin'] as const;
 
 export const ConfigRoutes = (
 	<>
@@ -102,10 +101,11 @@ export const ConfigRoutes = (
 				</RequireAuth>
 			}
 		/>
+		{/* A-263（RC-6 面漂移）：verifications 为 admin-only（后端面裁定），security_admin 不入口 */}
 		<Route
 			path="verifications"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<VerificationsPage />
 					</ErrorBoundary>
@@ -115,7 +115,7 @@ export const ConfigRoutes = (
 		<Route
 			path="verifications/:id"
 			element={
-				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
 					<VerificationDetailPage />
 				</RequireAuth>
 			}

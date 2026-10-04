@@ -102,14 +102,16 @@ export default function AuditLogsPage() {
 	const params: Record<string, unknown> = { ...pagination };
 	if (keyword) params.keyword = keyword;
 	if (action) params.action = action;
-	if (targetType) params.target_type = targetType;
-	if (actor) params.user_id = actor;
+	// RC-5（TASK-AB1-27）：请求侧 camel 书面写（拦截器 snake 化上 wire；
+	// wire 锚：service-audit dto.go:86-99 form user_id/target_type/start_time/end_time）
+	if (targetType) params.targetType = targetType;
+	if (actor) params.userId = actor;
 	if (status !== undefined) params.status = status;
 	if (level) params.level = level;
 	if (module) params.module = module;
 	if (dateRange) {
-		params.start_time = dateRange[0];
-		params.end_time = dateRange[1];
+		params.startTime = dateRange[0];
+		params.endTime = dateRange[1];
 	}
 
 	const { data, isLoading, refetch, error } = useAuditLogs(params);
@@ -131,7 +133,8 @@ export default function AuditLogsPage() {
 				startDate = start.toISOString().slice(0, 10);
 				endDate = end.toISOString().slice(0, 10);
 			}
-			const res = await verifyMutation.mutateAsync({ start_date: startDate, ...(endDate ? { end_date: endDate } : {}) });
+			// camel 书面写（拦截器 snake 化；wire 锚：dto.go:182-189 json start_date/end_date）
+			const res = await verifyMutation.mutateAsync({ startDate, ...(endDate ? { endDate } : {}) });
 			if (res?.valid) {
 				message.success(t('audit.toast.verifyPassed'));
 			} else {
@@ -170,7 +173,7 @@ export default function AuditLogsPage() {
 	const handleDownload = async (jobId: string) => {
 		try {
 			const res = await apiClient.get(API_PATHS.AUDIT.ADMIN_EXPORT_DOWNLOAD(jobId));
-			const url = extractItem(res.data)?.download_url;
+			const url = extractItem(res.data)?.downloadUrl;
 			if (url) {
 				window.open(url, '_blank');
 				message.success(t('audit.toast.downloadStart'));
@@ -203,7 +206,11 @@ export default function AuditLogsPage() {
 		setMerkleVisible(true);
 		setMerkleLoading(true);
 		try {
-		const res = await adminAuditMerkleProof({ entry_id: selectedEntryId, tenant_id: tenantId });
+		// camel 书面写（拦截器 snake 化）；generated 该端点入参类型仍为 snake 字面量（签名未收编）故收窄直传
+		const res = await adminAuditMerkleProof({ entryId: selectedEntryId, tenantId } as unknown as {
+			tenant_id: string;
+			entry_id: string;
+		});
 		setMerkleData(extractItem(res));
 		} catch (err) {
 			handleApiError(err, t('audit.toast.merkleProofError'));
@@ -301,7 +308,7 @@ export default function AuditLogsPage() {
 		},
 		{
 			title: t('common.actions'),
-			key: 'action_col',
+			key: 'actionCol',
 			width: 90,
 			render: (_: any, record: any) => (
 				<Button type="link" icon={<EyeOutlined />} onClick={() => openDetail(record)}>
@@ -827,7 +834,7 @@ export default function AuditLogsPage() {
 							<Col span={8} className="text-neutral-600">
 								{t('audit.merkle.entryId')}
 							</Col>
-							<Col span={16}>{merkleData.entryId || merkleData.entry_id || '-'}</Col>
+							<Col span={16}>{merkleData.entryId || '-'}</Col>
 						</Row>
 						<Row>
 							<Col span={8} className="text-neutral-600">
@@ -835,7 +842,7 @@ export default function AuditLogsPage() {
 							</Col>
 							<Col span={16}>
 								<Text copyable className="break-all font-mono text-xs">
-									{merkleData.rootHash || merkleData.root_hash || '-'}
+									{merkleData.rootHash || '-'}
 								</Text>
 							</Col>
 						</Row>
@@ -849,11 +856,11 @@ export default function AuditLogsPage() {
 								</Tag>
 							</Col>
 						</Row>
-						{merkleData.proofPath || merkleData.proof_path ? (
+						{merkleData.proofPath ? (
 							<div>
 								<div className="text-neutral-600 mb-2">{t('audit.merkle.proofPath')}</div>
 								<pre className="bg-neutral-50 p-3 rounded text-xs overflow-auto">
-									{JSON.stringify(merkleData.proofPath || merkleData.proof_path, null, 2)}
+									{JSON.stringify(merkleData.proofPath, null, 2)}
 								</pre>
 							</div>
 						) : null}

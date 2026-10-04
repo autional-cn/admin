@@ -82,8 +82,11 @@ export default function GlobalVariablesPage() {
 		},
 		{
 			title: t('notifications.globalVariables.scope'),
-			dataIndex: 'app_id',
-			key: 'app_id',
+			// RC-5（TASK-AB1-27 补）：行契约 camel 直读（拦截器深 camel 化；旧 dataIndex 'app_id' 读 camel 源恒
+			// undefined ⇒ 应用级变量被误示「全局」）。
+			// wire 锚：service-notification/internal/handler/dto/dto.go:873-879（json app_id）。
+			dataIndex: 'appId',
+			key: 'appId',
 			width: 120,
 			render: (v: string) =>
 				v ? (

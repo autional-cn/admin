@@ -19,13 +19,16 @@ import StatusPage from '../app/status/page';
 import ApiDocsPage from '../app/api-docs/page';
 
 const Admin = ['super_admin', 'admin'] as const;
+// A-444③（TASK-AB1-14）：监控/开发者只读面两条（/status、/oauth-clients）对 security_admin 开放；
+// 其余 developer 路由（api-keys/usage/sdks/api-docs/...）映射源不在 11 码集，保持 Admin。
+const SecurityRead = ['super_admin', 'admin', 'security_admin'] as const;
 
 export const DeveloperRoutes = (
 	<>
 		<Route
 			path="oauth-clients"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<OAuthClientsPage />
 					</ErrorBoundary>
@@ -115,7 +118,7 @@ export const DeveloperRoutes = (
 		<Route
 			path="status"
 			element={
-				<RequireAuth allowedRoles={Admin} fallback={<ForbiddenRedirect />}>
+				<RequireAuth allowedRoles={SecurityRead} fallback={<ForbiddenRedirect />}>
 					<ErrorBoundary {...DEFAULT_ERROR_BOUNDARY}>
 						<StatusPage />
 					</ErrorBoundary>

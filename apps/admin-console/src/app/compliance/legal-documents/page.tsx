@@ -11,27 +11,34 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import type { DataTableProps } from '@autional-cn/ui/antd';
 
-import { apiClient, API_PATHS, extractItem, useCurrentTenantIdOr } from '@autional-cn/shared';
+import {
+	apiClient,
+	API_PATHS,
+	fromPageResult,
+	toPageParams,
+	useCurrentTenantIdOr,
+} from '@autional-cn/shared';
 import dayjs from 'dayjs';
 
+// A-274（TASK-AB1-23）：契约键直读（响应拦截器已 snake→camel），禁止 snake 双读兼容。
 interface LegalDocumentItem {
 	id: string;
-	doc_type: string;
+	docType: string;
 	version: string;
 	title: string;
 	lang: string;
 	status: string;
 	content: string;
-	effective_at: string | null;
+	effectiveAt: string | null;
 }
 
 interface LegalDocumentFormValues {
-	doc_type?: string;
+	docType?: string;
 	version?: string;
 	title: string;
 	lang: string;
 	content: string;
-	effective_at?: dayjs.Dayjs | null;
+	effectiveAt?: dayjs.Dayjs | null;
 }
 
 /** 客户端分页每页条数（ADR-001：全量拉取后前端翻页） */
@@ -80,26 +87,28 @@ export default function LegalDocumentsPage() {
 	const [saving, setSaving] = useState(false);
 	const [form] = Form.useForm<LegalDocumentFormValues>();
 
-	/** 请求序号守卫（P2-1）：doc_type 快速变化时丢弃过期响应，防止旧数据覆盖新数据 */
+	/** 请求序号守卫（P2-1）：docType 快速变化时丢弃过期响应，防止旧数据覆盖新数据 */
 	const requestSeqRef = useRef(0);
 
 	/**
 	 * 拉取条款列表（ADR-003：useEffect + apiClient + API_PATHS，不引入 useQuery）。
-	 * doc_type 变化时经 useCallback 依赖自动重新请求（AC-010 服务端透传）。
+	 * docType 变化时经 useCallback 依赖自动重新请求（AC-010 服务端透传）。
 	 */
 	const fetchData = useCallback(async () => {
 		const seq = ++requestSeqRef.current;
 		setLoading(true);
 		setError(null);
 		try {
+			// A-274（TASK-AB1-23）：请求侧 camel 书面写（拦截器 snake 化）；分页参数经
+			// toPageParams 单点（勿手写 page_size 字面量——client.ts 契约指针）。
 			const res = await apiClient.get(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, {
-				params: { doc_type: docTypeFilter || undefined, page_size: FETCH_LIMIT },
+				params: { docType: docTypeFilter || undefined, ...toPageParams({ pageSize: FETCH_LIMIT }) },
 			});
 			// 过期响应直接丢弃（新请求已发出，旧结果不覆盖新数据）
 			if (seq !== requestSeqRef.current) return;
-			// res.data.data -> { items, total, page, page_size }
-			const data = extractItem(res.data);
-			const { items: listItems = [], total = 0 } = data || {};
+			// A-274（TASK-AB1-23）：列表归一单点 = fromPageResult（内部 extractList/pagination），
+			// 键名已由拦截器转 camel；条目形状 = LegalDocumentItem（docType/effectiveAt）。
+			const { items: listItems, total } = fromPageResult<LegalDocumentItem>(res.data);
 			setItems(listItems);
 			setServerTotal(total);
 			// 列表刷新后回到第 1 页（客户端分页语义）
@@ -129,13 +138,15 @@ export default function LegalDocumentsPage() {
 
 	const openEditModal = (record: LegalDocumentItem) => {
 		setEditingDoc(record);
+		// A-274 关键守门：契约 camel 直读（旧缺陷 = 读 snake 键恒 undefined →
+		// Select 空 + 编辑态 disabled + required ⇒ 校验必败且字段被禁 = 编辑死锁）
 		form.setFieldsValue({
-			doc_type: record.doc_type,
+			docType: record.docType,
 			version: record.version,
 			title: record.title,
 			lang: record.lang,
 			content: record.content,
-			effective_at: record.effective_at ? dayjs(record.effective_at) : null,
+			effectiveAt: record.effectiveAt ? dayjs(record.effectiveAt) : null,
 		});
 		setModalOpen(true);
 	};
@@ -150,13 +161,13 @@ export default function LegalDocumentsPage() {
 		setSaving(true);
 		try {
 			await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENTS, {
-				doc_type: values.doc_type,
+				docType: values.docType,
 				version: values.version,
 				title: values.title,
 				lang: values.lang,
 				content: values.content,
-				effective_at: values.effective_at?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
-				tenant_id: tenantId,
+				effectiveAt: values.effectiveAt?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
+				tenantId,
 			});
 			message.success(t('legalDocuments.createSuccess'));
 			closeModal();
@@ -170,8 +181,8 @@ export default function LegalDocumentsPage() {
 
 	/**
 	 * 编辑提交（AC-008 关键守门）：
-	 * PUT body 仅 4 字段 { title, lang, content, effective_at }，
-	 * 绝不含 doc_type / version / status（后端 Update 契约不可变）。
+	 * PUT body 仅 4 字段 { title, lang, content, effectiveAt }（camel 书面写，拦截器 snake 化），
+	 * 绝不含 docType / version / status（后端 Update 契约不可变）。
 	 */
 	const handleUpdate = async (values: LegalDocumentFormValues) => {
 		if (!editingDoc) return;
@@ -181,7 +192,7 @@ export default function LegalDocumentsPage() {
 				title: values.title,
 				lang: values.lang,
 				content: values.content,
-				effective_at: values.effective_at?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
+				effectiveAt: values.effectiveAt?.format('YYYY-MM-DDTHH:mm:ssZ') || null,
 			});
 			message.success(t('legalDocuments.updateSuccess'));
 			closeModal();
@@ -236,8 +247,8 @@ export default function LegalDocumentsPage() {
 	const columns: DataTableProps<LegalDocumentItem>['columns'] = [
 		{
 			title: t('legalDocuments.column.docType'),
-			dataIndex: 'doc_type',
-			key: 'doc_type',
+			dataIndex: 'docType',
+			key: 'docType',
 			width: 120,
 			render: (v: string) => t(`legalDocuments.docType.${v}`, { defaultValue: v }),
 		},
@@ -273,8 +284,8 @@ export default function LegalDocumentsPage() {
 		},
 		{
 			title: t('legalDocuments.column.effectiveAt'),
-			dataIndex: 'effective_at',
-			key: 'effective_at',
+			dataIndex: 'effectiveAt',
+			key: 'effectiveAt',
 			width: 190,
 			render: (v: string | null) => v || '\u2014',
 		},
@@ -315,7 +326,7 @@ export default function LegalDocumentsPage() {
 			</div>
 
 			<Space wrap>
-				{/* doc_type 筛选：服务端透传（AC-010） */}
+				{/* docType 筛选：服务端透传（AC-010） */}
 				<Select
 					style={{ width: 200 }}
 					value={docTypeFilter}
@@ -386,11 +397,11 @@ export default function LegalDocumentsPage() {
 			>
 				<Form form={form} layout="vertical" onFinish={editingDoc ? handleUpdate : handleCreate}>
 					<Form.Item
-						name="doc_type"
+						name="docType"
 						label={t('legalDocuments.column.docType')}
 						rules={[{ required: true }]}
 					>
-						{/* 编辑时只读（AC-008）：doc_type 参与唯一键，禁止修改 */}
+						{/* 编辑时只读（AC-008）：docType 参与唯一键，禁止修改 */}
 						<Select
 							options={DOC_TYPE_OPTIONS}
 							disabled={!!editingDoc}
@@ -427,7 +438,7 @@ export default function LegalDocumentsPage() {
 						{/* content 为纯文本 TextArea（防 XSS，禁富文本渲染器） */}
 						<Input.TextArea rows={10} maxLength={100000} showCount />
 					</Form.Item>
-					<Form.Item name="effective_at" label={t('legalDocuments.column.effectiveAt')}>
+					<Form.Item name="effectiveAt" label={t('legalDocuments.column.effectiveAt')}>
 						<DatePicker showTime className="w-full" />
 					</Form.Item>
 				</Form>

@@ -14,48 +14,52 @@ import {
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
 
-import { apiClient, API_PATHS, extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractList, fromPageResult, toPageParams, useCurrentTenantId } from '@autional-cn/shared';
 import { adminUsers } from '@autional-cn/shared/generated/api';
 import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
 import dayjs from 'dayjs';
 
+// TASK-AB1-27（RC-5 契约收敛）：契约键直读（响应拦截器已 snake→camel），禁止 snake 直读。
+// wire 锚：service-tenant dto.go:390-403 MinorsProtectionConfigResponse 经拦截器 camel 化。
 interface MinorsProtectionConfig {
-	tenant_id: string;
-	daily_usage_limit_min: number;
-	night_mode_start: string;
-	night_mode_end: string;
-	night_mode_enabled: boolean;
-	monthly_spend_limit: number;
-	live_stream_blocked_under_16: boolean;
-	content_filter_enabled: boolean;
-	child_default_max_privacy: boolean;
-	minor_data_retention_days: number;
+	tenantId: string;
+	dailyUsageLimitMin: number;
+	nightModeStart: string;
+	nightModeEnd: string;
+	nightModeEnabled: boolean;
+	monthlySpendLimit: number;
+	liveStreamBlockedUnder16: boolean;
+	contentFilterEnabled: boolean;
+	childDefaultMaxPrivacy: boolean;
+	minorDataRetentionDays: number;
 }
 
+/** wire 锚：service-identity dto/user.go:272-296 AuthUserResponse（isMinor/ageGroup/pendingParentalConsent…）。 */
 interface MinorUser {
 	id: string;
-	tenant_id: string;
+	tenantId: string;
 	email: string;
 	phone: string;
 	username: string;
 	status: string;
-	is_minor: boolean;
-	age_group: string;
-	birth_date: string;
-	pending_parental_consent: boolean;
-	created_at: string;
+	isMinor: boolean;
+	ageGroup: string;
+	birthDate: string;
+	pendingParentalConsent: boolean;
+	createdAt: string;
 }
 
+/** wire 锚：service-identity dto/consent.go:25-36 ChildrenConsentResponse（userId/parentEmail/recordedAt…）。 */
 interface ConsentRecord {
 	id: string;
-	user_id: string;
-	parent_email: string;
-	parent_phone: string;
+	userId: string;
+	parentEmail: string;
+	parentPhone: string;
 	status: string;
 	verified: boolean;
 	method: string;
-	recorded_at: string;
-	verified_at?: string;
+	recordedAt: string;
+	verifiedAt?: string;
 }
 
 export default function MinorsProtectionPage() {
@@ -94,22 +98,23 @@ export default function MinorsProtectionPage() {
 	const loadConfig = async () => {
 		try {
 			const res = await apiClient.get(API_PATHS.TENANT.MINORS_PROTECTION(tenantId));
-			setConfig(res.data.data as MinorsProtectionConfig);
-			const d = res.data.data as MinorsProtectionConfig;
+			// DataResponse 信封已由拦截器解包 + 深 camel：res.data 即配置对象（契约直读）
+			const d = res.data as MinorsProtectionConfig;
+			setConfig(d);
 			form.setFieldsValue({
-				daily_usage_limit_min: d.daily_usage_limit_min,
-				monthly_spend_limit: d.monthly_spend_limit,
-				night_mode_enabled: d.night_mode_enabled,
-				night_mode_start: d.night_mode_start
-					? dayjs(d.night_mode_start, 'HH:mm')
+				dailyUsageLimitMin: d.dailyUsageLimitMin,
+				monthlySpendLimit: d.monthlySpendLimit,
+				nightModeEnabled: d.nightModeEnabled,
+				nightModeStart: d.nightModeStart
+					? dayjs(d.nightModeStart, 'HH:mm')
 					: dayjs('22:00', 'HH:mm'),
-				night_mode_end: d.night_mode_end
-					? dayjs(d.night_mode_end, 'HH:mm')
+				nightModeEnd: d.nightModeEnd
+					? dayjs(d.nightModeEnd, 'HH:mm')
 					: dayjs('06:00', 'HH:mm'),
-				live_stream_blocked_under_16: d.live_stream_blocked_under_16,
-				content_filter_enabled: d.content_filter_enabled,
-				child_default_max_privacy: d.child_default_max_privacy,
-				minor_data_retention_days: d.minor_data_retention_days,
+				liveStreamBlockedUnder16: d.liveStreamBlockedUnder16,
+				contentFilterEnabled: d.contentFilterEnabled,
+				childDefaultMaxPrivacy: d.childDefaultMaxPrivacy,
+				minorDataRetentionDays: d.minorDataRetentionDays,
 			});
 		} catch {
 			// 加载配置失败时保持默认设置
@@ -121,9 +126,12 @@ export default function MinorsProtectionPage() {
 	const loadUsers = async () => {
 		setUsersLoading(true);
 		try {
-			const res = await adminUsers({ is_minor: true, page_size: 100 } as any);
-			setUsers(extractList(res));
-			setUserTotal(extractItem(res)?.total || 0);
+			// 请求侧 camel 书面写（拦截器 snake 化）；分页经 toPageParams 单点。
+			// isMinor 过滤为后端实名参数（identity dto/user.go:59 form:"is_minor"），生成签名未收编故 as any 收窄。
+			const res = await adminUsers({ isMinor: true, ...toPageParams({ pageSize: 100 }) } as any);
+			const page = fromPageResult<MinorUser>(res);
+			setUsers(page.items);
+			setUserTotal(page.total);
 		} catch (err) {
 			handleApiError(err, t('compliance.minors.loadUsersFailed'));
 		} finally {
@@ -135,7 +143,7 @@ export default function MinorsProtectionPage() {
 		setConsentsLoading(true);
 		try {
 			const res = await apiClient.get(API_PATHS.IDENTITY.ADMIN_CONSENTS, {
-				params: { page_size: 100 },
+				params: toPageParams({ pageSize: 100 }),
 			});
 			setConsents(extractList(res.data));
 		} catch {
@@ -155,17 +163,17 @@ export default function MinorsProtectionPage() {
 		try {
 			const values = await form.validateFields();
 			setSaving(true);
+			// 提交侧 camel 书面写（拦截器 snake 化上 wire）
 			const payload: Record<string, unknown> = {};
-			payload.daily_usage_limit_min = values.daily_usage_limit_min;
-			payload.monthly_spend_limit = values.monthly_spend_limit;
-			payload.night_mode_enabled = values.night_mode_enabled;
-			payload.live_stream_blocked_under_16 = values.live_stream_blocked_under_16;
-			payload.content_filter_enabled = values.content_filter_enabled;
-			payload.child_default_max_privacy = values.child_default_max_privacy;
-			payload.minor_data_retention_days = values.minor_data_retention_days;
-			if (values.night_mode_start)
-				payload.night_mode_start = values.night_mode_start.format('HH:mm');
-			if (values.night_mode_end) payload.night_mode_end = values.night_mode_end.format('HH:mm');
+			payload.dailyUsageLimitMin = values.dailyUsageLimitMin;
+			payload.monthlySpendLimit = values.monthlySpendLimit;
+			payload.nightModeEnabled = values.nightModeEnabled;
+			payload.liveStreamBlockedUnder16 = values.liveStreamBlockedUnder16;
+			payload.contentFilterEnabled = values.contentFilterEnabled;
+			payload.childDefaultMaxPrivacy = values.childDefaultMaxPrivacy;
+			payload.minorDataRetentionDays = values.minorDataRetentionDays;
+			if (values.nightModeStart) payload.nightModeStart = values.nightModeStart.format('HH:mm');
+			if (values.nightModeEnd) payload.nightModeEnd = values.nightModeEnd.format('HH:mm');
 			await apiClient.put(API_PATHS.TENANT.MINORS_PROTECTION(tenantId), payload);
 			message.success(t('compliance.minors.saveSuccess'));
 			loadConfig();
@@ -188,8 +196,8 @@ export default function MinorsProtectionPage() {
 		{ title: t('compliance.minors.columnPhone'), dataIndex: 'phone', key: 'phone' },
 		{
 			title: t('compliance.minors.columnAgeGroup'),
-			dataIndex: 'age_group',
-			key: 'age_group',
+			dataIndex: 'ageGroup',
+			key: 'ageGroup',
 			render: (v: string) => (
 				<Tag color={v === 'under-14' ? 'red' : v === '14-16' ? 'orange' : 'blue'}>
 					{AGE_GROUP_LABELS[v] || v}
@@ -198,8 +206,8 @@ export default function MinorsProtectionPage() {
 		},
 		{
 			title: t('compliance.minors.columnParentalConsent'),
-			dataIndex: 'pending_parental_consent',
-			key: 'pending_parental_consent',
+			dataIndex: 'pendingParentalConsent',
+			key: 'pendingParentalConsent',
 			render: (v: boolean) =>
 				v ? (
 					<Tag color="orange">{t('compliance.minors.pendingVerification')}</Tag>
@@ -210,8 +218,8 @@ export default function MinorsProtectionPage() {
 		{ title: t('compliance.minors.columnStatus'), dataIndex: 'status', key: 'status' },
 		{
 			title: t('compliance.minors.columnCreatedAt'),
-			dataIndex: 'created_at',
-			key: 'created_at',
+			dataIndex: 'createdAt',
+			key: 'createdAt',
 			width: 180,
 		},
 	];
@@ -236,7 +244,7 @@ export default function MinorsProtectionPage() {
 					<Card>
 						<Statistic
 							title={t('compliance.minors.dailyLimit')}
-							value={config?.daily_usage_limit_min || 0}
+							value={config?.dailyUsageLimitMin || 0}
 							suffix={t('compliance.minors.minutes')}
 						/>
 					</Card>
@@ -246,8 +254,8 @@ export default function MinorsProtectionPage() {
 						<Statistic
 							title={t('compliance.minors.curfew')}
 							value={
-								config?.night_mode_enabled
-									? `${config.night_mode_start}-${config.night_mode_end}`
+								config?.nightModeEnabled
+									? `${config.nightModeStart}-${config.nightModeEnd}`
 									: t('compliance.minors.curfewOff')
 							}
 							prefix={<SafetyCertificateOutlined />}
@@ -268,14 +276,14 @@ export default function MinorsProtectionPage() {
 								<SectionCard title={t('compliance.minors.sectionAntiAddiction')}>
 									<Form form={form} layout="vertical" className="max-w-[600px]">
 										<Form.Item
-											name="daily_usage_limit_min"
+											name="dailyUsageLimitMin"
 											label={t('compliance.minors.dailyUsageLimit')}
 											tooltip={t('compliance.minors.dailyUsageTooltip')}
 										>
 											<InputNumber min={0} max={1440} className="w-full" />
 										</Form.Item>
 										<Form.Item
-											name="night_mode_enabled"
+											name="nightModeEnabled"
 											label={t('compliance.minors.enableCurfew')}
 											valuePropName="checked"
 										>
@@ -283,20 +291,20 @@ export default function MinorsProtectionPage() {
 										</Form.Item>
 										<Form.Item
 											shouldUpdate={(prev, cur) =>
-												prev.night_mode_enabled !== cur.night_mode_enabled
+												prev.nightModeEnabled !== cur.nightModeEnabled
 											}
 										>
 											{({ getFieldValue }) =>
-												getFieldValue('night_mode_enabled') ? (
+												getFieldValue('nightModeEnabled') ? (
 													<Space>
 														<Form.Item
-															name="night_mode_start"
+															name="nightModeStart"
 															label={t('compliance.minors.curfewStart')}
 														>
 															<TimePicker format="HH:mm" />
 														</Form.Item>
 														<Form.Item
-															name="night_mode_end"
+															name="nightModeEnd"
 															label={t('compliance.minors.curfewEnd')}
 														>
 															<TimePicker format="HH:mm" />
@@ -311,21 +319,21 @@ export default function MinorsProtectionPage() {
 								<SectionCard title={t('compliance.minors.sectionSpending')} className="mt-4">
 									<Form form={form} layout="vertical" className="max-w-[600px]">
 										<Form.Item
-											name="monthly_spend_limit"
+											name="monthlySpendLimit"
 											label={t('compliance.minors.monthlySpendLimit')}
 											tooltip={t('compliance.minors.monthlySpendTooltip')}
 										>
 											<InputNumber min={0} className="w-full" />
 										</Form.Item>
 										<Form.Item
-											name="live_stream_blocked_under_16"
+											name="liveStreamBlockedUnder16"
 											label={t('compliance.minors.blockLiveUnder16')}
 											valuePropName="checked"
 										>
 											<Switch />
 										</Form.Item>
 										<Form.Item
-											name="content_filter_enabled"
+											name="contentFilterEnabled"
 											label={t('compliance.minors.enableContentFilter')}
 											valuePropName="checked"
 										>
@@ -337,14 +345,14 @@ export default function MinorsProtectionPage() {
 								<SectionCard title={t('compliance.minors.sectionPrivacy')} className="mt-4">
 									<Form form={form} layout="vertical" className="max-w-[600px]">
 										<Form.Item
-											name="child_default_max_privacy"
+											name="childDefaultMaxPrivacy"
 											label={t('compliance.minors.defaultMaxPrivacy')}
 											valuePropName="checked"
 										>
 											<Switch />
 										</Form.Item>
 										<Form.Item
-											name="minor_data_retention_days"
+											name="minorDataRetentionDays"
 											label={t('compliance.minors.dataRetentionDays')}
 										>
 											<InputNumber min={30} max={3650} className="w-full" />
@@ -395,15 +403,15 @@ export default function MinorsProtectionPage() {
 								columns={[
 									{
 										title: t('compliance.minors.columnUserId'),
-										dataIndex: 'user_id',
-										key: 'user_id',
+										dataIndex: 'userId',
+										key: 'userId',
 										width: 200,
 										ellipsis: true,
 									},
 									{
 										title: t('compliance.minors.parentEmail'),
-										dataIndex: 'parent_email',
-										key: 'parent_email',
+										dataIndex: 'parentEmail',
+										key: 'parentEmail',
 									},
 									{
 										title: t('compliance.minors.verificationMethod'),
@@ -429,8 +437,8 @@ export default function MinorsProtectionPage() {
 									},
 									{
 										title: t('compliance.minors.recordTime'),
-										dataIndex: 'recorded_at',
-										key: 'recorded_at',
+										dataIndex: 'recordedAt',
+										key: 'recordedAt',
 										width: 180,
 									},
 								]}

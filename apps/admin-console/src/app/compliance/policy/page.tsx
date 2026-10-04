@@ -44,12 +44,16 @@ interface ControlItem {
 	tags: string[];
 }
 
+// TASK-AB1-27（RC-5 契约收敛）：契约类型 camel 直读（响应拦截器深 camel 化，禁 snake 直读）。
+// wire 锚：service-compliance/internal/handler/dto/compliance_engine_dto.go:40-47（ResolvedParamItem）
+// / :59-69（ParameterGapItem）/ :83-92（ReadinessReportResponse）/ :98-104（OverrideItem）
+
 interface ResolvedParam {
 	value: any;
 	source: string[];
-	merge_rule: string;
+	mergeRule: string;
 	overridden: boolean;
-	override_value?: any;
+	overrideValue?: any;
 	severity: string;
 }
 
@@ -61,7 +65,7 @@ interface GapItem {
 	compliant: boolean;
 	severity: string;
 	standard?: string;
-	control_ref?: string;
+	controlRef?: string;
 	description?: string;
 }
 
@@ -69,17 +73,17 @@ interface OverrideItem {
 	parameter: string;
 	value: any;
 	reason: string;
-	created_by: string;
-	created_at: string;
+	createdBy: string;
+	createdAt: string;
 }
 
 interface ReadinessItem {
-	standard_id: string;
-	standard_name: string;
-	total_controls: number;
-	passed_controls: number;
-	compliance_rate: number;
-	ready_for_audit: boolean;
+	standardId: string;
+	standardName: string;
+	totalControls: number;
+	passedControls: number;
+	complianceRate: number;
+	readyForAudit: boolean;
 	recommendations: string[];
 }
 
@@ -321,7 +325,7 @@ export default function CompliancePolicyPage() {
 									dataIndex: 'value',
 									render: (v: any) => String(v),
 								},
-								{ title: t('compliance.policy.mergeRule'), dataIndex: 'merge_rule', width: 100 },
+								{ title: t('compliance.policy.mergeRule'), dataIndex: 'mergeRule', width: 100 },
 								{
 									title: t('compliance.policy.sourceStandards'),
 									dataIndex: 'source',
@@ -462,7 +466,7 @@ export default function CompliancePolicyPage() {
 									render: (v: any) => <Tag color="green">{String(v)}</Tag>,
 								},
 								{ title: t('compliance.policy.reason'), dataIndex: 'reason' },
-								{ title: t('compliance.policy.setTime'), dataIndex: 'created_at', width: 180 },
+								{ title: t('compliance.policy.setTime'), dataIndex: 'createdAt', width: 180 },
 								{
 									title: t('common.actions'),
 									width: 80,
@@ -549,22 +553,22 @@ export default function CompliancePolicyPage() {
 													<Col span={6}>
 														<Statistic
 															title={t('compliance.policy.readinessRate')}
-															value={Math.round(r.compliance_rate)}
+															value={Math.round(r.complianceRate)}
 															suffix="%"
 														/>
 													</Col>
 													<Col span={6}>
 														<Statistic
 															title={t('compliance.policy.passed')}
-															value={r.passed_controls}
-															suffix={`/ ${r.total_controls}`}
+															value={r.passedControls}
+															suffix={`/ ${r.totalControls}`}
 														/>
 													</Col>
 													<Col span={6}>
 														<Statistic
 															title={t('compliance.policy.auditable')}
 															value={
-																r.ready_for_audit
+																r.readyForAudit
 																	? t('compliance.policy.yes')
 																	: t('compliance.policy.no')
 															}
@@ -573,9 +577,9 @@ export default function CompliancePolicyPage() {
 													<Col span={6}>
 														<Progress
 															type="circle"
-															percent={Math.round(r.compliance_rate)}
+															percent={Math.round(r.complianceRate)}
 															size={60}
-															status={r.ready_for_audit ? 'success' : 'normal'}
+															status={r.readyForAudit ? 'success' : 'normal'}
 														/>
 													</Col>
 												</Row>

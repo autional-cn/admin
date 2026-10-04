@@ -44,17 +44,20 @@ describe('useUsers', () => {
 		const { result } = renderHook(() => useUsers({ search: 'ali' }), { wrapper: createWrapper() });
 
 		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-		// useUsers 会做 snake→camel 归一 + 默认值填充（未映射字段回退空串/must_change）
-		expect(result.current.data).toEqual([
-			{
-				id: '1',
-				username: 'alice',
-				email: '',
-				status: '',
-				createdAt: '',
-				passwordStatus: 'must_change',
-			},
-		]);
+		// TASK-AB1-17 起：列表返回 { items, total }（H008 分页单点）；默认值填充（未映射字段回退空串/must_change）
+		expect(result.current.data).toEqual({
+			items: [
+				{
+					id: '1',
+					username: 'alice',
+					email: '',
+					status: '',
+					createdAt: '',
+					passwordStatus: 'must_change',
+				},
+			],
+			total: 0,
+		});
 	});
 });
 

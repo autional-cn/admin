@@ -96,11 +96,13 @@ export default function AuditAnomaliesPage() {
 	// Comments
 	const [newComment, setNewComment] = useState('');
 
+	// TASK-AB1-27（RC-5 契约收敛）：查询参数 camel 书面写（拦截器 snake 化上 wire）。
+	// wire 锚：service-audit/internal/handler/dto/dto.go:373（form time_range）
 	const params: Record<string, unknown> = { ...pagination };
 	if (severity) params.severity = severity;
 	if (status) params.status = status;
 	if (type) params.type = type;
-	if (timeRange) params.time_range = timeRange;
+	if (timeRange) params.timeRange = timeRange;
 
 	const isRestricted = useIsAuditRestricted();
 	const { data, isLoading, refetch, error } = useAnomalies(params);
@@ -155,8 +157,9 @@ export default function AuditAnomaliesPage() {
 
 	const handleDetect = useCallback(async () => {
 		try {
+			// wire 锚：service-audit/internal/handler/dto/dto.go:855（json time_range，detect body）
 			const payload: Record<string, string> = {};
-			if (timeRange) payload.time_range = timeRange;
+			if (timeRange) payload.timeRange = timeRange;
 			await detectMut.mutateAsync(payload);
 			message.success(t('auditAnomalies.detectSuccess'));
 			refetch();
@@ -252,7 +255,7 @@ export default function AuditAnomaliesPage() {
 		},
 		{
 			title: t('auditAnomalies.column.action'),
-			key: 'action_col',
+			key: 'actionCol',
 			width: 360,
 			render: (_: any, record: any) => (
 				<Space size="small" wrap>

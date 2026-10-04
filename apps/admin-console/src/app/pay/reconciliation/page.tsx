@@ -30,9 +30,11 @@ export default function PayReconciliationPage() {
 		filters.startDate && filters.endDate ? [filters.startDate, filters.endDate] : null;
 
 	const params: Record<string, unknown> = {};
+	// TASK-AB1-27（RC-5 契约收敛）：查询参数 camel 书面写（拦截器 snake 化上 wire）。
+	// wire 锚：service-pay/internal/handler/dto/dto.go:157-161（GetReconciliationRequest form start_date/end_date）
 	if (filters.channel) params.channel = filters.channel;
-	if (filters.startDate) params.start_date = filters.startDate;
-	if (filters.endDate) params.end_date = filters.endDate;
+	if (filters.startDate) params.startDate = filters.startDate;
+	if (filters.endDate) params.endDate = filters.endDate;
 
 	const { data: records = [], isLoading, error, refetch } = usePayReconciliation(tenantId, params);
 	const { mutate: runReconciliation, isPending: isRunning } = useRunPayReconciliation();

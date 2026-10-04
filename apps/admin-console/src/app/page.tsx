@@ -44,11 +44,12 @@ const DashboardPage = memo(function DashboardPage() {
 	}, [timeRange]);
 
 	const {
-		data: users = [],
+		data: usersResult,
 		isLoading: usersLoading,
 		error: usersError,
 		refetch: usersRefetch,
-	} = useUsers({ limit: 200 });
+	} = useUsers({ page: 1, pageSize: 200 });
+	const users = usersResult?.items ?? [];
 	const {
 		data: activeSessions = 0,
 		isLoading: sessionsLoading,
@@ -56,7 +57,7 @@ const DashboardPage = memo(function DashboardPage() {
 		refetch: activeSessionsRefetch,
 	} = useActiveSessions();
 	const {
-		data: roles = [],
+		data: rolesResult,
 		isLoading: rolesLoading,
 		error: rolesError,
 		refetch: rolesRefetch,
@@ -75,7 +76,8 @@ const DashboardPage = memo(function DashboardPage() {
 	const statsLoading = usersLoading || sessionsLoading || rolesLoading || auditLoading;
 
 	const totalUsers = summary.memberCount;
-	const roleCount = roles.length;
+	// TASK-AB1-18：useRoles 返回 { items, total }（服务端分页结果），总数直接取 total（不再取首页数组长度）。
+	const roleCount = rolesResult?.total ?? 0;
 	const auditAlerts = auditStats?.alerts ?? auditStats?.pending ?? 0;
 
 	const todayStart = new Date();
@@ -294,9 +296,9 @@ const DashboardPage = memo(function DashboardPage() {
 											<FileTextOutlined className="text-neutral-500" />
 											<span className="text-sm">{item.title}</span>
 										</div>
-										<span className="text-xs text-neutral-500">
-											{item.publish_at
-												? new Date(item.publish_at).toLocaleDateString('zh-CN')
+										<span className="text-xs text-neutral-600">
+											{item.publishAt
+												? new Date(item.publishAt).toLocaleDateString('zh-CN')
 												: '-'}
 										</span>
 									</div>

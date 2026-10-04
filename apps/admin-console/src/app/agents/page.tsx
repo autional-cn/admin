@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
-import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Popconfirm, Skeleton } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug, useCurrentTenantId, extractList, extractItem } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -18,19 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
+import type { AgentInfo, CreateAgentRequest } from '@autional-cn/shared/generated/types';
 
-
-interface AgentRecord {
-	id: string;
-	name: string;
-	description: string;
-	workload_subtype: string;
-	status: string;
-	owner_name: string;
-	rotation_days: number;
-	jit_ttl: string;
-	created_at: string;
-}
+/** 列表行 = 生成契约 AgentInfo（identity_id / rotation_days / jit_ttl 等经拦截器深 camel；列表 id 即 identityId）。 */
+type AgentRecord = AgentInfo;
 
 const SUBTYPE_LABELS: Record<string, string> = {
 	agent: 'Agent',
@@ -61,26 +52,13 @@ function formatDate(iso: string): string {
 }
 
 async function fetchAgents(): Promise<AgentRecord[]> {
-	const res = await adminAgents();
-	const data = res?.data ?? res;
-	const items = (data as any)?.items ?? (Array.isArray(data) ? data : []);
-	// API 返回 camelCase（workloadSubtype/ownerName/rotationDays/createdAt），映射为接口 snake_case
-	return (items as Record<string, unknown>[]).map((d) => ({
-		id: (d.identityId ?? d.id ?? d.identity_id ?? '') as string,
-		name: (d.name as string) || '',
-		description: (d.description as string) || '',
-		workload_subtype: (d.workloadSubtype ?? d.workload_subtype ?? '') as string,
-		status: (d.status as string) || '',
-		owner_name: (d.ownerId ?? d.owner_id ?? d.ownerName ?? d.owner_name ?? '') as string,
-		rotation_days: (d.rotationDays ?? d.rotation_days ?? 0) as number,
-		jit_ttl: (d.jitTtl ?? d.jit_ttl ?? '') as string,
-		created_at: (d.createdAt ?? d.created_at ?? '') as string,
-	}));
+	// TASK-AB1-20 / A-74：形状适配单点（extractList 解包 + 契约 camel 字段直读），删除双读兼容分支。
+	return extractList<AgentRecord>(await adminAgents());
 }
 
-async function createAgent(values: Record<string, unknown>): Promise<AgentRecord> {
-	const res = await adminAgentsPost(values as any);
-	return res?.data ?? res;
+async function createAgent(values: CreateAgentRequest): Promise<AgentRecord | null> {
+	// TASK-AB1-20 / A-74：去类型断言 —— camel 书面键经拦截器 snake 化上 wire（rotation_days / jit_ttl 为 number）。
+	return extractItem<AgentRecord>(await adminAgentsPost(values));
 }
 
 async function deleteAgent(id: string): Promise<void> {
@@ -118,7 +96,7 @@ export default function AgentsPage() {
 		onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.agents.all(tenantId) }),
 	});
 
-	const handleCreate = async (values: Record<string, unknown>) => {
+	const handleCreate = async (values: CreateAgentRequest) => {
 		try {
 			await createMut.mutateAsync(values);
 			message.success(t('agents.createSuccess'));
@@ -144,15 +122,18 @@ export default function AgentsPage() {
 			dataIndex: 'name',
 			key: 'name',
 			render: (v: string, record: AgentRecord) => (
-				<a onClick={() => navigate(buildNavHref(`/agents/${record.id}`, tenantSlug))} className="font-medium">
+				<a
+					onClick={() => navigate(buildNavHref(`/agents/${record.identityId ?? ''}`, tenantSlug))}
+					className="font-medium"
+				>
 					{v}
 				</a>
 			),
 		},
 		{
 			title: t('agents.column.subtype'),
-			dataIndex: 'workload_subtype',
-			key: 'workload_subtype',
+			dataIndex: 'workloadSubtype',
+			key: 'workloadSubtype',
 			render: (v: string) => (
 				<Tag color={SUBTYPE_COLORS[v] || 'default'}>
 					{t(`agents.type.${v}`, { defaultValue: SUBTYPE_LABELS[v] || v || '-' })}
@@ -171,15 +152,15 @@ export default function AgentsPage() {
 		},
 		{
 			title: t('agents.column.owner'),
-			dataIndex: 'owner_name',
-			key: 'owner_name',
+			dataIndex: 'ownerId',
+			key: 'ownerId',
 			render: (v: string) => v || '-',
 		},
 		{
 			title: t('agents.column.created'),
-			dataIndex: 'created_at',
-			key: 'created_at',
-			render: (v: string) => formatDate(v),
+			dataIndex: 'createdAt',
+			key: 'createdAt',
+			render: (v: string | undefined) => formatDate(v ?? ''),
 		},
 		{
 			title: t('agents.column.actions'),
@@ -191,7 +172,7 @@ export default function AgentsPage() {
 						icon={<EditOutlined />}
 						onClick={(e) => {
 							e.stopPropagation();
-							navigate(buildNavHref(`/agents/${record.id}`, tenantSlug));
+							navigate(buildNavHref(`/agents/${record.identityId ?? ''}`, tenantSlug));
 						}}
 					>
 						{t('common.edit')}
@@ -199,7 +180,7 @@ export default function AgentsPage() {
 					<Popconfirm
 						title={t('agents.confirmDelete')}
 						description={t('agents.deleteWarning')}
-						onConfirm={() => handleDelete(record.id)}
+						onConfirm={() => handleDelete(record.identityId ?? '')}
 						okText={t('common.delete')}
 						okButtonProps={{ danger: true }}
 						cancelText={t('common.cancel')}
@@ -271,13 +252,13 @@ export default function AgentsPage() {
 
 			{!isLoading && !error && agents.length > 0 && (
 				<DataTable
-					rowKey="id"
+					rowKey="identityId"
 					columns={columns}
 					dataSource={agents}
 					pagination={{ pageSize: 10 }}
 					scroll={{ x: 800 }}
 					onRow={(record) => ({
-						onClick: () => navigate(buildNavHref(`/agents/${record.id}`, tenantSlug)),
+						onClick: () => navigate(buildNavHref(`/agents/${record.identityId ?? ''}`, tenantSlug)),
 						style: { cursor: 'pointer' },
 					})}
 				/>
@@ -303,7 +284,7 @@ export default function AgentsPage() {
 						<Input.TextArea rows={3} placeholder={t('agents.form.descPlaceholder')} />
 					</Form.Item>
 					<Form.Item
-						name="workload_subtype"
+						name="workloadSubtype"
 						label={t('agents.form.subtype')}
 						rules={[{ required: true }]}
 						initialValue="agent"
@@ -316,11 +297,20 @@ export default function AgentsPage() {
 							]}
 						/>
 					</Form.Item>
-					<Form.Item name="rotation_days" label={t('agents.form.rotationDays')} initialValue={90}>
-						<Input type="number" placeholder="90" />
+					<Form.Item name="rotationDays" label={t('agents.form.rotationDays')} initialValue={90}>
+						{/* TASK-AB1-20 / A-74：InputNumber（value 恒 number）；范围对齐后端 binding omitempty,min=1,max=3650 */}
+						<InputNumber min={1} max={3650} placeholder="90" className="w-full" />
 					</Form.Item>
-					<Form.Item name="jit_ttl" label="JIT TTL" initialValue="1h">
-						<Input placeholder="1h, 30m, 5m" />
+					<Form.Item name="jitTtl" label="JIT TTL" initialValue={3600}>
+						{/* TASK-AB1-20 / A-74：Select 秒值选项（后端 jit_ttl int seconds, min=60）；提交值为 number */}
+						<Select
+							options={[
+								{ value: 300, label: '5m' },
+								{ value: 900, label: '15m' },
+								{ value: 1800, label: '30m' },
+								{ value: 3600, label: '1h' },
+							]}
+						/>
 					</Form.Item>
 				</Form>
 			</Modal>

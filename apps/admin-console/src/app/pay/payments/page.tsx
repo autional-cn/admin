@@ -31,10 +31,12 @@ export default function PayPaymentsPage() {
 
 	const params = useMemo(() => {
 		const p: Record<string, unknown> = {};
+		// TASK-AB1-27（RC-5 契约收敛）：查询参数 camel 书面写（拦截器 snake 化上 wire）。
+		// wire 锚：service-pay/internal/handler/dto/dto.go:152（channel_code）/ :159-160（form start_date/end_date）
 		if (filters.status) p.status = filters.status;
-		if (filters.channel) p.channel_code = filters.channel;
-		if (filters.startDate) p.start_date = filters.startDate;
-		if (filters.endDate) p.end_date = filters.endDate;
+		if (filters.channel) p.channelCode = filters.channel;
+		if (filters.startDate) p.startDate = filters.startDate;
+		if (filters.endDate) p.endDate = filters.endDate;
 		if (searchText) p.search = searchText;
 		return p;
 	}, [filters, searchText]);

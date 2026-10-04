@@ -10,21 +10,15 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import type { AuthPolicyResponse, UpdateAuthPolicyRequest } from '@autional-cn/shared/generated/types';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
-interface AuthPolicyMFA {
-	mfaEnabled?: boolean;
-	mfaEnforceForAll?: boolean;
-	mfaEnforceForHighRisk?: boolean;
-	mfaEnforceForNewDevice?: boolean;
-	mfaMethods?: string;
-}
-
 type MFAMode = 'required' | 'optional' | 'disabled';
 
-/** 后端 auth_policies 字段 → 表单字段（apiClient 响应已转 camelCase） */
-function policyToForm(p: AuthPolicyMFA | undefined): {
+/** 后端 auth_policies 字段 → 表单字段（契约类型直读：AuthPolicyResponse 已被拦截器深 camel 化）。
+ *  wire 锚：service-tenant/internal/domain/auth_policy.go:14-16/53/55（mfa_enabled/mfa_enforce_* json tag） */
+function policyToForm(p: AuthPolicyResponse | undefined): {
 	mode: MFAMode;
 	methods: string[];
 	highRiskRequired: boolean;
@@ -52,21 +46,21 @@ function policyToForm(p: AuthPolicyMFA | undefined): {
 	};
 }
 
-/** 表单字段 → 后端 auth_policies 字段（部分更新） */
+/** 表单字段 → 后端 auth_policies 字段（部分更新；camel 书面写，拦截器 snake 化上 wire） */
 function formToPolicy(values: {
 	mode: MFAMode;
 	methods: string[];
 	highRiskRequired: boolean;
 	newDeviceRequired: boolean;
-}): Record<string, unknown> {
-	const payload: Record<string, unknown> = {
-		mfa_enforce_for_high_risk: values.highRiskRequired,
-		mfa_enforce_for_new_device: values.newDeviceRequired,
+}): UpdateAuthPolicyRequest {
+	const payload: UpdateAuthPolicyRequest = {
+		mfaEnforceForHighRisk: values.highRiskRequired,
+		mfaEnforceForNewDevice: values.newDeviceRequired,
 	};
-	// mode: disabled → mfa_enabled=false; optional → on + enforce_for_all=false; required → on + enforce_for_all=true
-	payload.mfa_enabled = values.mode !== 'disabled';
-	payload.mfa_enforce_for_all = values.mode === 'required';
-	payload.mfa_methods = JSON.stringify(values.methods);
+	// mode: disabled → mfaEnabled=false; optional → on + enforceForAll=false; required → on + enforceForAll=true
+	payload.mfaEnabled = values.mode !== 'disabled';
+	payload.mfaEnforceForAll = values.mode === 'required';
+	payload.mfaMethods = JSON.stringify(values.methods);
 	return payload;
 }
 
@@ -79,13 +73,13 @@ export default function MFAPolicyPage() {
 		queryKey: queryKeys.security.mfaPolicy,
 		queryFn: async () => {
 			const res = await getAuthPolicy(tenantId);
-			return extractItem<AuthPolicyMFA>(res) ?? {};
+			return extractItem<AuthPolicyResponse>(res) ?? {};
 		},
 		enabled: !!tenantId,
 	});
 
 	const updateMut = useMutation({
-		mutationFn: (data: Record<string, unknown>) => updateAuthPolicy(tenantId, data),
+		mutationFn: (data: UpdateAuthPolicyRequest) => updateAuthPolicy(tenantId, data),
 		onSuccess: () => {
 			message.success(t('mfa.saveSuccess'));
 		},
