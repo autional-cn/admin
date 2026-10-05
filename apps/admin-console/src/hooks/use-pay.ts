@@ -60,8 +60,6 @@ export interface ReconciliationRecord {
 
 export interface RefundRecord {
 	id: string;
-	// 支付详情页签（A-342）遗留键兼容：值 = id；该页签列/行键仍以 refundId 命名（随批 4 收敛）
-	refundId?: string;
 	paymentId: string;
 	status: string;
 	amount: string;
@@ -125,7 +123,8 @@ export function usePayReceipt(id: string) {
 
 // W2-01（A-352/A-353）：数据源 = GET /pay/v1/admin/refunds（pay_refund_records 单源，与写链同源）；
 // status 入 queryKey（筛选触发新请求）。支付详情页签（A-342）传 payment_id 时按支付单本地过滤
-// （admin 端点为租户级，无 payment_id 参数）；refundId 为遗留键兼容别名（= id）。
+// （admin 端点为租户级，无 payment_id 参数）。
+// W4-05（U400①/RC-B4-06）：退款记录遗留键别名与 map 已移除——消费面一律使用契约真键 `id`。
 export function usePayRefunds(params?: Record<string, unknown>) {
 	const status = typeof params?.status === 'string' ? params.status : undefined;
 	const paymentId = typeof params?.payment_id === 'string' ? params.payment_id : undefined;
@@ -133,9 +132,7 @@ export function usePayRefunds(params?: Record<string, unknown>) {
 		queryKey: queryKeys.pay.refunds(params),
 		queryFn: async () => {
 			const res = await listAdminRefunds({ status });
-			return extractList<RefundRecord>(res)
-				.filter((r) => !paymentId || r.paymentId === paymentId)
-				.map((r) => ({ ...r, refundId: r.id }));
+			return extractList<RefundRecord>(res).filter((r) => !paymentId || r.paymentId === paymentId);
 		},
 	});
 }

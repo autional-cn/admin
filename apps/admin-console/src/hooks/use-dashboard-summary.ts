@@ -12,7 +12,11 @@ import { queryKeys } from '@/lib/query-keys';
 export interface TenantSummary {
 	tenantName: string;
 	memberCount: number;
-	rolesCount: number;
+	/**
+	 * 角色数：未就绪（loading/error）为 undefined —— RC-B4-01 修「假 0」：
+	 * 消费侧必须按 classifyQueryState 三态渲染（forbidden/error 不显数值），不得 `?? 0` 兜底。
+	 */
+	rolesCount?: number;
 	activeSessionsCount: number;
 	apiKeysCount: number;
 	secretsCount: number;
@@ -46,8 +50,9 @@ export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
 	const memberCount = typeof memberTotal === 'number' ? memberTotal : 0;
 
 	// TASK-AB1-18：useRoles 改返回 { items, total }（服务端分页结果），总数直接取 total。
+	// RC-B4-01：不再 `?? 0` —— error/未就绪时保持 undefined，由消费侧按三态渲染（假 0 根因锁）。
 	const { data: rolesData } = useRoles();
-	const rolesCount = rolesData?.total ?? 0;
+	const rolesCount = rolesData?.total;
 
 	const { data: activeSessions } = useActiveSessions();
 

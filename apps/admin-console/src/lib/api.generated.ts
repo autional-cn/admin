@@ -846,3 +846,12 @@ export const generateBackupCodes = Generated.mfaBackupCodesGeneratePost;
 
 // ============ Profile (developer-portal merge) ============
 export const uploadAvatar = Generated.profilesAvatarUploadByProfilesPost;
+
+// ============ Settings 自助三通道（W2-04 / A-437 · Q-06）============
+// 别名增补（生成物已含 self 通道函数；settings 页统一从本文件取接口以避免散落引用）。
+// 旧缺陷：保存资料走 admin 端点 updateUser（恒含非空 email → 61002205 必败）；正确通道 = 以下 self 面。
+export const updateMyProfile = Generated.authMePut; // PUT /identity/api/v1/auth/me（username）
+export const requestEmailChange = Generated.authMeEmailChangePost; // POST .../auth/me/email/change
+export const verifyEmailChange = Generated.authMeEmailVerifyPost; // POST .../auth/me/email/verify
+export const cancelEmailChange = Generated.authMeEmailChangeCancelPost; // POST .../auth/me/email/change/cancel
+export const updateMyAvatar = Generated.profilesAvatarByProfilesPut; // PUT /profile/api/v1/profiles/{user_id}/avatar

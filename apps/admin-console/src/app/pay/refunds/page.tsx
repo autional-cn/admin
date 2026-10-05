@@ -31,7 +31,7 @@ export default function PayRefundsPage() {
 
 	const columns = [
 		{
-			title: t('payRefunds.refundId'),
+			title: t('payRefunds.refundRecordId'),
 			dataIndex: 'id',
 			key: 'id',
 			ellipsis: true,
@@ -136,7 +136,7 @@ export default function PayRefundsPage() {
 			>
 				{selected && (
 					<Descriptions column={1} bordered size="small">
-						<Descriptions.Item label={t('payRefunds.refundId')}>{selected.id}</Descriptions.Item>
+						<Descriptions.Item label={t('payRefunds.refundRecordId')}>{selected.id}</Descriptions.Item>
 						<Descriptions.Item label={t('payRefunds.paymentId')}>
 							{selected.paymentId}
 						</Descriptions.Item>

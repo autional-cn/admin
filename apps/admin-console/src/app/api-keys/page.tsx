@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Empty, Spin } from 'antd';
-import { PlusOutlined, DeleteOutlined, SyncOutlined, KeyOutlined } from '@ant-design/icons';
+import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Empty, Spin, Typography } from 'antd';
+import { PlusOutlined, DeleteOutlined, SyncOutlined, CopyOutlined } from '@ant-design/icons';
 import { message } from '@/lib/antd-app';
 import { useTranslation } from 'react-i18next';
 import {
@@ -22,6 +22,8 @@ const { Option } = Select;
 export default function ApiKeysPage() {
 	const { t } = useTranslation();
 	const [modalVisible, setModalVisible] = useState(false);
+	// A-49（RC-B4-02）：一次性密钥展示框 —— wire 键 = rawKey（顶层，信封已由拦截器解包），仅返回一次。
+	const [revealedKey, setRevealedKey] = useState<string | null>(null);
 	const [form] = Form.useForm();
 
 	const { data = [], isLoading, error, refetch } = useApiKeys();
@@ -29,6 +31,16 @@ export default function ApiKeysPage() {
 	const deleteMut = useDeleteApiKey();
 	const rotateMut = useRotateApiKey();
 	const statusMut = useUpdateApiKeyStatus();
+
+	const handleCopyKey = async () => {
+		if (!revealedKey) return;
+		try {
+			await navigator.clipboard.writeText(revealedKey);
+			message.success(t('apiKeys.copied'));
+		} catch {
+			message.error(t('apiKeys.copyFailed'));
+		}
+	};
 
 	const handleCreate = async (values: any) => {
 		try {
@@ -39,14 +51,11 @@ export default function ApiKeysPage() {
 			};
 			if (values.expiresInDays) payload.expiresInDays = values.expiresInDays;
 			const res = await createMut.mutateAsync(payload);
-			const result = res as any;
-			if (result?.data?.key || result?.key) {
-				const key = result.data?.key || result.key;
-				message.success(t('apiKeys.createSuccess'));
-				message.info(`${t('apiKeys.copyKeyHint')}: ${key}`);
-			} else {
-				message.success(t('apiKeys.createSuccess'));
-			}
+			// A-49：旧判键 `result?.data?.key || result?.key` 恒 false（wire 键 = rawKey）→ 凭据原文丢失。
+			// rawKey 缺失时降级为原成功 toast（不崩、不伪造展示）。
+			const rawKey = (res as { rawKey?: string } | undefined)?.rawKey;
+			message.success(t('apiKeys.createSuccess'));
+			if (typeof rawKey === 'string' && rawKey) setRevealedKey(rawKey);
 			setModalVisible(false);
 			form.resetFields();
 		} catch (err) {
@@ -66,14 +75,9 @@ export default function ApiKeysPage() {
 	const handleRotate = async (id: string) => {
 		try {
 			const res = await rotateMut.mutateAsync(id);
-			const result = res as any;
-			if (result?.data?.key || result?.key) {
-				const key = result.data?.key || result.key;
-				message.success(t('apiKeys.rotateSuccess'));
-				message.info(`${t('apiKeys.copyKeyHint')}: ${key}`);
-			} else {
-				message.success(t('apiKeys.rotateSuccess'));
-			}
+			const rawKey = (res as { rawKey?: string } | undefined)?.rawKey;
+			message.success(t('apiKeys.rotateSuccess'));
+			if (typeof rawKey === 'string' && rawKey) setRevealedKey(rawKey);
 		} catch (err) {
 			handleApiError(err, t('apiKeys.rotateFailed'));
 		}
@@ -216,6 +220,34 @@ export default function ApiKeysPage() {
 						<Input type="number" min={1} placeholder={t('apiKeys.form.expiresInDaysPlaceholder')} />
 					</Form.Item>
 				</Form>
+			</Modal>
+
+			{/* A-49：一次性凭据展示框（仅显示一次 + 复制）——不再用瞬态 toast 传递凭据。 */}
+			<Modal
+				title={t('apiKeys.newKeyTitle')}
+				open={revealedKey !== null}
+				onCancel={() => setRevealedKey(null)}
+				footer={
+					<Button type="primary" onClick={() => setRevealedKey(null)}>
+						{t('common.confirm')}
+					</Button>
+				}
+				destroyOnClose
+			>
+				<Typography.Paragraph type="warning" className="mb-3">
+					{t('apiKeys.newKeyWarning')}
+				</Typography.Paragraph>
+				<div className="flex items-center gap-2">
+					<Input
+						readOnly
+						value={revealedKey ?? ''}
+						onFocus={(e) => e.target.select()}
+						data-testid="api-key-revealed"
+					/>
+					<Button icon={<CopyOutlined />} onClick={handleCopyKey}>
+						{t('apiKeys.copy')}
+					</Button>
+				</div>
 			</Modal>
 		</div>
 	);

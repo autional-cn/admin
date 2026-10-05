@@ -176,16 +176,16 @@ export default function PayPaymentDetailPage() {
 						label: t('paymentDetail.refunds'),
 						children: (
 							<DataTable
-								rowKey="refundId"
+								rowKey="id"
 								dataSource={refunds}
 								loading={refundsLoading}
 								pagination={{ pageSize: 10 }}
 								scroll={{ x: 800 }}
 								columns={[
 									{
-										title: t('paymentDetail.refundId'),
-										dataIndex: 'refundId',
-										key: 'refundId',
+										title: t('paymentDetail.refundRecordId'),
+										dataIndex: 'id',
+										key: 'id',
 										ellipsis: true,
 									},
 									{

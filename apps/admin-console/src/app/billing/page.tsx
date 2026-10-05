@@ -40,6 +40,21 @@ import {
 import type { BillingRecord, Plan, PaymentGateway, RefundApproval } from '@/hooks/use-billing';
 
 /**
+ * 金额渲染单点（A-279 / RC-B4-03）：wire 的金额是 decimal 序列化 —— 可能是 number 也可能是 string。
+ * number 直用；string 可解析则同格式；其余（null/undefined/空串/不可解析）→ '-'。
+ * 此前直接 `v.toFixed(2)`：string 金额一进来就 TypeError 白屏（记录 Tab "499" 实证）。
+ * 同文件三处（记录金额 + 方案月费/年费）统一收口（Q-03 / ADR-B4-04）。
+ */
+export function formatAmount(v: unknown): string {
+	if (typeof v === 'number') return Number.isFinite(v) ? `$${v.toFixed(2)}` : '-';
+	if (typeof v === 'string' && v.trim() !== '') {
+		const n = Number(v);
+		if (Number.isFinite(n)) return `$${n.toFixed(2)}`;
+	}
+	return '-';
+}
+
+/**
  * 判断错误是否为"资源/记录不存在"（业务 404：61110004 resource not found / 61110025 usage stats not found / HTTP 404）。
  * 此类错误应显示空态而非"加载失败"（BUG-016：租户无订阅/用量记录时）。
  */
@@ -273,7 +288,8 @@ export default function BillingPage() {
 			title: t('billing.records.column.amount'),
 			dataIndex: 'amount',
 			key: 'amount',
-			render: (v: number) => (v != null ? `$${v.toFixed(2)}` : '-'),
+			// A-279：string 金额（"499"）此前 .toFixed 崩溃；统一 formatAmount。
+			render: (v: unknown) => formatAmount(v),
 		},
 		{
 			title: t('billing.records.column.status'),
@@ -311,13 +327,14 @@ export default function BillingPage() {
 			title: t('billing.plans.column.monthlyPrice'),
 			dataIndex: 'monthlyPrice',
 			key: 'monthlyPrice',
-			render: (v: number) => (v != null ? `$${v.toFixed(2)}` : '-'),
+			// Q-03 同文件收口：方案价格同为 decimal → 同一 formatAmount（修复 A-282 恒空后即爆同一崩溃）。
+			render: (v: unknown) => formatAmount(v),
 		},
 		{
 			title: t('billing.plans.column.yearlyPrice'),
 			dataIndex: 'yearlyPrice',
 			key: 'yearlyPrice',
-			render: (v: number) => (v != null ? `$${v.toFixed(2)}` : '-'),
+			render: (v: unknown) => formatAmount(v),
 		},
 		{
 			title: t('billing.plans.column.features'),

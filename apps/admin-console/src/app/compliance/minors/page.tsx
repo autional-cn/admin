@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
 import { message } from '@/lib/antd-app';
 
-import { apiClient, API_PATHS, extractList, fromPageResult, toPageParams, useCurrentTenantId } from '@autional-cn/shared';
+import { apiClient, API_PATHS, fromPageResult, toPageParams, useCurrentTenantId } from '@autional-cn/shared';
 import { adminUsers } from '@autional-cn/shared/generated/api';
 import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
 import dayjs from 'dayjs';
@@ -63,6 +63,9 @@ interface ConsentRecord {
 	verifiedAt?: string;
 }
 
+/** W4-02（A-273）：真服务端分页——wire 契约 page/page_size（service-core base/dto/page.go，默认 20 上限 100）。 */
+const PAGE_SIZE = 20;
+
 export default function MinorsProtectionPage() {
 	const { t } = useTranslation();
 
@@ -88,8 +91,12 @@ export default function MinorsProtectionPage() {
 	const [users, setUsers] = useState<MinorUser[]>([]);
 	const [usersLoading, setUsersLoading] = useState(false);
 	const [userTotal, setUserTotal] = useState(0);
+	// W4-02（A-273）：真服务端分页——当前页由请求回填，翻页触发新请求（旧实现 pageSize=100 单页假分页）。
+	const [userPage, setUserPage] = useState(1);
 	const [consents, setConsents] = useState<ConsentRecord[]>([]);
 	const [consentsLoading, setConsentsLoading] = useState(false);
+	const [consentTotal, setConsentTotal] = useState(0);
+	const [consentPage, setConsentPage] = useState(1);
 	// A-268f（RC-B2-14 P2）：失败 ≠ 空态。403 专用文案（权限不足/管理面配置缺失）与通用失败文案分流。
 	const [consentsError, setConsentsError] = useState<'forbidden' | 'failed' | null>(null);
 	const [activeTab, setActiveTab] = useState('config');
@@ -135,15 +142,19 @@ export default function MinorsProtectionPage() {
 		loadConfig();
 	};
 
-	const loadUsers = async () => {
+	const loadUsers = async (page: number = userPage) => {
 		setUsersLoading(true);
 		try {
 			// 请求侧 camel 书面写（拦截器 snake 化）；分页经 toPageParams 单点。
 			// isMinor 过滤为后端实名参数（identity dto/user.go:59 form:"is_minor"），生成签名未收编故 as any 收窄。
-			const res = await adminUsers({ isMinor: true, ...toPageParams({ pageSize: 100 }) } as any);
-			const page = fromPageResult<MinorUser>(res);
-			setUsers(page.items);
-			setUserTotal(page.total);
+			const res = await adminUsers({
+				isMinor: true,
+				...toPageParams({ page, pageSize: PAGE_SIZE }),
+			} as any);
+			const result = fromPageResult<MinorUser>(res);
+			setUsers(result.items);
+			setUserTotal(result.total);
+			setUserPage(page);
 		} catch (err) {
 			handleApiError(err, t('compliance.minors.loadUsersFailed'));
 		} finally {
@@ -151,13 +162,16 @@ export default function MinorsProtectionPage() {
 		}
 	};
 
-	const loadConsents = async () => {
+	const loadConsents = async (page: number = consentPage) => {
 		setConsentsLoading(true);
 		try {
 			const res = await apiClient.get(API_PATHS.IDENTITY.ADMIN_CONSENTS, {
-				params: toPageParams({ pageSize: 100 }),
+				params: toPageParams({ page, pageSize: PAGE_SIZE }),
 			});
-			setConsents(extractList(res.data));
+			const result = fromPageResult<ConsentRecord>(res.data);
+			setConsents(result.items);
+			setConsentTotal(result.total);
+			setConsentPage(page);
 			setConsentsError(null);
 		} catch (err) {
 			// 403 = 权限不足或管理面配置缺失（TASK-AB2-32 网关声明面）；其余失败走通用文案。
@@ -418,9 +432,11 @@ export default function MinorsProtectionPage() {
 								rowKey="id"
 								loading={usersLoading}
 								pagination={{
-									pageSize: 20,
+									current: userPage,
+									pageSize: PAGE_SIZE,
 									total: userTotal,
-									showSizeChanger: true,
+									onChange: (p) => loadUsers(p),
+									showSizeChanger: false,
 									showTotal: (total) => t('paginationTotal', { count: total }),
 								}}
 								scroll={{ x: 800 }}
@@ -487,7 +503,13 @@ export default function MinorsProtectionPage() {
 								dataSource={consents}
 								rowKey="id"
 								loading={consentsLoading}
-								pagination={{ pageSize: 20 }}
+								pagination={{
+									current: consentPage,
+									pageSize: PAGE_SIZE,
+									total: consentTotal,
+									onChange: (p) => loadConsents(p),
+									showSizeChanger: false,
+								}}
 								scroll={{ x: 800 }}
 							/>
 						),

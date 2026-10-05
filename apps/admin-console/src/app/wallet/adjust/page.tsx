@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Form, Input, InputNumber, Button, Card, Select } from 'antd';
+import { Alert, Form, Input, InputNumber, Button, Card, Select } from 'antd';
 import { message } from '@/lib/antd-app';
 import { useAdjustWalletBalance } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
@@ -18,22 +18,36 @@ interface AdjustFormValues {
 	reason: string;
 }
 
+/** U399（W4-04）：成功应答 ManualAdjustResult.wallet 的消费面（余额/币种回显）。 */
+interface AdjustWalletResult {
+	balance: string;
+	currency?: string;
+}
+
 export default function WalletAdjustPage() {
 	const { t } = useTranslation();
 	const adjustMut = useAdjustWalletBalance();
 	const [form] = Form.useForm<AdjustFormValues>();
+	const [adjustResult, setAdjustResult] = React.useState<AdjustWalletResult | null>(null);
 
 	const handleAdjust = async (values: AdjustFormValues) => {
 		try {
-			await adjustMut.mutateAsync({
+			// U399：消费 ManualAdjustResult.wallet（此前响应丢弃 → 用户看不到调账后余额，只能去列表碰运气）。
+			const result = (await adjustMut.mutateAsync({
 				userId: values.userId,
 				data: {
 					amount: String(values.amount),
 					type: values.type,
 					reason: values.reason,
 				},
-			});
-			message.success(t('walletAdjust.success'));
+			})) as { wallet?: { balance?: string; currency?: string } } | undefined;
+			const wallet = result?.wallet;
+			if (wallet?.balance !== undefined && wallet?.balance !== null) {
+				setAdjustResult({ balance: wallet.balance, currency: wallet.currency });
+			} else {
+				// 降级：响应缺 wallet（旧形态/异常载荷）→ 原 toast，不崩
+				message.success(t('walletAdjust.success'));
+			}
 			form.resetFields();
 		} catch (err) {
 			handleApiError(err, t('walletAdjust.failed'));
@@ -43,6 +57,20 @@ export default function WalletAdjustPage() {
 	return (
 		<div>
 			<ConsolePageHeader title={t('walletAdjust.title')} />
+			{adjustResult && (
+				<Alert
+					type="success"
+					showIcon
+					closable
+					className="mb-4 max-w-lg"
+					message={t('walletAdjust.success')}
+					description={t('walletAdjust.successBalance', {
+						balance: adjustResult.balance,
+						currency: adjustResult.currency ?? '',
+					})}
+					onClose={() => setAdjustResult(null)}
+				/>
+			)}
 			<Card className="max-w-lg">
 				<Form form={form} layout="vertical" onFinish={handleAdjust}>
 					<Form.Item

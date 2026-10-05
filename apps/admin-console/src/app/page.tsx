@@ -13,14 +13,16 @@ import {
 	LockOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
 import { useUsers } from '@/hooks/use-users';
 import { useActiveSessions } from '@/hooks/use-users';
 import { useRoles } from '@/hooks/use-roles';
 import { useAuditStats, useAuditLogs, type AuditLogRecord } from '@/hooks/use-audit-logs';
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
-import { PageError } from '@autional-cn/ui/antd';
+import { classifyQueryState, type QueryState } from '@autional-cn/shared';
 import { ConsolePageHeader } from '@autional-cn/ui';
+import { QueryStateFallback } from '@/components/common/QueryStateFallback';
 
 const DashboardPage = memo(function DashboardPage() {
 	const { t } = useTranslation();
@@ -40,18 +42,24 @@ const DashboardPage = memo(function DashboardPage() {
 				start = new Date(now);
 				start.setHours(0, 0, 0, 0);
 		}
-		return { startDate: start.toISOString(), endDate: now.toISOString() };
+		// F2-04②（RC-B4-02）：audit 只认 start_date/end_date（YYYY-MM-DD）；ISO 串会 60100001 被 400。
+		return {
+			start_date: dayjs(start).format('YYYY-MM-DD'),
+			end_date: dayjs(now).format('YYYY-MM-DD'),
+		};
 	}, [timeRange]);
 
+	// F2-04①（RC-B4-02）：page_size 上限 100（service-core/base/dto/page.go:45），200 直接 400 → 50（ADM-009 先例）。
 	const {
 		data: usersResult,
 		isLoading: usersLoading,
 		error: usersError,
 		refetch: usersRefetch,
-	} = useUsers({ page: 1, pageSize: 200 });
+	} = useUsers({ page: 1, pageSize: 50 });
 	const users = usersResult?.items ?? [];
+	// RC-B4-01：不做 `= 0` 默认——error 时该值恒 0 即「假 0」；状态判定走 classifyQueryState。
 	const {
-		data: activeSessions = 0,
+		data: activeSessions,
 		isLoading: sessionsLoading,
 		error: activeSessionsError,
 		refetch: activeSessionsRefetch,
@@ -62,23 +70,60 @@ const DashboardPage = memo(function DashboardPage() {
 		error: rolesError,
 		refetch: rolesRefetch,
 	} = useRoles();
-	const { data: auditStats = {}, isLoading: auditLoading } = useAuditStats();
+	const { data: auditStats, isLoading: auditLoading, error: auditStatsError } = useAuditStats();
 	const {
 		data: recentLogins,
 		isLoading: logsLoading,
 		error: auditLogsError,
 		refetch: auditLogsRefetch,
-	} = useAuditLogs({ action: 'LOGIN', pageSize: 10, page: 1, ...timeRangeParams });
+	} = useAuditLogs({ action: 'LOGIN', page_size: 10, page: 1, ...timeRangeParams });
 	const recentLoginItems = recentLogins?.items ?? [];
-	const { data: announcements, isLoading: announcementsLoading } = useAnnouncements();
+	const {
+		data: announcements,
+		isLoading: announcementsLoading,
+		error: announcementsError,
+	} = useAnnouncements();
 	const summary = useTenantSummary();
 
-	const statsLoading = usersLoading || sessionsLoading || rolesLoading || auditLoading;
+	// 六查询逐个分类（AC-B4-W1-01-3；硬序 forbidden > error > loading > empty > ready）。
+	const usersState = classifyQueryState({
+		isLoading: usersLoading,
+		error: usersError,
+		data: usersResult,
+	});
+	const sessionsState = classifyQueryState({
+		isLoading: sessionsLoading,
+		error: activeSessionsError,
+		data: activeSessions,
+	});
+	const rolesState = classifyQueryState({ isLoading: rolesLoading, error: rolesError, data: rolesResult });
+	const auditState = classifyQueryState({
+		isLoading: auditLoading,
+		error: auditStatsError,
+		data: auditStats,
+	});
+	const logsState = classifyQueryState({
+		isLoading: logsLoading,
+		error: auditLogsError,
+		data: recentLoginItems,
+	});
+	const announcementsData = (announcements?.items ?? []).slice(0, 5);
+	const announcementsState = classifyQueryState({
+		isLoading: announcementsLoading,
+		error: announcementsError,
+		data: announcementsData,
+	});
+
+	/** forbidden/error 的卡级文案；loading/empty/ready 返回 null（由 Skeleton/Empty/数值原位承担）。 */
+	const stateText = (state: QueryState): string | null =>
+		state === 'forbidden' ? t('common.forbidden') : state === 'error' ? t('common.loadError') : null;
 
 	const totalUsers = summary.memberCount;
-	// TASK-AB1-18：useRoles 返回 { items, total }（服务端分页结果），总数直接取 total（不再取首页数组长度）。
-	const roleCount = rolesResult?.total ?? 0;
-	const auditAlerts = auditStats?.alerts ?? auditStats?.pending ?? 0;
+	// TASK-AB1-18：useRoles 返回 { items, total }（服务端分页结果）；error/forbidden 时 total 为 undefined，
+	// 由 stateText 覆盖显示，杜绝 error → 0（假 0）。
+	const roleCount = rolesResult?.total;
+	const roleStatValue = stateText(rolesState) ?? roleCount ?? summary.rolesCount ?? (rolesState === 'loading' ? '…' : 0);
+	const auditAlerts = auditStats?.alerts ?? auditStats?.pending;
 
 	const todayStart = new Date();
 	todayStart.setHours(0, 0, 0, 0);
@@ -87,8 +132,6 @@ const DashboardPage = memo(function DashboardPage() {
 		const d = new Date(u.createdAt);
 		return d >= todayStart;
 	}).length;
-
-	const announcementsData = (announcements?.items ?? []).slice(0, 5);
 
 	const timeRangeOptions = [
 		{ label: t('dashboard.timeToday'), value: 'today' },
@@ -111,22 +154,31 @@ const DashboardPage = memo(function DashboardPage() {
 				}
 			/>
 
-			{usersError && (
-				<PageError message={t('dashboard.loadError')} retry={usersRefetch} className="mb-4" />
-			)}
-			{activeSessionsError && (
-				<PageError
-					message={t('dashboard.loadError')}
-					retry={activeSessionsRefetch}
-					className="mb-4"
-				/>
-			)}
-			{rolesError && (
-				<PageError message={t('dashboard.loadError')} retry={rolesRefetch} className="mb-4" />
-			)}
-			{auditLogsError && (
-				<PageError message={t('dashboard.loadError')} retry={auditLogsRefetch} className="mb-4" />
-			)}
+			{/* 四来源错误横幅：文案含来源；403 走无权限（无 retry）；retry 仅 isRetryableError（AC-B4-W1-01-3）。 */}
+			<QueryStateFallback
+				error={usersError}
+				onRetry={usersRefetch}
+				errorMessage={t('dashboard.loadErrorUsers')}
+				className="mb-4"
+			/>
+			<QueryStateFallback
+				error={activeSessionsError}
+				onRetry={activeSessionsRefetch}
+				errorMessage={t('dashboard.loadErrorSessions')}
+				className="mb-4"
+			/>
+			<QueryStateFallback
+				error={rolesError}
+				onRetry={rolesRefetch}
+				errorMessage={t('dashboard.loadErrorRoles')}
+				className="mb-4"
+			/>
+			<QueryStateFallback
+				error={auditLogsError}
+				onRetry={auditLogsRefetch}
+				errorMessage={t('dashboard.loadErrorLogins')}
+				className="mb-4"
+			/>
 
 			<Card
 				title={t('dashboard.tenantOverview')}
@@ -142,9 +194,10 @@ const DashboardPage = memo(function DashboardPage() {
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
+						{/* AC-B4-W1-01-1：roles 403 呈「无权限」不显 0（无 retry）。 */}
 						<Statistic
 							title={t('dashboard.roles')}
-							value={summary.rolesCount}
+							value={roleStatValue}
 							prefix={<SafetyOutlined className="text-warning" />}
 						/>
 					</Col>
@@ -175,12 +228,12 @@ const DashboardPage = memo(function DashboardPage() {
 			<Row gutter={[16, 16]}>
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{statsLoading ? (
+						{usersState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.totalUsers')}
-								value={totalUsers}
+								value={stateText(usersState) ?? totalUsers}
 								prefix={<TeamOutlined className="text-info" />}
 							/>
 						)}
@@ -188,12 +241,12 @@ const DashboardPage = memo(function DashboardPage() {
 				</Col>
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{statsLoading ? (
+						{usersState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.newToday')}
-								value={newUsers}
+								value={stateText(usersState) ?? newUsers}
 								prefix={<UserAddOutlined className="text-success" />}
 							/>
 						)}
@@ -201,12 +254,12 @@ const DashboardPage = memo(function DashboardPage() {
 				</Col>
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{statsLoading ? (
+						{sessionsState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.activeSessions')}
-								value={activeSessions}
+								value={stateText(sessionsState) ?? activeSessions ?? 0}
 								prefix={<LoginOutlined className="text-info" />}
 							/>
 						)}
@@ -214,12 +267,12 @@ const DashboardPage = memo(function DashboardPage() {
 				</Col>
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{statsLoading ? (
+						{rolesState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.roleCount')}
-								value={roleCount}
+								value={stateText(rolesState) ?? roleCount ?? 0}
 								prefix={<SafetyOutlined className="text-warning" />}
 							/>
 						)}
@@ -230,12 +283,12 @@ const DashboardPage = memo(function DashboardPage() {
 			<Row gutter={[16, 16]} className="mt-4">
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{statsLoading ? (
+						{auditState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.pendingAlerts')}
-								value={auditAlerts}
+								value={stateText(auditState) ?? auditAlerts ?? 0}
 								prefix={<WarningOutlined className="text-danger" />}
 							/>
 						)}
@@ -246,10 +299,13 @@ const DashboardPage = memo(function DashboardPage() {
 			<Row gutter={[16, 16]} className="mt-6">
 				<Col xs={24} lg={12}>
 					<Card title={t('dashboard.recentLogins')} className="h-full">
-						{logsLoading ? (
+						{logsState === 'loading' ? (
 							<div className="py-8 flex justify-center">
 								<Spin />
 							</div>
+						) : stateText(logsState) ? (
+							/* error 绝不回落「暂无登录记录」（修伪空态；AC-B4-W1-01-3）。 */
+							<Empty description={stateText(logsState)} />
 						) : recentLoginItems.length === 0 ? (
 							<Empty description={t('dashboard.noLogins')} />
 						) : (
@@ -282,10 +338,13 @@ const DashboardPage = memo(function DashboardPage() {
 				</Col>
 				<Col xs={24} lg={12}>
 					<Card title={t('dashboard.announcements')} className="h-full">
-						{announcementsLoading ? (
+						{announcementsState === 'loading' ? (
 							<div className="py-8 flex justify-center">
 								<Spin />
 							</div>
+						) : stateText(announcementsState) ? (
+							/* 403/失败成态 ≠「暂无公告」；真空数组才空态（AC-B4-W1-01-2）。 */
+							<Empty description={stateText(announcementsState)} />
 						) : announcementsData.length === 0 ? (
 							<Empty description={t('dashboard.noAnnouncements')} />
 						) : (

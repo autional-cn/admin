@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { useParams, useNavigate } from 'react-router';
-import { Button, Tag, Modal, Form, Input, Select, Skeleton, Descriptions } from 'antd';
+import { Button, Tag, Modal, Form, Input, Skeleton, Descriptions } from 'antd';
 import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
@@ -175,12 +175,13 @@ export default function AgentDetailPage() {
 
 	const openEdit = () => {
 		if (!agent) return;
+		// W2-05（A-75 残余 / ADR-B4-08）：编辑表单收窄为 PUT 契约键集 {name, description, callbackUrl}
+		// （identity agent.go:104-108 UpdateAgentRequest）——workloadSubtype/rotationDays/jitTtl
+		// 提交后端静默忽略（假成功），从编辑弹窗移除（创建通道仍支持、详情 Descriptions 仍展示）。
 		form.setFieldsValue({
 			name: agent.name,
 			description: agent.description,
-			workloadSubtype: agent.workloadSubtype,
-			rotationDays: agent.rotationDays,
-			jitTtl: agent.jitTtl,
+			callbackUrl: agent.callbackUrl,
 		});
 		setEditVisible(true);
 	};
@@ -418,24 +419,9 @@ export default function AgentDetailPage() {
 					<Form.Item name="description" label={t('agents.detail.form.description')}>
 						<Input.TextArea rows={3} placeholder={t('agents.detail.form.descriptionPlaceholder')} />
 					</Form.Item>
-					<Form.Item
-						name="workloadSubtype"
-						label={t('agents.detail.form.subtype')}
-						rules={[{ required: true }]}
-					>
-						<Select
-							options={[
-								{ value: 'agent', label: t('agents.type.agent') },
-								{ value: 'service_account', label: t('agents.type.service_account') },
-								{ value: 'automation', label: t('agents.type.automation') },
-							]}
-						/>
-					</Form.Item>
-					<Form.Item name="rotationDays" label={t('agents.detail.form.rotationDays')}>
-						<Input type="number" placeholder="90" />
-					</Form.Item>
-					<Form.Item name="jitTtl" label={t('agents.detail.form.jitTtl')}>
-						<Input placeholder={t('agents.detail.form.jitTtlPlaceholder')} />
+					{/* W2-05（A-75 残余）：契约键 callbackUrl 补入口（后端支持无 UI；此前提交后静默丢弃） */}
+					<Form.Item name="callbackUrl" label={t('agents.detail.form.callbackUrl')}>
+						<Input placeholder={t('agents.detail.form.callbackUrlPlaceholder')} />
 					</Form.Item>
 				</Form>
 			</Modal>
