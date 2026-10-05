@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Button, Tag, Modal, Form, Input, Select, Skeleton, Descriptions } from 'antd';
-import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
@@ -124,7 +124,7 @@ export default function DeviceDetailPage() {
 			<div className="mb-6">
 				<Button
 					type="text"
-					icon={<ArrowLeftOutlined />}
+					icon={<ArrowLeft size="1em" />}
 					onClick={() => navigate(buildNavHref('/devices', tenantSlug))}
 					className="mb-4 pl-0"
 				>
@@ -140,7 +140,7 @@ export default function DeviceDetailPage() {
 						}
 					/>
 					{device && (
-						<Button icon={<EditOutlined />} onClick={openEdit}>
+						<Button icon={<Pencil size="1em" />} onClick={openEdit}>
 							{t('devices.editTitle')}
 						</Button>
 					)}

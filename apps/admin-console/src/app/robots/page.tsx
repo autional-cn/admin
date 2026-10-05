@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
@@ -161,7 +161,7 @@ export default function RobotsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={(e) => {
 							e.stopPropagation();
 							navigate(buildNavHref(`/robots/${record.identityId ?? ''}`, tenantSlug));
@@ -180,7 +180,7 @@ export default function RobotsPage() {
 						<Button
 							type="link"
 							danger
-							icon={<DeleteOutlined />}
+							icon={<Trash2 size="1em" />}
 							onClick={(e) => e.stopPropagation()}
 						>
 							{t('common.delete')}
@@ -199,7 +199,7 @@ export default function RobotsPage() {
 				actions={
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);
@@ -231,7 +231,7 @@ export default function RobotsPage() {
 					<EmptyState title={t('robots.emptyTitle')} description={t('robots.emptyDesc')} />
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);

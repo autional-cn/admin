@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select } from 'antd';
 import { message, modal } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useAbacPolicies,
@@ -154,7 +154,7 @@ export default function AbacPoliciesPage() {
 					<Space size="small">
 						<Button
 							type="link"
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							onClick={() => {
 								setEditing(record);
 								form.setFieldsValue(record);
@@ -166,7 +166,7 @@ export default function AbacPoliciesPage() {
 						<Button
 							type="link"
 							danger
-							icon={<DeleteOutlined />}
+							icon={<Trash2 size="1em" />}
 							onClick={() => handleDelete(record.id)}
 						>
 							{t('common.delete')}
@@ -185,7 +185,7 @@ export default function AbacPoliciesPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

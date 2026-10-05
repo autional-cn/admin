@@ -5,14 +5,14 @@ import { useCurrentTenantId } from '@autional-cn/shared';
 import { Card, Tag, Descriptions, Tabs, Button, Spin, Empty, Row, Col, Statistic, Modal, Form, Input, InputNumber, Select, Space } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	ReloadOutlined,
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	CheckOutlined,
-	CloseOutlined,
-	PlayCircleOutlined,
-} from '@ant-design/icons';
+	Check,
+	Pencil,
+	Play,
+	Plus,
+	RefreshCw,
+	Trash2,
+	X,
+} from 'lucide-react';
 
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -362,7 +362,7 @@ export default function BillingPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditingPlan(record);
 							planForm.setFieldsValue(record);
@@ -374,7 +374,7 @@ export default function BillingPage() {
 					<Button
 						type="link"
 						danger
-						icon={<DeleteOutlined />}
+						icon={<Trash2 size="1em" />}
 						onClick={() => handleDeletePlan(record.id)}
 					>
 						{t('common.delete')}
@@ -410,7 +410,7 @@ export default function BillingPage() {
 			render: (_: any, record: PaymentGateway) => (
 				<Button
 					type="link"
-					icon={<EditOutlined />}
+					icon={<Pencil size="1em" />}
 					onClick={() => {
 						setEditingGateway(record);
 						gatewayForm.setFieldsValue(record);
@@ -478,7 +478,7 @@ export default function BillingPage() {
 						<Space size="small">
 							<Button
 								type="link"
-								icon={<CheckOutlined />}
+								icon={<Check size="1em" />}
 								onClick={() => handleApproveRefund(record.id)}
 							>
 								{t('billing.approve')}
@@ -486,7 +486,7 @@ export default function BillingPage() {
 							<Button
 								type="link"
 								danger
-								icon={<CloseOutlined />}
+								icon={<X size="1em" />}
 								onClick={() => handleRejectRefund(record.id)}
 							>
 								{t('billing.reject')}
@@ -498,7 +498,7 @@ export default function BillingPage() {
 					return (
 						<Button
 							type="link"
-							icon={<PlayCircleOutlined />}
+							icon={<Play size="1em" />}
 							onClick={() => {
 								setExecutingRefund(record);
 								executeForm.resetFields();
@@ -763,7 +763,7 @@ export default function BillingPage() {
 					<div className="flex justify-end mb-4">
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditingPlan(null);
 								planForm.resetFields();
@@ -800,7 +800,7 @@ export default function BillingPage() {
 					<div className="flex justify-end mb-4">
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditingGateway(null);
 								gatewayForm.resetFields();
@@ -900,7 +900,7 @@ export default function BillingPage() {
 				actions={
 					<>
 						<Button
-							icon={<ReloadOutlined />}
+							icon={<RefreshCw size="1em" />}
 							onClick={() => {
 								subRefetch();
 								usageRefetch();

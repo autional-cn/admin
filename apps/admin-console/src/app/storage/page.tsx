@@ -5,16 +5,16 @@ import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Tabs, Card, Button, Tree, Progress, Space, Upload, Modal, Form, Input, Row, Col } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	UploadOutlined,
-	FolderAddOutlined,
-	DownloadOutlined,
-	DeleteOutlined,
-	UndoOutlined,
-	FileOutlined,
-	FileImageOutlined,
-	FileTextOutlined,
-	FileZipOutlined,
-} from '@ant-design/icons';
+	Download,
+	File,
+	FileArchive,
+	FileImage,
+	FileText,
+	FolderPlus,
+	Trash2,
+	Undo2,
+	Upload as UploadIcon,
+} from 'lucide-react';
 import {
 	useFiles,
 	useStorageQuota,
@@ -36,11 +36,11 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
 
 const getFileIcon = (type: string) => {
-	if (type?.startsWith('image/')) return <FileImageOutlined className="text-info" />;
+	if (type?.startsWith('image/')) return <FileImage size="1em" className="text-info" />;
 	if (type?.includes('zip') || type?.includes('rar'))
-		return <FileZipOutlined className="text-warning" />;
-	if (type?.startsWith('text/')) return <FileTextOutlined className="text-success" />;
-	return <FileOutlined className="text-neutral-600" />;
+		return <FileArchive size="1em" className="text-warning" />;
+	if (type?.startsWith('text/')) return <FileText size="1em" className="text-success" />;
+	return <File size="1em" className="text-neutral-600" />;
 };
 
 const formatSize = (bytes: number) => {
@@ -224,13 +224,13 @@ export default function StoragePage() {
 			key: 'action',
 			render: (_: any, record: FileRecord) => (
 				<Space size="small">
-					<Button type="link" icon={<DownloadOutlined />} onClick={() => handleDownload(record)}>
+					<Button type="link" icon={<Download size="1em" />} onClick={() => handleDownload(record)}>
 						{t('storage.download')}
 					</Button>
 					<Button
 						type="link"
 						danger
-						icon={<DeleteOutlined />}
+						icon={<Trash2 size="1em" />}
 						onClick={() => handleDeleteFile(record.fileId)}
 					>
 						{t('storage.delete')}
@@ -265,13 +265,13 @@ export default function StoragePage() {
 			key: 'action',
 			render: (_: any, record: TrashRecord) => (
 				<Space size="small">
-					<Button type="link" icon={<UndoOutlined />} onClick={() => handleRestore(record.fileId)}>
+					<Button type="link" icon={<Undo2 size="1em" />} onClick={() => handleRestore(record.fileId)}>
 						{t('storage.restore')}
 					</Button>
 					<Button
 						type="link"
 						danger
-						icon={<DeleteOutlined />}
+						icon={<Trash2 size="1em" />}
 						onClick={() => handlePermanentDelete(record.fileId)}
 					>
 						{t('storage.permanentDelete')}
@@ -289,9 +289,9 @@ export default function StoragePage() {
 					<>
 						<Space>
 							<Upload beforeUpload={handleUpload} showUploadList={false}>
-								<Button icon={<UploadOutlined />}>{t('storage.uploadFile')}</Button>
+								<Button icon={<UploadIcon size="1em" />}>{t('storage.uploadFile')}</Button>
 							</Upload>
-							<Button icon={<FolderAddOutlined />} onClick={() => setNewFolderVisible(true)}>
+							<Button icon={<FolderPlus size="1em" />} onClick={() => setNewFolderVisible(true)}>
 								{t('storage.newFolder')}
 							</Button>
 						</Space>

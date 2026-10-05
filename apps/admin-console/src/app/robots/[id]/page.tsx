@@ -16,12 +16,12 @@ import {
 	Space,
 } from 'antd';
 import {
-	EditOutlined,
-	ArrowLeftOutlined,
-	PlayCircleOutlined,
-	PauseCircleOutlined,
-	KeyOutlined,
-} from '@ant-design/icons';
+	ArrowLeft,
+	KeyRound,
+	PauseCircle,
+	Pencil,
+	Play,
+} from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
@@ -230,7 +230,7 @@ export default function RobotDetailPage() {
 			<div className="mb-6">
 				<Button
 					type="text"
-					icon={<ArrowLeftOutlined />}
+					icon={<ArrowLeft size="1em" />}
 					onClick={() => navigate(buildNavHref('/robots', tenantSlug))}
 					className="mb-4 pl-0"
 				>
@@ -249,7 +249,7 @@ export default function RobotDetailPage() {
 						<Space>
 							{canCommission && (
 								<Button
-									icon={<PlayCircleOutlined />}
+									icon={<Play size="1em" />}
 									className="!text-success-text !border-success"
 									onClick={handleCommission}
 									loading={commissionMut.isPending}
@@ -259,7 +259,7 @@ export default function RobotDetailPage() {
 							)}
 							{canDecommission && (
 								<Button
-									icon={<PauseCircleOutlined />}
+									icon={<PauseCircle size="1em" />}
 									danger
 									onClick={handleDecommission}
 									loading={decommissionMut.isPending}
@@ -269,7 +269,7 @@ export default function RobotDetailPage() {
 							)}
 							{canIssueIntent && (
 								<Button
-									icon={<KeyOutlined />}
+									icon={<KeyRound size="1em" />}
 									onClick={() => {
 										intentForm.resetFields();
 										setIntentResult(null);
@@ -279,7 +279,7 @@ export default function RobotDetailPage() {
 									{t('robotDetail.issueIntent')}
 								</Button>
 							)}
-							<Button icon={<EditOutlined />} onClick={openEdit}>
+							<Button icon={<Pencil size="1em" />} onClick={openEdit}>
 								{t('robotDetail.editTitle')}
 							</Button>
 						</Space>

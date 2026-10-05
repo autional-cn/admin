@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Tag, Button, Modal, Form, Input, Select, Space, Card, Descriptions } from 'antd';
 import { message } from '@/lib/antd-app';
-import { EyeOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Check, Eye, X } from 'lucide-react';
 import {
 	useBillingRefunds,
 	useApproveRefund,
@@ -117,7 +117,7 @@ export default function BillingRefundsPage() {
 					<Button
 						type="link"
 						size="small"
-						icon={<EyeOutlined />}
+						icon={<Eye size="1em" />}
 						onClick={() => {
 							setSelected(record);
 							setDetailModal(true);
@@ -130,7 +130,7 @@ export default function BillingRefundsPage() {
 							<Button
 								type="link"
 								size="small"
-								icon={<CheckOutlined />}
+								icon={<Check size="1em" />}
 								onClick={() => handleApprove(record.id)}
 							>
 								{t('refunds2.approve')}
@@ -139,7 +139,7 @@ export default function BillingRefundsPage() {
 								type="link"
 								size="small"
 								danger
-								icon={<CloseOutlined />}
+								icon={<X size="1em" />}
 								onClick={() => handleReject(record.id)}
 							>
 								{t('refunds2.reject')}

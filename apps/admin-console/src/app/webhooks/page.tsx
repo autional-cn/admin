@@ -5,12 +5,12 @@ import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Timeline, Popconfirm, Spin, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	SendOutlined,
-	FileTextOutlined,
-} from '@ant-design/icons';
+	FileText,
+	Pencil,
+	Plus,
+	Send,
+	Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useWebhooks,
@@ -171,7 +171,7 @@ export default function WebhooksPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -191,7 +191,7 @@ export default function WebhooksPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<SendOutlined />}
+						icon={<Send size="1em" />}
 						onClick={() => handleTest(record)}
 					>
 						{t('webhooks.test')}
@@ -199,13 +199,13 @@ export default function WebhooksPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<FileTextOutlined />}
+						icon={<FileText size="1em" />}
 						onClick={() => openLogs(record)}
 					>
 						{t('webhooks.logs')}
 					</Button>
 					<Popconfirm title={t('webhooks.deleteConfirm')} onConfirm={() => handleDelete(record.id)}>
-						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+						<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -222,7 +222,7 @@ export default function WebhooksPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

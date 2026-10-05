@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
@@ -165,7 +165,7 @@ export default function DevicesPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={(e) => {
 							e.stopPropagation();
 							navigate(buildNavHref(`/devices/${record.identityId ?? ''}`, tenantSlug));
@@ -184,7 +184,7 @@ export default function DevicesPage() {
 						<Button
 							type="link"
 							danger
-							icon={<DeleteOutlined />}
+							icon={<Trash2 size="1em" />}
 							onClick={(e) => e.stopPropagation()}
 						>
 							{t('common.delete')}
@@ -203,7 +203,7 @@ export default function DevicesPage() {
 				actions={
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);
@@ -235,7 +235,7 @@ export default function DevicesPage() {
 					<EmptyState title={t('devices.emptyTitle')} description={t('devices.emptyDesc')} />
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);

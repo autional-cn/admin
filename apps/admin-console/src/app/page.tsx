@@ -3,15 +3,15 @@
 import React, { useState, useMemo, memo } from 'react';
 import { Card, Col, Row, Statistic, Segmented, Tag, Empty, Spin, Skeleton, List } from 'antd';
 import {
-	TeamOutlined,
-	UserAddOutlined,
-	SafetyOutlined,
-	LoginOutlined,
-	FileTextOutlined,
-	WarningOutlined,
-	KeyOutlined,
-	LockOutlined,
-} from '@ant-design/icons';
+	AlertTriangle,
+	FileText,
+	KeyRound,
+	Lock,
+	LogIn,
+	ShieldCheck,
+	UserPlus,
+	Users,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { useUsers } from '@/hooks/use-users';
@@ -190,7 +190,7 @@ const DashboardPage = memo(function DashboardPage() {
 						<Statistic
 							title={t('dashboard.members')}
 							value={summary.memberCount}
-							prefix={<TeamOutlined className="text-info" />}
+							prefix={<Users size="1em" className="text-info" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
@@ -198,28 +198,28 @@ const DashboardPage = memo(function DashboardPage() {
 						<Statistic
 							title={t('dashboard.roles')}
 							value={roleStatValue}
-							prefix={<SafetyOutlined className="text-warning" />}
+							prefix={<ShieldCheck size="1em" className="text-warning" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
 						<Statistic
 							title={t('dashboard.activeSessions')}
 							value={summary.activeSessionsCount}
-							prefix={<LoginOutlined className="text-info" />}
+							prefix={<LogIn size="1em" className="text-info" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
 						<Statistic
 							title={t('dashboard.apiKeys')}
 							value={summary.apiKeysCount}
-							prefix={<KeyOutlined className="text-purple-500" />}
+							prefix={<KeyRound size="1em" className="text-purple-500" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
 						<Statistic
 							title={t('dashboard.secrets')}
 							value={summary.secretsCount}
-							prefix={<LockOutlined className="text-danger" />}
+							prefix={<Lock size="1em" className="text-danger" />}
 						/>
 					</Col>
 				</Row>
@@ -234,7 +234,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.totalUsers')}
 								value={stateText(usersState) ?? totalUsers}
-								prefix={<TeamOutlined className="text-info" />}
+								prefix={<Users size="1em" className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -247,7 +247,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.newToday')}
 								value={stateText(usersState) ?? newUsers}
-								prefix={<UserAddOutlined className="text-success" />}
+								prefix={<UserPlus size="1em" className="text-success" />}
 							/>
 						)}
 					</Card>
@@ -260,7 +260,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.activeSessions')}
 								value={stateText(sessionsState) ?? activeSessions ?? 0}
-								prefix={<LoginOutlined className="text-info" />}
+								prefix={<LogIn size="1em" className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -273,7 +273,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.roleCount')}
 								value={stateText(rolesState) ?? roleCount ?? 0}
-								prefix={<SafetyOutlined className="text-warning" />}
+								prefix={<ShieldCheck size="1em" className="text-warning" />}
 							/>
 						)}
 					</Card>
@@ -289,7 +289,7 @@ const DashboardPage = memo(function DashboardPage() {
 							<Statistic
 								title={t('dashboard.pendingAlerts')}
 								value={stateText(auditState) ?? auditAlerts ?? 0}
-								prefix={<WarningOutlined className="text-danger" />}
+								prefix={<AlertTriangle size="1em" className="text-danger" />}
 							/>
 						)}
 					</Card>
@@ -352,7 +352,7 @@ const DashboardPage = memo(function DashboardPage() {
 								{announcementsData.map((item: AnnouncementRecord, i: number) => (
 									<div key={i} className="flex justify-between items-center py-1">
 										<div className="flex items-center gap-2">
-											<FileTextOutlined className="text-neutral-500" />
+											<FileText size="1em" className="text-neutral-500" />
 											<span className="text-sm">{item.title}</span>
 										</div>
 										<span className="text-xs text-neutral-600">

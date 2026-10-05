@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Input, Button, Empty } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { RefreshCw, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -32,9 +32,9 @@ export default function TracesPage() {
 								onChange={(e) => setSearch(e.target.value)}
 								onSearch={handleUnavailable}
 								style={{ width: 300 }}
-								enterButton={<SearchOutlined />}
+								enterButton={<Search size="1em" />}
 							/>
-							<Button icon={<ReloadOutlined />} onClick={handleUnavailable}>
+							<Button icon={<RefreshCw size="1em" />} onClick={handleUnavailable}>
 								{t('common.refresh')}
 							</Button>
 						</div>

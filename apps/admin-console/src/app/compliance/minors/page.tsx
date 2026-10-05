@@ -5,12 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { DataTable, PageError } from '@autional-cn/ui/antd';
 import { Card, Form, InputNumber, Switch, Button, Spin, TimePicker, Space, Statistic, Row, Col, Tabs, Tag } from 'antd';
 import {
-	SafetyCertificateOutlined,
-	SaveOutlined,
-	ReloadOutlined,
-	UserOutlined,
-	AuditOutlined,
-} from '@ant-design/icons';
+	BadgeCheck,
+	RefreshCw,
+	Save,
+	User,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
 import { message } from '@/lib/antd-app';
@@ -276,7 +275,7 @@ export default function MinorsProtectionPage() {
 							<Statistic
 								title={t('compliance.minors.userCount')}
 								value={userTotal}
-								prefix={<UserOutlined />}
+								prefix={<User size="1em" />}
 							/>
 						</Card>
 					</Col>
@@ -298,7 +297,7 @@ export default function MinorsProtectionPage() {
 										? `${config.nightModeStart}-${config.nightModeEnd}`
 										: t('compliance.minors.curfewOff')
 								}
-								prefix={<SafetyCertificateOutlined />}
+								prefix={<BadgeCheck size="1em" />}
 							/>
 						</Card>
 					</Col>
@@ -407,14 +406,14 @@ export default function MinorsProtectionPage() {
 								</SectionCard>
 
 								<div className="mt-6 text-right">
-									<Button onClick={loadConfig} icon={<ReloadOutlined />} className="mr-2">
+									<Button onClick={loadConfig} icon={<RefreshCw size="1em" />} className="mr-2">
 										{t('compliance.minors.reset')}
 									</Button>
 									<Button
 										type="primary"
 										onClick={handleSave}
 										loading={saving}
-										icon={<SaveOutlined />}
+										icon={<Save size="1em" />}
 									>
 										{t('compliance.minors.saveConfig')}
 									</Button>

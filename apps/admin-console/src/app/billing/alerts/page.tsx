@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import {
 	useBillingAlerts,
 	useCreateBillingAlert,
@@ -147,7 +147,7 @@ export default function BillingAlertsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -169,7 +169,7 @@ export default function BillingAlertsPage() {
 						okText={t('billingAlerts.okText')}
 						cancelText={t('billingAlerts.cancelText')}
 					>
-						<Button type="link" danger icon={<DeleteOutlined />}>
+						<Button type="link" danger icon={<Trash2 size="1em" />}>
 							{t('billingAlerts.delete')}
 						</Button>
 					</Popconfirm>
@@ -186,7 +186,7 @@ export default function BillingAlertsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Input, Space, Button, Spin, Empty } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/query-keys';
@@ -60,7 +60,7 @@ export default function LogsPage() {
 								onSearch={(v) => setKeyword(v || undefined)}
 								style={{ width: 240 }}
 							/>
-							<Button icon={<ReloadOutlined />} onClick={() => refetch()}>
+							<Button icon={<RefreshCw size="1em" />} onClick={() => refetch()}>
 								{t('common.refresh')}
 							</Button>
 						</Space>

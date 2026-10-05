@@ -4,14 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, Select, Avatar, Modal, Typography } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	UserOutlined,
-	LockOutlined,
-	SaveOutlined,
-	GlobalOutlined,
-	ClockCircleOutlined,
-	MailOutlined,
-	SafetyOutlined,
-} from '@ant-design/icons';
+	Clock,
+	Globe,
+	Lock,
+	Mail,
+	Save,
+	ShieldCheck,
+	User,
+} from 'lucide-react';
 import { useAuthStore, processPasswordForTransmission } from '@autional-cn/shared';
 import { PublicAuthConfigByAuthConfig } from '@autional-cn/shared/generated/api';
 // W2-04（A-437）：保存资料改走 self 自助三通道（旧 updateUser 走 admin 端点恒 61002205）。
@@ -223,7 +223,7 @@ export default function SettingsPage() {
 				<div className="flex items-center gap-4 mb-6">
 					<Avatar
 						size={64}
-						icon={<UserOutlined />}
+						icon={<User size="1em" />}
 						src={user?.avatarUrl}
 						className="!bg-info"
 					/>
@@ -234,13 +234,13 @@ export default function SettingsPage() {
 				</div>
 				<Form form={profileForm} layout="vertical" onFinish={handleSaveProfile}>
 					<Form.Item name="username" label={t('settings.username')} rules={[{ required: true }]}>
-						<Input prefix={<UserOutlined />} placeholder={t('settings.usernamePlaceholder')} />
+						<Input prefix={<User size="1em" />} placeholder={t('settings.usernamePlaceholder')} />
 					</Form.Item>
 					{/* A-437（Q-06）：邮箱改只读展示 + 独立双步 OTP 弹窗（不再随「保存资料」走 admin 端点直存） */}
 					<Form.Item label={t('settings.email')}>
 						<div className="flex items-center gap-3">
 							<span data-testid="settings-email-display">{user?.email || '-'}</span>
-							<Button icon={<MailOutlined />} onClick={openEmailModal}>
+							<Button icon={<Mail size="1em" />} onClick={openEmailModal}>
 								{t('settings.changeEmail')}
 							</Button>
 						</div>
@@ -248,7 +248,7 @@ export default function SettingsPage() {
 					<Form.Item name="avatarUrl" label={t('settings.avatarUrl')}>
 						<Input placeholder="https://example.com/avatar.png" />
 					</Form.Item>
-					<Button type="primary" icon={<SaveOutlined />} htmlType="submit" loading={loading}>
+					<Button type="primary" icon={<Save size="1em" />} htmlType="submit" loading={loading}>
 						{t('settings.saveProfile')}
 					</Button>
 				</Form>
@@ -263,7 +263,7 @@ export default function SettingsPage() {
 				>
 					<Form.Item name="language" label={t('settings.language')}>
 						<Select
-							prefix={<GlobalOutlined />}
+							prefix={<Globe size="1em" />}
 							options={[
 								{ label: t('settings.langZhCN'), value: 'zh-CN' },
 								{ label: t('settings.langEnUS'), value: 'en-US' },
@@ -272,7 +272,7 @@ export default function SettingsPage() {
 					</Form.Item>
 					<Form.Item name="timezone" label={t('settings.timezone')}>
 						<Select
-							prefix={<ClockCircleOutlined />}
+							prefix={<Clock size="1em" />}
 							options={[
 								{ label: t('settings.timezoneShanghai'), value: 'Asia/Shanghai' },
 								{ label: t('settings.timezoneTokyo'), value: 'Asia/Tokyo' },
@@ -280,7 +280,7 @@ export default function SettingsPage() {
 							]}
 						/>
 					</Form.Item>
-					<Button type="primary" icon={<SaveOutlined />} htmlType="submit">
+					<Button type="primary" icon={<Save size="1em" />} htmlType="submit">
 						{t('settings.savePreferences')}
 					</Button>
 				</Form>
@@ -294,7 +294,7 @@ export default function SettingsPage() {
 						rules={[{ required: true, message: t('settings.oldPasswordRequired') }]}
 					>
 						<Input.Password
-							prefix={<LockOutlined />}
+							prefix={<Lock size="1em" />}
 							placeholder={t('settings.oldPasswordPlaceholder')}
 						/>
 					</Form.Item>
@@ -304,7 +304,7 @@ export default function SettingsPage() {
 						rules={[{ required: true, message: t('settings.newPasswordRequired') }]}
 					>
 						<Input.Password
-							prefix={<LockOutlined />}
+							prefix={<Lock size="1em" />}
 							placeholder={t('settings.newPasswordPlaceholder')}
 						/>
 					</Form.Item>
@@ -324,11 +324,11 @@ export default function SettingsPage() {
 						]}
 					>
 						<Input.Password
-							prefix={<LockOutlined />}
+							prefix={<Lock size="1em" />}
 							placeholder={t('settings.confirmPasswordPlaceholder')}
 						/>
 					</Form.Item>
-					<Button type="primary" icon={<LockOutlined />} htmlType="submit" loading={loading}>
+					<Button type="primary" icon={<Lock size="1em" />} htmlType="submit" loading={loading}>
 						{t('settings.changePassword')}
 					</Button>
 				</Form>
@@ -352,7 +352,7 @@ export default function SettingsPage() {
 								{ type: 'email', message: t('settings.newEmailInvalid') },
 							]}
 						>
-							<Input prefix={<MailOutlined />} placeholder={t('settings.newEmailPlaceholder')} />
+							<Input prefix={<Mail size="1em" />} placeholder={t('settings.newEmailPlaceholder')} />
 						</Form.Item>
 						<Form.Item
 							name="password"
@@ -360,7 +360,7 @@ export default function SettingsPage() {
 							rules={[{ required: true, message: t('settings.oldPasswordRequired') }]}
 						>
 							<Input.Password
-								prefix={<LockOutlined />}
+								prefix={<Lock size="1em" />}
 								placeholder={t('settings.oldPasswordPlaceholder')}
 							/>
 						</Form.Item>
@@ -382,7 +382,7 @@ export default function SettingsPage() {
 							rules={[{ required: true, message: t('settings.emailCodeRequired') }]}
 						>
 							<Input
-								prefix={<SafetyOutlined />}
+								prefix={<ShieldCheck size="1em" />}
 								placeholder={t('settings.emailCodePlaceholder')}
 							/>
 						</Form.Item>

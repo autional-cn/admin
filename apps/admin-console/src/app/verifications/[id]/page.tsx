@@ -9,12 +9,10 @@ import { buildNavHref } from '@/lib/nav';
 import { Card, Tag, Button, Space, Descriptions, Modal, Form, Select, Input, Spin, Empty, Tabs } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	ArrowLeftOutlined,
-	EditOutlined,
-	ReloadOutlined,
-	CheckCircleOutlined,
-	CloseCircleOutlined,
-} from '@ant-design/icons';
+	ArrowLeft,
+	Pencil,
+	RefreshCw,
+} from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
@@ -222,7 +220,7 @@ export default function VerificationDetailPage() {
 	return (
 		<div>
 			<div className="mb-4">
-				<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
+				<Button icon={<ArrowLeft size="1em" />} onClick={() => navigate(-1)}>
 					{t('verifications.actionBack')}
 				</Button>
 			</div>
@@ -242,7 +240,7 @@ export default function VerificationDetailPage() {
 					</div>
 					<Space wrap>
 						<Button
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							onClick={() => {
 								overrideForm.setFieldsValue({ status: record.status });
 								setOverrideModalOpen(true);
@@ -252,7 +250,7 @@ export default function VerificationDetailPage() {
 						</Button>
 						{record.status === 'rejected' && (
 							<Button
-								icon={<ReloadOutlined />}
+								icon={<RefreshCw size="1em" />}
 								onClick={handleResetRetry}
 								loading={resetRetryMutation.isPending}
 							>

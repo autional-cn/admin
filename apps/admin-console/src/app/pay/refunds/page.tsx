@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePayRefunds, type RefundRecord } from '@/hooks/use-pay';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
@@ -79,7 +79,7 @@ export default function PayRefundsPage() {
 			render: (_: unknown, record: RefundRecord) => (
 				<Button
 					type="link"
-					icon={<EyeOutlined />}
+					icon={<Eye size="1em" />}
 					onClick={() => {
 						setSelected(record);
 						setDetailModal(true);

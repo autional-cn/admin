@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card, Row, Col, Statistic, Space, Select, Button } from 'antd';
-import { SearchOutlined, DollarOutlined } from '@ant-design/icons';
+import { Search } from 'lucide-react';
 import { useBillingRevenue, type RevenueItem } from '@/hooks/use-billing-admin';
 import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
 import type { DateRangeValue } from '@autional-cn/ui/antd';
@@ -122,7 +122,7 @@ export default function BillingRevenuePage() {
 							}
 						}}
 					/>
-					<Button type="primary" icon={<SearchOutlined />} onClick={() => refetch()}>
+					<Button type="primary" icon={<Search size="1em" />} onClick={() => refetch()}>
 						{t('revenue.query')}
 					</Button>
 				</Space>

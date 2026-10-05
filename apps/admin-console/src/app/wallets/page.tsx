@@ -6,19 +6,17 @@ import { useTranslation } from 'react-i18next';
 import { Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, DatePicker, Tabs, InputNumber } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	WalletOutlined,
-	ArrowUpOutlined,
-	ArrowDownOutlined,
-	ToolOutlined,
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	GiftOutlined,
-	SafetyOutlined,
-	SyncOutlined,
-	LockOutlined,
-	UnlockOutlined,
-} from '@ant-design/icons';
+	ArrowDown,
+	ArrowUp,
+	Lock,
+	Pencil,
+	Plus,
+	RefreshCw,
+	Trash2,
+	Unlock,
+	Wallet,
+	Wrench,
+} from 'lucide-react';
 import {
 	useWalletSummary,
 	useWalletTransactions,
@@ -381,7 +379,7 @@ export default function WalletsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditingCoupon(record);
 							couponForm.setFieldsValue(record);
@@ -393,7 +391,7 @@ export default function WalletsPage() {
 					<Button
 						type="link"
 						danger
-						icon={<DeleteOutlined />}
+						icon={<Trash2 size="1em" />}
 						onClick={() => handleDeleteCoupon(record.id)}
 					>
 						{t('wallets.delete')}
@@ -462,7 +460,7 @@ export default function WalletsPage() {
 					<>
 						<Space>
 							<Button
-								icon={<LockOutlined />}
+								icon={<Lock size="1em" />}
 								onClick={() => {
 									batchForm.resetFields();
 									setBatchFreezeModal(true);
@@ -471,7 +469,7 @@ export default function WalletsPage() {
 								{t('wallets.batchFreeze')}
 							</Button>
 							<Button
-								icon={<UnlockOutlined />}
+								icon={<Unlock size="1em" />}
 								onClick={() => {
 									batchForm.resetFields();
 									setBatchUnfreezeModal(true);
@@ -481,7 +479,7 @@ export default function WalletsPage() {
 							</Button>
 							<Button
 								type="primary"
-								icon={<ToolOutlined />}
+								icon={<Wrench size="1em" />}
 								onClick={() => {
 									adjustForm.resetFields();
 									setAdjustModal(true);
@@ -504,7 +502,7 @@ export default function WalletsPage() {
 							valueStyle={{ color: 'var(--color-success-text)' }}
 							prefix={
 								<span>
-									<WalletOutlined /> ¥
+									<Wallet size="1em" /> ¥
 								</span>
 							}
 						/>
@@ -529,7 +527,7 @@ export default function WalletsPage() {
 							precision={2}
 							prefix={
 								<span>
-									<ArrowUpOutlined /> ¥
+									<ArrowUp size="1em" /> ¥
 								</span>
 							}
 						/>
@@ -544,7 +542,7 @@ export default function WalletsPage() {
 							valueStyle={{ color: 'var(--color-danger-text)' }}
 							prefix={
 								<span>
-									<ArrowDownOutlined /> ¥
+									<ArrowDown size="1em" /> ¥
 								</span>
 							}
 						/>
@@ -638,7 +636,7 @@ export default function WalletsPage() {
 								<div className="flex justify-end mb-4">
 									<Button
 										type="primary"
-										icon={<PlusOutlined />}
+										icon={<Plus size="1em" />}
 										onClick={() => {
 											setEditingCoupon(null);
 											couponForm.resetFields();
@@ -694,7 +692,7 @@ export default function WalletsPage() {
 																<Button
 																	type="link"
 																	danger
-																	icon={<DeleteOutlined />}
+																	icon={<Trash2 size="1em" />}
 																	aria-label={t('wallets.delete')}
 																	onClick={() => remove(name)}
 																/>
@@ -757,7 +755,7 @@ export default function WalletsPage() {
 													<Button
 														type="dashed"
 														onClick={() => add({ enabled: true })}
-														icon={<PlusOutlined />}
+														icon={<Plus size="1em" />}
 														block
 													>
 														{t('wallets.addRule')}
@@ -798,7 +796,7 @@ export default function WalletsPage() {
 									/>
 									<Button
 										type="primary"
-										icon={<SyncOutlined />}
+										icon={<RefreshCw size="1em" />}
 										onClick={() => reconRefetch()}
 										disabled={!reconDate}
 									>

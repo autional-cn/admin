@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Card, Descriptions, Tag, Button, Spin, Tabs } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeft } from 'lucide-react';
 import {
 	usePayPaymentDetail,
 	usePayReceipt,
@@ -73,7 +73,7 @@ export default function PayPaymentDetailPage() {
 		<div>
 			<Button
 				type="link"
-				icon={<ArrowLeftOutlined />}
+				icon={<ArrowLeft size="1em" />}
 				onClick={() => navigate(buildNavHref('/pay/payments', tenantSlug))}
 				className="mb-4 pl-0"
 			>

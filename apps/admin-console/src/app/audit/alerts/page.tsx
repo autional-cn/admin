@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Tag, Button, Select, Space, Row, Col, Modal, Input } from 'antd';
 
 import { message } from '@/lib/antd-app';
-import { SearchOutlined } from '@ant-design/icons';
+import { Search } from 'lucide-react';
 import { useAlerts, useUpdateAlertStatus, useAssignAlert } from '@/hooks/use-audit-alerts';
 import { handleApiError } from '@/lib/error-handler';
 import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
@@ -249,7 +249,7 @@ export default function AuditAlertsPage() {
 						/>
 					</Col>
 					<Col xs={24} sm={8} md={6}>
-						<Button type="primary" icon={<SearchOutlined />} onClick={() => refetch()}>
+						<Button type="primary" icon={<Search size="1em" />} onClick={() => refetch()}>
 							{t('auditAlerts.search')}
 						</Button>
 					</Col>

@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
 import { Tree, Card, Button, Space, Tag, Modal, Form, Input, Empty } from 'antd';
 import { message, modal } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined, ApartmentOutlined } from '@ant-design/icons';
+import { Network, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { DataNode } from 'antd/es/tree';
 import {
 	useDepartments,
@@ -125,7 +125,7 @@ export default function DepartmentsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();
@@ -158,12 +158,12 @@ export default function DepartmentsPage() {
 						<div>
 							<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
 								<div className="flex items-center gap-2">
-									<ApartmentOutlined />
+									<Network size="1em" />
 									<span className="text-lg font-medium">{selectedDept.name}</span>
 								</div>
 								<Space>
 									<Button
-										icon={<PlusOutlined />}
+										icon={<Plus size="1em" />}
 										onClick={() => {
 											setEditing(null);
 											form.resetFields();
@@ -173,7 +173,7 @@ export default function DepartmentsPage() {
 										{t('departments.addSubDepartment')}
 									</Button>
 									<Button
-										icon={<EditOutlined />}
+										icon={<Pencil size="1em" />}
 										onClick={() => {
 											setEditing(selectedDept);
 											form.setFieldsValue({ name: selectedDept.name });
@@ -184,7 +184,7 @@ export default function DepartmentsPage() {
 									</Button>
 									<Button
 										danger
-										icon={<DeleteOutlined />}
+										icon={<Trash2 size="1em" />}
 										onClick={() => handleDelete(selectedDept.id)}
 									>
 										{t('common.delete')}

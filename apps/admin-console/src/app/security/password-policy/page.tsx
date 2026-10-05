@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Form, InputNumber, Checkbox, Switch, Button, Space } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined } from '@ant-design/icons';
+import { Save } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getPasswordPolicy, updatePasswordPolicy } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
@@ -110,7 +110,7 @@ export default function PasswordPolicyPage() {
 
 					<Button
 						type="primary"
-						icon={<SaveOutlined />}
+						icon={<Save size="1em" />}
 						htmlType="submit"
 						loading={updateMut.isPending}
 					>

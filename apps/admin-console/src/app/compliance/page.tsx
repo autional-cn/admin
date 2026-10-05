@@ -5,13 +5,13 @@ import React, { useState } from 'react';
 import { Tabs, Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, InputNumber, Select, Switch, Empty, Progress, Badge, Popconfirm } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	SafetyCertificateOutlined,
-	EditOutlined,
-	PlusOutlined,
-	EyeOutlined,
-	SettingOutlined,
-	ReloadOutlined,
-} from '@ant-design/icons';
+	BadgeCheck,
+	Eye,
+	Pencil,
+	Plus,
+	RefreshCw,
+	Settings,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useDSARs,
@@ -380,7 +380,7 @@ export default function CompliancePage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EyeOutlined />}
+						icon={<Eye size="1em" />}
 						onClick={() => {
 							setCurrentDsar(record);
 							setDsarDrawer(true);
@@ -482,7 +482,7 @@ export default function CompliancePage() {
 					<Space size="small">
 						<Button
 							type="link"
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							onClick={() => {
 								// A-241：只预填 wire 回传四键（name/autoDelete 无回显源不预填，
 								// 提交侧独立门控——见 handleSavePolicy）。
@@ -604,7 +604,7 @@ export default function CompliancePage() {
 											? 'var(--color-success-light)'
 											: 'var(--color-error-light)',
 								}}
-								prefix={<SafetyCertificateOutlined />}
+								prefix={<BadgeCheck size="1em" />}
 							/>
 							{complianceScore?.grade && (
 								<div className="mt-2 text-sm text-neutral-600">
@@ -636,7 +636,7 @@ export default function CompliancePage() {
 						<Button
 							type="link"
 							size="small"
-							icon={<SettingOutlined />}
+							icon={<Settings size="1em" />}
 							onClick={() => navigate(buildNavHref('/compliance/policy', tenantSlug))}
 						>
 							{t('compliance.managePolicy')}
@@ -727,7 +727,7 @@ export default function CompliancePage() {
 							<>
 								<div className="flex justify-end gap-2 mb-4">
 									<Button
-										icon={<ReloadOutlined />}
+										icon={<RefreshCw size="1em" />}
 										onClick={() => erasureRefetch()}
 									>
 										{t('common.refresh')}
@@ -735,7 +735,7 @@ export default function CompliancePage() {
 									{isAdminRole && (
 										<Button
 											type="primary"
-											icon={<PlusOutlined />}
+											icon={<Plus size="1em" />}
 											onClick={() => openErasureModal()}
 										>
 											{t('compliance.erasure.create')}
@@ -770,7 +770,7 @@ export default function CompliancePage() {
 									<div className="flex justify-end mb-4">
 										<Button
 											type="primary"
-											icon={<PlusOutlined />}
+											icon={<Plus size="1em" />}
 											onClick={() => {
 												consentForm.resetFields();
 												setConsentModal(true);
@@ -818,7 +818,7 @@ export default function CompliancePage() {
 									<div className="flex justify-end mb-4">
 										<Button
 											type="primary"
-											icon={<PlusOutlined />}
+											icon={<Plus size="1em" />}
 											onClick={() => {
 												setEditingPolicy(null);
 												policyForm.resetFields();

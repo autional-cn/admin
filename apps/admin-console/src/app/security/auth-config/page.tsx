@@ -16,7 +16,7 @@ import {
 	Tag,
 } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { BadgeCheck, Save } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getAuthConfig, updateAuthConfig } from '@/lib/api.generated';
 
@@ -127,7 +127,7 @@ export default function AuthConfigPage() {
 			{/* Compliance Profile Selector */}
 			<Card size="small" className="mb-4 border-info-soft bg-info-soft">
 				<div className="flex items-center gap-3">
-					<SafetyCertificateOutlined className="text-info text-lg" />
+					<BadgeCheck size="1em" className="text-info text-lg" />
 					<span className="font-medium text-info-text">{t('authConfig.complianceProfile')}:</span>
 					<Select
 						value={selectedProfile}
@@ -419,7 +419,7 @@ export default function AuthConfigPage() {
 
 				<Button
 					type="primary"
-					icon={<SaveOutlined />}
+					icon={<Save size="1em" />}
 					htmlType="submit"
 					loading={updateMut.isPending}
 					size="large"

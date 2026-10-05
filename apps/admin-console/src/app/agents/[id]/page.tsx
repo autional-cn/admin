@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { useParams, useNavigate } from 'react-router';
 import { Button, Tag, Modal, Form, Input, Skeleton, Descriptions } from 'antd';
-import { EditOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
@@ -264,7 +264,7 @@ export default function AgentDetailPage() {
 			<div className="mb-6">
 				<Button
 					type="text"
-					icon={<ArrowLeftOutlined />}
+					icon={<ArrowLeft size="1em" />}
 					onClick={() => navigate(buildNavHref('/agents', tenantSlug))}
 					className="mb-4 pl-0"
 				>
@@ -276,7 +276,7 @@ export default function AgentDetailPage() {
 						description={agent?.description || t('common.loading')}
 					/>
 					{agent && (
-						<Button icon={<EditOutlined />} onClick={openEdit}>
+						<Button icon={<Pencil size="1em" />} onClick={openEdit}>
 							{t('agents.detail.editBtn')}
 						</Button>
 					)}

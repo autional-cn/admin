@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Tag, Button, Modal, Form, Input, Select, Space, Card, Descriptions, Popconfirm, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
-import { EyeOutlined, StopOutlined, RetweetOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Ban, Calendar, Eye, Repeat2 } from 'lucide-react';
 import {
 	useBillingSubscriptions,
 	useCancelSubscription,
@@ -135,7 +135,7 @@ export default function BillingSubscriptionsPage() {
 			render: (_: unknown, record: SubscriptionItem) => (
 				<Button
 					type="link"
-					icon={<EyeOutlined />}
+					icon={<Eye size="1em" />}
 					onClick={() => {
 						setSelected(record);
 						setDetailModal(true);
@@ -153,7 +153,7 @@ export default function BillingSubscriptionsPage() {
 				<Space size="small">
 					<Button
 						size="small"
-						icon={<RetweetOutlined />}
+						icon={<Repeat2 size="1em" />}
 						onClick={() => {
 							setChangeTenantId(record.tenantId);
 							changePlanForm.resetFields();
@@ -164,7 +164,7 @@ export default function BillingSubscriptionsPage() {
 					</Button>
 					<Button
 						size="small"
-						icon={<RetweetOutlined />}
+						icon={<Repeat2 size="1em" />}
 						onClick={() => handleRollback(record.tenantId)}
 						disabled={record.status === 'trialing'}
 					>
@@ -172,7 +172,7 @@ export default function BillingSubscriptionsPage() {
 					</Button>
 					<Button
 						size="small"
-						icon={<CalendarOutlined />}
+						icon={<Calendar size="1em" />}
 						onClick={() => {
 							setExtendTenantId(record.tenantId);
 							extendTrialForm.resetFields();
@@ -187,7 +187,7 @@ export default function BillingSubscriptionsPage() {
 						okText={t('subscriptions.confirmOk')}
 						cancelText={t('subscriptions.confirmCancelText')}
 					>
-						<Button size="small" danger icon={<StopOutlined />}>
+						<Button size="small" danger icon={<Ban size="1em" />}>
 							{t('subscriptions.cancel')}
 						</Button>
 					</Popconfirm>

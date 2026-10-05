@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Tag, Button, Select, Space, Row, Col, Modal, Input, Descriptions, Divider, Timeline, Empty, Spin } from 'antd';
 
 import { message } from '@/lib/antd-app';
-import { SecurityScanOutlined, LinkOutlined, WarningOutlined } from '@ant-design/icons';
+import { AlertTriangle, Link2, Shield } from 'lucide-react';
 import {
 	useAnomalies,
 	useUpdateAnomalyStatus,
@@ -294,7 +294,7 @@ export default function AuditAnomaliesPage() {
 						<Button
 							type="link"
 							size="small"
-							icon={<WarningOutlined />}
+							icon={<AlertTriangle size="1em" />}
 							onClick={() => handleStatusChange(record.id, 'false_positive')}
 						>
 							{t('auditAnomalies.actions.falsePositive')}
@@ -306,7 +306,7 @@ export default function AuditAnomaliesPage() {
 					<Button
 						type="link"
 						size="small"
-						icon={<LinkOutlined />}
+						icon={<Link2 size="1em" />}
 						onClick={() => handleLinkCaseClick(record.id)}
 					>
 						{t('auditAnomalies.actions.linkCase')}
@@ -334,7 +334,7 @@ export default function AuditAnomaliesPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<SecurityScanOutlined />}
+							icon={<Shield size="1em" />}
 							loading={detectMut.isPending}
 							onClick={handleDetect}
 						>
@@ -500,7 +500,7 @@ export default function AuditAnomaliesPage() {
 							)}
 							{(currentRecord.status === 'open' || currentRecord.status === 'investigating') && (
 								<Button
-									icon={<WarningOutlined />}
+									icon={<AlertTriangle size="1em" />}
 									onClick={() => handleStatusChange(currentRecord.id, 'false_positive')}
 									loading={statusMut.isPending}
 								>
@@ -510,7 +510,7 @@ export default function AuditAnomaliesPage() {
 							<Button onClick={() => handleAssignClick(currentRecord.id)}>
 								{t('auditAnomalies.actions.assign')}
 							</Button>
-							<Button icon={<LinkOutlined />} onClick={() => handleLinkCaseClick(currentRecord.id)}>
+							<Button icon={<Link2 size="1em" />} onClick={() => handleLinkCaseClick(currentRecord.id)}>
 								{t('auditAnomalies.actions.linkCase')}
 							</Button>
 						</Space>

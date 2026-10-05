@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Popconfirm, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useGlobalVariables,
@@ -104,7 +104,7 @@ export default function GlobalVariablesPage() {
 					<Tooltip title={t('common.edit')}>
 						<Button
 							size="small"
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							aria-label={t('common.edit')}
 							onClick={() => openEdit(record)}
 						/>
@@ -120,7 +120,7 @@ export default function GlobalVariablesPage() {
 							}
 						}}
 					>
-						<Button size="small" danger icon={<DeleteOutlined />} aria-label={t('common.delete')} />
+						<Button size="small" danger icon={<Trash2 size="1em" />} aria-label={t('common.delete')} />
 					</Popconfirm>
 				</Space>
 			),
@@ -133,7 +133,7 @@ export default function GlobalVariablesPage() {
 				title={t('notifications.globalVariables.title')}
 				actions={
 					<>
-						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={openCreate}>
 							{t('notifications.globalVariables.createVariable')}
 						</Button>
 					</>

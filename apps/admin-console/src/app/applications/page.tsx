@@ -5,14 +5,14 @@ import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Button, Space, Tag, Modal, Form, Input, Select, Empty, Tabs, Tooltip, Popconfirm, Descriptions, Divider } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	CopyOutlined,
-	EditOutlined,
-	PauseCircleOutlined,
-	PlayCircleOutlined,
-	DeleteOutlined,
-	EyeOutlined,
-} from '@ant-design/icons';
+	Copy,
+	Eye,
+	PauseCircle,
+	Pencil,
+	Play,
+	Plus,
+	Trash2,
+} from 'lucide-react';
 import {
 	useApplications,
 	useCreateApplication,
@@ -151,7 +151,7 @@ export default function ApplicationsPage() {
 						<Button
 							type="text"
 							size="small"
-							icon={<CopyOutlined />}
+							icon={<Copy size="1em" />}
 							aria-label={t('applications.copy')}
 							onClick={() => handleCopy(v)}
 						/>
@@ -187,7 +187,7 @@ export default function ApplicationsPage() {
 						<Button
 							type="text"
 							size="small"
-							icon={<EyeOutlined />}
+							icon={<Eye size="1em" />}
 							aria-label={t('applications.detail')}
 							onClick={() => setDetailRecord(record)}
 						/>
@@ -195,7 +195,7 @@ export default function ApplicationsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -212,7 +212,7 @@ export default function ApplicationsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={record.status === 'active' ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+						icon={record.status === 'active' ? <PauseCircle size="1em" /> : <Play size="1em" />}
 						onClick={() => handleToggleStatus(record)}
 					>
 						{record.status === 'active' ? t('applications.pause') : t('applications.resume')}
@@ -224,7 +224,7 @@ export default function ApplicationsPage() {
 						okButtonProps={{ danger: true }}
 						onConfirm={() => handleDelete(record.id)}
 					>
-						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+						<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -245,7 +245,7 @@ export default function ApplicationsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();
@@ -348,7 +348,7 @@ export default function ApplicationsPage() {
 								<Button
 									type="text"
 									size="small"
-									icon={<CopyOutlined />}
+									icon={<Copy size="1em" />}
 									onClick={() => {
 										navigator.clipboard.writeText(detailRecord.clientId);
 										message.success(t('applications.copiedClientId'));

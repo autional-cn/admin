@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { Tag, Button, Space, Modal, Form, Input, Select, Popconfirm, Upload } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	CheckCircleOutlined,
-	ApiOutlined,
-} from '@ant-design/icons';
+	CheckCircle2,
+	Pencil,
+	Plug,
+	Plus,
+	Trash2,
+} from 'lucide-react';
 import {
 	useIdentityProviders,
 	useCreateIdentityProvider,
@@ -242,7 +242,7 @@ export default function IdentityProvidersPage() {
 					<Button
 						type="link"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => openModal(record)}
 					>
 						{t('common.edit')}
@@ -250,14 +250,14 @@ export default function IdentityProvidersPage() {
 					<Button
 						type="link"
 						size="small"
-						icon={<CheckCircleOutlined />}
+						icon={<CheckCircle2 size="1em" />}
 						loading={testingId === record.id}
 						onClick={() => handleTest(record.id)}
 					>
 						{t('idp.testConnection')}
 					</Button>
 					<Popconfirm title={t('idp.confirmDelete')} onConfirm={() => handleDelete(record.id)}>
-						<Button type="link" size="small" danger icon={<DeleteOutlined />}>
+						<Button type="link" size="small" danger icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -274,7 +274,7 @@ export default function IdentityProvidersPage() {
 				title={t('idp.title')}
 				actions={
 					<>
-						<Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={() => openModal()}>
 							{t('idp.createBtn')}
 						</Button>
 					</>
@@ -436,7 +436,7 @@ export default function IdentityProvidersPage() {
 							{/* Test Connection button */}
 							<Form.Item>
 								<Button
-									icon={<ApiOutlined />}
+									icon={<Plug size="1em" />}
 									loading={testingConnection}
 									onClick={handleTestLdapConnection}
 								>

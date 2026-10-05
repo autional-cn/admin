@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
 import { Button, Modal, Form, Input, Select, Tag, Space, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -105,7 +105,7 @@ export default function PayChannelsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -126,7 +126,7 @@ export default function PayChannelsPage() {
 						okText={t('payChannels.ok')}
 						cancelText={t('payChannels.cancel')}
 					>
-						<Button type="link" danger icon={<DeleteOutlined />}>
+						<Button type="link" danger icon={<Trash2 size="1em" />}>
 							{t('payChannels.delete')}
 						</Button>
 					</Popconfirm>
@@ -143,7 +143,7 @@ export default function PayChannelsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

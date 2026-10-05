@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, DatePicker, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import dayjs from 'dayjs';
 import {
 	useCoupons,
@@ -149,7 +149,7 @@ export default function WalletCouponsPage() {
 			key: 'action',
 			render: (_: unknown, record: CouponItem) => (
 				<Space size="small">
-					<Button type="link" icon={<EditOutlined />} onClick={() => openEdit(record)}>
+					<Button type="link" icon={<Pencil size="1em" />} onClick={() => openEdit(record)}>
 						{t('walletCoupons.edit')}
 					</Button>
 					<Popconfirm
@@ -158,7 +158,7 @@ export default function WalletCouponsPage() {
 						okText={t('walletCoupons.ok')}
 						cancelText={t('walletCoupons.cancel')}
 					>
-						<Button type="link" danger icon={<DeleteOutlined />}>
+						<Button type="link" danger icon={<Trash2 size="1em" />}>
 							{t('walletCoupons.delete')}
 						</Button>
 					</Popconfirm>
@@ -175,7 +175,7 @@ export default function WalletCouponsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

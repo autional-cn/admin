@@ -8,12 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { Tag, Button, Input, Space, Card, Statistic, Row, Col, Select, Modal, Form, Empty, Skeleton } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	SearchOutlined,
-	AuditOutlined,
-	CheckCircleOutlined,
-	ClockCircleOutlined,
-	CloseCircleOutlined,
-} from '@ant-design/icons';
+	CheckCircle2,
+	ClipboardCheck,
+	Clock,
+	Search,
+	XCircle,
+} from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
@@ -186,7 +186,7 @@ export default function VerificationsPage() {
 				title={t('verifications.title')}
 				actions={
 					<>
-						<Button icon={<AuditOutlined />} onClick={() => refetch()}>
+						<Button icon={<ClipboardCheck size="1em" />} onClick={() => refetch()}>
 							{t('common.refresh')}
 						</Button>
 					</>
@@ -203,7 +203,7 @@ export default function VerificationsPage() {
 						<Statistic
 							title={t('verifications.statsTotal')}
 							value={stats?.total ?? 0}
-							prefix={<AuditOutlined />}
+							prefix={<ClipboardCheck size="1em" />}
 						/>
 					</Card>
 				</Col>
@@ -212,7 +212,7 @@ export default function VerificationsPage() {
 						<Statistic
 							title={t('verifications.statsVerified')}
 							value={stats?.verified ?? 0}
-							prefix={<CheckCircleOutlined />}
+							prefix={<CheckCircle2 size="1em" />}
 							valueStyle={{ color: 'var(--color-success-light)' }}
 						/>
 					</Card>
@@ -222,7 +222,7 @@ export default function VerificationsPage() {
 						<Statistic
 							title={t('verifications.statsPending')}
 							value={stats?.pending ?? 0}
-							prefix={<ClockCircleOutlined />}
+							prefix={<Clock size="1em" />}
 							valueStyle={{ color: 'var(--color-warning-light)' }}
 						/>
 					</Card>
@@ -232,7 +232,7 @@ export default function VerificationsPage() {
 						<Statistic
 							title={t('verifications.statsRejected')}
 							value={stats?.rejected ?? 0}
-							prefix={<CloseCircleOutlined />}
+							prefix={<XCircle size="1em" />}
 							valueStyle={{ color: 'var(--color-error-light)' }}
 						/>
 					</Card>
@@ -244,7 +244,7 @@ export default function VerificationsPage() {
 					<Input.Search
 						placeholder={t('verifications.searchUser')}
 						allowClear
-						enterButton={<SearchOutlined />}
+						enterButton={<Search size="1em" />}
 						value={keyword}
 						onChange={(e) => setKeyword(e.target.value)}
 						onSearch={handleSearch}

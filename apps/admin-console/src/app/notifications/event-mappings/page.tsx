@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Select, Switch, Popconfirm, Tooltip } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined, TagOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Tag as TagIcon, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
@@ -108,7 +108,7 @@ export default function EventMappingsPage() {
 				<Button
 					type="link"
 					size="small"
-					icon={<TagOutlined />}
+					icon={<TagIcon size="1em" />}
 					onClick={() => navigate(buildNavHref('/notifications/templates', tenantSlug))}
 					className="p-0"
 				>
@@ -165,7 +165,7 @@ export default function EventMappingsPage() {
 					<Tooltip title={t('common.edit')}>
 						<Button
 							size="small"
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							aria-label={t('common.edit')}
 							onClick={() => openEdit(record)}
 						/>
@@ -181,7 +181,7 @@ export default function EventMappingsPage() {
 							}
 						}}
 					>
-						<Button size="small" danger icon={<DeleteOutlined />} aria-label={t('common.delete')} />
+						<Button size="small" danger icon={<Trash2 size="1em" />} aria-label={t('common.delete')} />
 					</Popconfirm>
 				</Space>
 			),
@@ -194,7 +194,7 @@ export default function EventMappingsPage() {
 				title={t('notifications.eventMappings.title')}
 				actions={
 					<>
-						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={openCreate}>
 							{t('notifications.eventMappings.createMapping')}
 						</Button>
 					</>

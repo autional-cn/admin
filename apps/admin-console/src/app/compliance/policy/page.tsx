@@ -4,13 +4,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, Card, Checkbox, Button, Tag, Space, Modal, Form, Input, message, Progress, Row, Col, Statistic, Descriptions } from 'antd';
 import {
-	SafetyCertificateOutlined,
-	CheckCircleOutlined,
-	CloseCircleOutlined,
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-} from '@ant-design/icons';
+	BadgeCheck,
+	CheckCircle2,
+	Pencil,
+	Plus,
+	Trash2,
+	XCircle,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '@/lib/error-handler';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
@@ -352,7 +352,7 @@ export default function CompliancePolicyPage() {
 					<Space>
 						<Button
 							type="primary"
-							icon={<SafetyCertificateOutlined />}
+							icon={<BadgeCheck size="1em" />}
 							onClick={handleApply}
 							loading={loading}
 						>
@@ -467,7 +467,7 @@ export default function CompliancePolicyPage() {
 										<Button
 											type="link"
 											danger
-											icon={<DeleteOutlined />}
+											icon={<Trash2 size="1em" />}
 											onClick={() => removeConfigRow(row.key)}
 										>
 											{t('compliance.policy.remove')}
@@ -477,7 +477,7 @@ export default function CompliancePolicyPage() {
 							]}
 						/>
 						<Space className="mt-3">
-							<Button icon={<PlusOutlined />} onClick={addConfigRow}>
+							<Button icon={<Plus size="1em" />} onClick={addConfigRow}>
 								{t('compliance.policy.addParam')}
 							</Button>
 							<Button type="primary" onClick={handleRunGapAnalysis} loading={loading}>
@@ -532,11 +532,11 @@ export default function CompliancePolicyPage() {
 										width: 80,
 										render: (v: boolean) =>
 											v ? (
-												<Tag color="green" icon={<CheckCircleOutlined />}>
+												<Tag color="green" icon={<CheckCircle2 size="1em" />}>
 													{t('compliance.gap.compliant')}
 												</Tag>
 											) : (
-												<Tag color="red" icon={<CloseCircleOutlined />}>
+												<Tag color="red" icon={<XCircle size="1em" />}>
 													{t('compliance.gap.nonCompliant')}
 												</Tag>
 											),
@@ -575,7 +575,7 @@ export default function CompliancePolicyPage() {
 					<Card
 						title={t('compliance.policy.overrides')}
 						extra={
-							<Button type="primary" icon={<EditOutlined />} onClick={() => setOverrideModal(true)}>
+							<Button type="primary" icon={<Pencil size="1em" />} onClick={() => setOverrideModal(true)}>
 								{t('compliance.policy.addOverride')}
 							</Button>
 						}
@@ -599,7 +599,7 @@ export default function CompliancePolicyPage() {
 										<Button
 											type="link"
 											danger
-											icon={<DeleteOutlined />}
+											icon={<Trash2 size="1em" />}
 											onClick={() => handleRemoveOverride(record.parameter)}
 										>
 											{t('compliance.policy.remove')}
@@ -742,7 +742,7 @@ export default function CompliancePolicyPage() {
 	return (
 		<div>
 			<h2 className="mb-4">
-				<SafetyCertificateOutlined className="mr-2" />
+				<BadgeCheck size="1em" className="mr-2" />
 				{t('compliance.policy.title')}
 			</h2>
 			<Tabs activeKey={activeTab} onChange={setActiveTab} items={tabs} />

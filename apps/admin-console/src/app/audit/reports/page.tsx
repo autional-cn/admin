@@ -15,7 +15,7 @@ import {
 	Col,
 	Typography,
 } from 'antd';
-import { FileProtectOutlined, AuditOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ClipboardCheck, FileLock } from 'lucide-react';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditReportsSecurity,
@@ -144,7 +144,7 @@ export default function AuditReportsPage() {
 				/>
 				<Button
 					type="primary"
-					icon={<FileProtectOutlined />}
+					icon={<FileLock size="1em" />}
 					onClick={generateSecurityReport}
 					loading={secLoading}
 				>
@@ -254,7 +254,7 @@ export default function AuditReportsPage() {
 			{!secData && !secLoading && !secError && (
 				<Card>
 					<div className="text-center py-10 text-neutral-600">
-						<FileProtectOutlined className="text-[40px]" />
+						<FileLock size="1em" className="text-[40px]" />
 						<p className="mt-3">{t('auditReports.securityEmptyHint')}</p>
 					</div>
 				</Card>
@@ -280,7 +280,7 @@ export default function AuditReportsPage() {
 				/>
 				<Button
 					type="primary"
-					icon={<AuditOutlined />}
+					icon={<ClipboardCheck size="1em" />}
 					onClick={generateComplianceReport}
 					loading={compLoading}
 				>
@@ -399,7 +399,7 @@ export default function AuditReportsPage() {
 			{!compData && !compLoading && !compError && (
 				<Card>
 					<div className="text-center py-10 text-neutral-600">
-						<AuditOutlined className="text-[40px]" />
+						<ClipboardCheck size="1em" className="text-[40px]" />
 						<p className="mt-3">
 							{t('auditReports.complianceEmptyHint')}
 						</p>
@@ -423,13 +423,13 @@ export default function AuditReportsPage() {
 					{
 						key: 'security',
 						label: t('auditReports.tab.security'),
-						icon: <FileProtectOutlined />,
+						icon: <FileLock size="1em" />,
 						children: securityTab,
 					},
 					{
 						key: 'compliance',
 						label: t('auditReports.tab.compliance'),
-						icon: <AuditOutlined />,
+						icon: <ClipboardCheck size="1em" />,
 						children: complianceTab,
 					},
 				]}

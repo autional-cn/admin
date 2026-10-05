@@ -7,15 +7,14 @@ import dayjs from 'dayjs';
 
 import { message, modal } from '@/lib/antd-app';
 import {
-	SearchOutlined,
-	ExportOutlined,
-	SafetyOutlined,
-	EyeOutlined,
-	DownloadOutlined,
-	LinkOutlined,
-	CheckCircleOutlined,
-	FileProtectOutlined,
-} from '@ant-design/icons';
+	Download,
+	ExternalLink,
+	Eye,
+	FileLock,
+	Link2,
+	Search,
+	ShieldCheck,
+} from 'lucide-react';
 import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/use-audit-logs';
 import { handleApiError } from '@/lib/error-handler';
 import { DataTable, DateRangeFilter, Drawer, PageError } from '@autional-cn/ui/antd';
@@ -339,7 +338,7 @@ export default function AuditLogsPage() {
 			key: 'actionCol',
 			width: 90,
 			render: (_: any, record: any) => (
-				<Button type="link" icon={<EyeOutlined />} onClick={() => openDetail(record)}>
+				<Button type="link" icon={<Eye size="1em" />} onClick={() => openDetail(record)}>
 					{t('common.viewDetail')}
 				</Button>
 			),
@@ -358,14 +357,14 @@ export default function AuditLogsPage() {
 					<>
 						<Space>
 							<Button
-								icon={<SafetyOutlined />}
+								icon={<ShieldCheck size="1em" />}
 								onClick={handleVerifyChain}
 								loading={verifyMutation.isPending}
 							>
 								{t('audit.action.verifyChain')}
 							</Button>
 							<Button
-								icon={<ExportOutlined />}
+								icon={<ExternalLink size="1em" />}
 								onClick={() => handleExport('csv')}
 								loading={exportMutation.isPending}
 							>
@@ -456,7 +455,7 @@ export default function AuditLogsPage() {
 					</Col>
 				</Row>
 				<div className="mt-3 text-right">
-					<Button type="primary" icon={<SearchOutlined />} onClick={() => refetch()}>
+					<Button type="primary" icon={<Search size="1em" />} onClick={() => refetch()}>
 						{t('audit.action.search')}
 					</Button>
 				</div>
@@ -629,7 +628,7 @@ export default function AuditLogsPage() {
 						key: 'export',
 						label: (
 							<span>
-								<ExportOutlined className="mr-2" />
+								<ExternalLink size="1em" className="mr-2" />
 								{t('audit.exportJobs.title')}
 							</span>
 						),
@@ -680,7 +679,7 @@ export default function AuditLogsPage() {
 													<Button
 														type="link"
 														size="small"
-														icon={<DownloadOutlined />}
+														icon={<Download size="1em" />}
 														onClick={() => handleDownload(record.jobId)}
 													>
 														{t('audit.exportJobs.download')}
@@ -697,7 +696,7 @@ export default function AuditLogsPage() {
 						key: 'verification',
 						label: (
 							<span>
-								<FileProtectOutlined className="mr-2" />
+								<FileLock size="1em" className="mr-2" />
 								{t('audit.verification.title')}
 							</span>
 						),
@@ -711,7 +710,7 @@ export default function AuditLogsPage() {
 											<Button
 												type="primary"
 												size="small"
-												icon={<LinkOutlined />}
+												icon={<Link2 size="1em" />}
 												onClick={handleViewHashChain}
 											>
 												{t('audit.hashChain.view')}
@@ -731,7 +730,7 @@ export default function AuditLogsPage() {
 											<Button
 												type="primary"
 												size="small"
-												icon={<SafetyOutlined />}
+												icon={<ShieldCheck size="1em" />}
 												onClick={handleVerifyProof}
 											>
 												{t('audit.merkle.verify')}

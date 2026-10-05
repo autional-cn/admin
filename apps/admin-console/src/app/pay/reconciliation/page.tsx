@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
 import { Tag, Select, Space, Card, Row, Col, Statistic, Button } from 'antd';
-import { RetweetOutlined } from '@ant-design/icons';
+import { Repeat2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -206,7 +206,7 @@ export default function PayReconciliationPage() {
 					/>
 					<Button
 						type="primary"
-						icon={<RetweetOutlined />}
+						icon={<Repeat2 size="1em" />}
 						loading={isRunning}
 						onClick={handleRunReconciliation}
 					>

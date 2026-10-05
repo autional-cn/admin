@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Form, Input, Select, Switch, InputNumber, Button } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined } from '@ant-design/icons';
+import { Save } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getSecurityPolicy, updateSecurityPolicy } from '@/lib/api.generated';
 import { queryKeys } from '@/lib/query-keys';
@@ -194,7 +194,7 @@ export default function SecurityPolicyPage() {
 
 					<Button
 						type="primary"
-						icon={<SaveOutlined />}
+						icon={<Save size="1em" />}
 						htmlType="submit"
 						loading={updateMut.isPending}
 					>

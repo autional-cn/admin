@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { DataTable, PageError } from '@autional-cn/ui/antd';
 import { Tabs, Button, Modal, Form, Input, Select, Space, Tag, Typography, InputNumber, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Plus, RefreshCw } from 'lucide-react';
 import { ConsolePageHeader, EmptyState, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { apiClient, API_PATHS } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
@@ -126,7 +126,7 @@ function CrudTab({
 			{!readOnly && (
 				<Button
 					type="primary"
-					icon={<PlusOutlined />}
+					icon={<Plus size="1em" />}
 					onClick={() => {
 						form.resetFields();
 						setModalOpen(true);
@@ -136,7 +136,7 @@ function CrudTab({
 					{t('common.create')}
 				</Button>
 			)}
-			<Button icon={<ReloadOutlined />} onClick={fetchData} className="mb-4 ml-2">
+			<Button icon={<RefreshCw size="1em" />} onClick={fetchData} className="mb-4 ml-2">
 				{t('common.refresh')}
 			</Button>
 			{!readOnly && (

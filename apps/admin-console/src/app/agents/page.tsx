@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { DataTable } from '@autional-cn/ui/antd';
 import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Popconfirm, Skeleton } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId, extractList, extractItem } from '@autional-cn/shared';
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
@@ -169,7 +169,7 @@ export default function AgentsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={(e) => {
 							e.stopPropagation();
 							navigate(buildNavHref(`/agents/${record.identityId ?? ''}`, tenantSlug));
@@ -188,7 +188,7 @@ export default function AgentsPage() {
 						<Button
 							type="link"
 							danger
-							icon={<DeleteOutlined />}
+							icon={<Trash2 size="1em" />}
 							onClick={(e) => e.stopPropagation()}
 						>
 							{t('common.delete')}
@@ -207,7 +207,7 @@ export default function AgentsPage() {
 				actions={
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);
@@ -239,7 +239,7 @@ export default function AgentsPage() {
 					<EmptyState title={t('agents.emptyTitle')} description={t('agents.emptyDesc')} />
 					<Button
 						type="primary"
-						icon={<PlusOutlined />}
+						icon={<Plus size="1em" />}
 						onClick={() => {
 							form.resetFields();
 							setModalVisible(true);

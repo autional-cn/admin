@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button, DatePicker, Empty, Form, Input, Modal, Select, Space, Tag } from 'antd';
 
-import { PlusOutlined } from '@ant-design/icons';
+import { Plus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { message, modal } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
@@ -333,7 +333,7 @@ export default function LegalDocumentsPage() {
 					<h2 className="mb-1">{t('legalDocuments.title')}</h2>
 					<p className="text-sm text-neutral-600">{t('legalDocuments.subtitle')}</p>
 				</div>
-				<Button type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
+				<Button type="primary" icon={<Plus size="1em" />} onClick={openCreateModal}>
 					{t('legalDocuments.create')}
 				</Button>
 			</div>

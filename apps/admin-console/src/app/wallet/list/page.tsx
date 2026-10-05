@@ -5,7 +5,7 @@ import { useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Space, Popconfirm, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { Lock, Plus, Unlock } from 'lucide-react';
 import {
 	useWalletList,
 	useCreateWallet,
@@ -122,7 +122,7 @@ export default function WalletListPage() {
 							okText={t('walletList.ok')}
 							cancelText={t('walletList.cancel')}
 						>
-							<Button type="link" icon={<LockOutlined />} size="small">
+							<Button type="link" icon={<Lock size="1em" />} size="small">
 								{t('walletList.freeze')}
 							</Button>
 						</Popconfirm>
@@ -133,7 +133,7 @@ export default function WalletListPage() {
 							okText={t('walletList.ok')}
 							cancelText={t('walletList.cancel')}
 						>
-							<Button type="link" icon={<UnlockOutlined />} size="small">
+							<Button type="link" icon={<Unlock size="1em" />} size="small">
 								{t('walletList.unfreeze')}
 							</Button>
 						</Popconfirm>
@@ -161,7 +161,7 @@ export default function WalletListPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								form.resetFields();
 								setCreateModal(true);

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, Form, Select, Button, Space, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Download } from 'lucide-react';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
 import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
 import type { DateRangeValue } from '@autional-cn/ui/antd';
@@ -64,7 +64,7 @@ export default function BillingTaxExportPage() {
 			render: (_: unknown, record: TaxExportItem) => (
 				<Button
 					type="link"
-					icon={<DownloadOutlined />}
+					icon={<Download size="1em" />}
 					disabled={record.status !== 'completed' || !record.downloadUrl}
 					onClick={() => {
 						if (record.downloadUrl) {

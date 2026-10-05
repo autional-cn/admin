@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Card, Tag, Button, Popconfirm, Empty } from 'antd';
 import { message } from '@/lib/antd-app';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Trash2 } from 'lucide-react';
 import { useSessions, useActiveSessionCount, useDeleteSession } from '@/hooks/use-sessions';
 import type { SessionRecord } from '@/hooks/use-sessions';
 import { handleApiError } from '@/lib/error-handler';
@@ -151,7 +151,7 @@ export default function SessionsPage() {
 								title={t('sessions.batchRevokeConfirm', { count: selectedRowKeys.length })}
 								onConfirm={handleBatchDelete}
 							>
-								<Button type="primary" danger icon={<DeleteOutlined />}>
+								<Button type="primary" danger icon={<Trash2 size="1em" />}>
 									{t('sessions.batchRevoke', { count: selectedRowKeys.length })}
 								</Button>
 							</Popconfirm>

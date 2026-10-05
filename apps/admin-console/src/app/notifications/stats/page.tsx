@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Card, Row, Col, Statistic, Skeleton, Tag, Typography, Empty, Segmented } from 'antd';
-import { ArrowUpOutlined, BellOutlined, EyeOutlined, SendOutlined } from '@ant-design/icons';
+import { ArrowUp, Eye, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useNotificationStats,
@@ -101,7 +101,7 @@ export default function NotificationStatsPage() {
 							<Statistic
 								title={t('notifications.stats.totalSent')}
 								value={stats?.totalSent ?? 0}
-								prefix={<SendOutlined className="text-info" />}
+								prefix={<Send size="1em" className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -114,7 +114,7 @@ export default function NotificationStatsPage() {
 							<Statistic
 								title={t('notifications.stats.totalRead')}
 								value={stats?.totalRead ?? 0}
-								prefix={<EyeOutlined className="text-success" />}
+								prefix={<Eye size="1em" className="text-success" />}
 							/>
 						)}
 					</Card>
@@ -129,7 +129,7 @@ export default function NotificationStatsPage() {
 								value={stats?.readRate ? Math.round(stats.readRate * 10000) / 100 : 0}
 								suffix="%"
 								precision={1}
-								prefix={<ArrowUpOutlined className="text-info" />}
+								prefix={<ArrowUp size="1em" className="text-info" />}
 								valueStyle={{
 									color:
 										(stats?.readRate ?? 0) > 0.4

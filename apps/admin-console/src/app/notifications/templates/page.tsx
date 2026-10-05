@@ -4,13 +4,13 @@ import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select, Tabs, Tooltip, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	SendOutlined,
-	CodeOutlined,
-	CopyOutlined,
-} from '@ant-design/icons';
+	Code,
+	Copy,
+	Pencil,
+	Plus,
+	Send,
+	Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { extractItem } from '@autional-cn/shared';
 import {
@@ -206,7 +206,7 @@ export default function NotificationTemplatesPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							setActiveLang('zh-CN');
@@ -224,7 +224,7 @@ export default function NotificationTemplatesPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<SendOutlined />}
+						icon={<Send size="1em" />}
 						onClick={() => setTestModalVisible(true)}
 					>
 						{t('notifications.templates.test')}
@@ -232,7 +232,7 @@ export default function NotificationTemplatesPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<CopyOutlined />}
+						icon={<Copy size="1em" />}
 						onClick={() => {
 							setCloning(record);
 							setCloneModalVisible(true);
@@ -244,7 +244,7 @@ export default function NotificationTemplatesPage() {
 						title={t('notifications.templates.confirmDelete')}
 						onConfirm={() => handleDelete(record.templateId)}
 					>
-						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+						<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -294,7 +294,7 @@ export default function NotificationTemplatesPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								setActiveLang('zh-CN');
@@ -386,7 +386,7 @@ export default function NotificationTemplatesPage() {
 									title={t('notifications.templates.insertVariableTip').replace('{}', v)}
 									key={v}
 								>
-									<Button size="small" icon={<CodeOutlined />} onClick={() => insertVariable(v)}>
+									<Button size="small" icon={<Code size="1em" />} onClick={() => insertVariable(v)}>
 										{v}
 									</Button>
 								</Tooltip>

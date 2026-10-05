@@ -14,13 +14,12 @@ import {
 	Select,
 } from 'antd';
 import {
-	LockOutlined,
-	DownloadOutlined,
-	ArrowLeftOutlined,
-	SendOutlined,
-	HistoryOutlined,
-	AuditOutlined,
-} from '@ant-design/icons';
+	ArrowLeft,
+	Download,
+	History,
+	Lock,
+	Send,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConsolePageHeader, EmptyState, ErrorState, LoadingScreen, SectionCard } from '@autional-cn/ui';
 import { apiClient, API_PATHS, extractItem, useTenantSlug } from '@autional-cn/shared';
@@ -188,7 +187,7 @@ export default function ProfileDetailPage() {
 			key: 'history',
 			label: (
 				<span>
-					<HistoryOutlined /> {t('profileDetail.tab.versionHistory')}
+					<History size="1em" /> {t('profileDetail.tab.versionHistory')}
 				</span>
 			),
 			children:
@@ -227,16 +226,16 @@ export default function ProfileDetailPage() {
 				description={t('profileDetail.subtitleUser', { userId })}
 			/>
 			<Space className="mb-4">
-				<Button icon={<ArrowLeftOutlined />} onClick={() => navigate(buildNavHref('/profiles', tenantSlug))}>
+				<Button icon={<ArrowLeft size="1em" />} onClick={() => navigate(buildNavHref('/profiles', tenantSlug))}>
 					{t('profileDetail.action.back')}
 				</Button>
-				<Button icon={<LockOutlined />} danger onClick={handleArchive}>
+				<Button icon={<Lock size="1em" />} danger onClick={handleArchive}>
 					{t('profileDetail.action.archive')}
 				</Button>
-				<Button icon={<DownloadOutlined />} onClick={handleExport}>
+				<Button icon={<Download size="1em" />} onClick={handleExport}>
 					{t('profileDetail.action.export')}
 				</Button>
-				<Button icon={<SendOutlined />} onClick={() => setApprovalOpen(true)}>
+				<Button icon={<Send size="1em" />} onClick={() => setApprovalOpen(true)}>
 					{t('profileDetail.action.requestApproval')}
 				</Button>
 			</Space>

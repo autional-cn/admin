@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select, Switch, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	CopyOutlined,
-	EyeOutlined,
-} from '@ant-design/icons';
+	Copy,
+	Pencil,
+	Plus,
+	Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useCommunicationTemplates,
@@ -156,7 +155,7 @@ export default function CommunicationTemplatesPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -177,7 +176,7 @@ export default function CommunicationTemplatesPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<CopyOutlined />}
+						icon={<Copy size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							cloneForm.resetFields();
@@ -190,7 +189,7 @@ export default function CommunicationTemplatesPage() {
 						title={t('communication.templates.confirmDelete')}
 						onConfirm={() => record.id && handleDelete(record.id)}
 					>
-						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+						<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -207,7 +206,7 @@ export default function CommunicationTemplatesPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

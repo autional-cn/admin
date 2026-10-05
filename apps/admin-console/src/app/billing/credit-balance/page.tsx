@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Tag, Button, Input, Space, Card, Descriptions, Spin, Select } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Search } from 'lucide-react';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
@@ -115,7 +115,7 @@ export default function BillingCreditBalancePage() {
 						/>
 					</div>
 					<Button
-						icon={<SearchOutlined />}
+						icon={<Search size="1em" />}
 						onClick={() => {
 							setLookupId(tenantId);
 							setPage(1);

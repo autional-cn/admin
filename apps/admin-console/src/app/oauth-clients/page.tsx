@@ -4,15 +4,15 @@ import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select, Descriptions, Popconfirm, Empty, Spin, Tabs, Statistic, Card, Row, Col, Typography } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	KeyOutlined,
-	ReloadOutlined,
-	EyeOutlined,
-	StopOutlined,
-	CopyOutlined,
-} from '@ant-design/icons';
+	Ban,
+	Copy,
+	Eye,
+	KeyRound,
+	Pencil,
+	Plus,
+	RefreshCw,
+	Trash2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useOAuthClients,
@@ -134,7 +134,7 @@ export default function OAuthClientsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<CopyOutlined />}
+						icon={<Copy size="1em" />}
 						onClick={() => {
 							navigator.clipboard.writeText(v);
 							message.success(t('oauthClients.copied'));
@@ -165,7 +165,7 @@ export default function OAuthClientsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<KeyOutlined />}
+						icon={<KeyRound size="1em" />}
 						onClick={() => setSecretDrawerClient(record)}
 					>
 						{t('oauthClients.manageSecrets')}
@@ -173,7 +173,7 @@ export default function OAuthClientsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EyeOutlined />}
+						icon={<Eye size="1em" />}
 						onClick={() => setDetailClient(record)}
 					>
 						{t('oauthClients.detail')}
@@ -181,7 +181,7 @@ export default function OAuthClientsPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -196,7 +196,7 @@ export default function OAuthClientsPage() {
 						title={t('oauthClients.confirmDelete')}
 						onConfirm={() => handleDelete(record.clientId)}
 					>
-						<Button type="text" size="small" danger icon={<DeleteOutlined />} />
+						<Button type="text" size="small" danger icon={<Trash2 size="1em" />} />
 					</Popconfirm>
 				</Space>
 			),
@@ -215,7 +215,7 @@ export default function OAuthClientsPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();
@@ -304,7 +304,7 @@ export default function OAuthClientsPage() {
 									<Button
 										type="text"
 										size="small"
-										icon={<CopyOutlined />}
+										icon={<Copy size="1em" />}
 										onClick={() => {
 											navigator.clipboard.writeText(detailClient.clientId);
 											message.success(t('oauthClients.copied'));
@@ -355,10 +355,10 @@ export default function OAuthClientsPage() {
 				size="sm"
 				extra={
 					<Space>
-						<Button icon={<ReloadOutlined />} onClick={handleRotateSecret}>
+						<Button icon={<RefreshCw size="1em" />} onClick={handleRotateSecret}>
 							{t('oauthClients.rotateSecret')}
 						</Button>
-						<Button type="primary" icon={<PlusOutlined />} onClick={handleCreateSecret}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={handleCreateSecret}>
 							{t('oauthClients.addSecret')}
 						</Button>
 					</Space>
@@ -419,7 +419,7 @@ export default function OAuthClientsPage() {
 														})
 													}
 												>
-													<Button type="text" size="small" icon={<StopOutlined />} />
+													<Button type="text" size="small" icon={<Ban size="1em" />} />
 												</Popconfirm>
 												<Popconfirm
 													title={t('oauthClients.confirmDeleteSecret')}
@@ -430,7 +430,7 @@ export default function OAuthClientsPage() {
 														})
 													}
 												>
-													<Button type="text" size="small" danger icon={<DeleteOutlined />} />
+													<Button type="text" size="small" danger icon={<Trash2 size="1em" />} />
 												</Popconfirm>
 											</Space>
 										),

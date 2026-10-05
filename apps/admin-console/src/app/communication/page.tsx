@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Card, Tabs, Form, Input, Button, Tag, Row, Col, Space, Spin, Statistic, Skeleton, Select, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
-import { CheckCircleOutlined, SendOutlined, SwapRightOutlined } from '@ant-design/icons';
+import { CheckCircle2, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	useChannelStats,
@@ -201,7 +201,7 @@ export default function CommunicationPage() {
 							<Statistic
 								title={t('communication.totalSent30d')}
 								value={dashboard?.totalSent ?? 0}
-								prefix={<SendOutlined className="text-info" />}
+								prefix={<Send size="1em" className="text-info" />}
 							/>
 						)}
 					</Card>
@@ -214,7 +214,7 @@ export default function CommunicationPage() {
 							<Statistic
 								title={t('communication.delivered')}
 								value={dashboard?.delivered ?? 0}
-								prefix={<CheckCircleOutlined className="text-success" />}
+								prefix={<CheckCircle2 size="1em" className="text-success" />}
 							/>
 						)}
 					</Card>
@@ -389,7 +389,7 @@ export default function CommunicationPage() {
 										{t('communication.saveConfig')}
 									</Button>
 									<Button
-										icon={<CheckCircleOutlined />}
+										icon={<CheckCircle2 size="1em" />}
 										onClick={() => handleCheckHealth(c.key)}
 										loading={checkingHealth[c.key]}
 									>

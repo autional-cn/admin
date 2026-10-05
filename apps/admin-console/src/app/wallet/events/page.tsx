@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { Card, Input, Button, Typography, Space, Spin, Descriptions } from 'antd';
 import { Result } from '@autional-cn/ui';
 import {
-	SearchOutlined,
-	CheckCircleFilled,
-	CloseCircleFilled,
-	LinkOutlined,
-} from '@ant-design/icons';
+	CheckCircle2,
+	Link2,
+	Search,
+	XCircle,
+} from 'lucide-react';
 import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
 
 const { Title, Text } = Typography;
@@ -67,9 +67,9 @@ export default function WalletEventsPage() {
 						value={walletId}
 						onChange={(e) => setWalletId(e.target.value)}
 						onPressEnter={handleVerify}
-						prefix={<LinkOutlined />}
+						prefix={<Link2 size="1em" />}
 					/>
-					<Button type="primary" icon={<SearchOutlined />} onClick={handleVerify} loading={loading}>
+					<Button type="primary" icon={<Search size="1em" />} onClick={handleVerify} loading={loading}>
 						{t('walletEvents.verifyBtn')}
 					</Button>
 				</Space.Compact>
@@ -123,9 +123,9 @@ export default function WalletEventsPage() {
 						className="mx-auto max-w-md"
 						icon={
 							result.valid ? (
-								<CheckCircleFilled className="text-success text-5xl" />
+								<CheckCircle2 size="1em" className="text-success text-5xl" />
 							) : (
-								<CloseCircleFilled className="text-danger text-5xl" />
+								<XCircle size="1em" className="text-danger text-5xl" />
 							)
 						}
 						title={

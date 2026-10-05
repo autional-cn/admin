@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select, Popconfirm, Empty, Spin, Typography } from 'antd';
-import { PlusOutlined, DeleteOutlined, SyncOutlined, CopyOutlined } from '@ant-design/icons';
+import { Copy, Plus, RefreshCw, Trash2 } from 'lucide-react';
 import { message } from '@/lib/antd-app';
 import { useTranslation } from 'react-i18next';
 import {
@@ -139,12 +139,12 @@ export default function ApiKeysPage() {
 			render: (_: any, record: ApiKeyRecord) => (
 				<Space size="small">
 					<Popconfirm title={t('apiKeys.confirmRotate')} onConfirm={() => handleRotate(record.id)}>
-						<Button type="text" size="small" icon={<SyncOutlined />}>
+						<Button type="text" size="small" icon={<RefreshCw size="1em" />}>
 							{t('apiKeys.rotate')}
 						</Button>
 					</Popconfirm>
 					<Popconfirm title={t('apiKeys.confirmRevoke')} onConfirm={() => handleDelete(record.id)}>
-						<Button type="text" size="small" danger icon={<DeleteOutlined />}>
+						<Button type="text" size="small" danger icon={<Trash2 size="1em" />}>
 							{t('apiKeys.revoke')}
 						</Button>
 					</Popconfirm>
@@ -163,7 +163,7 @@ export default function ApiKeysPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setModalVisible(true);
 								form.resetFields();
@@ -244,7 +244,7 @@ export default function ApiKeysPage() {
 						onFocus={(e) => e.target.select()}
 						data-testid="api-key-revealed"
 					/>
-					<Button icon={<CopyOutlined />} onClick={handleCopyKey}>
+					<Button icon={<Copy size="1em" />} onClick={handleCopyKey}>
 						{t('apiKeys.copy')}
 					</Button>
 				</div>

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useCurrentTenantIdOr, classifyQueryState, type QueryState } from '@autional-cn/shared';
 import { Card, Row, Col, Statistic, Select, Spin, Empty } from 'antd';
-import { BarChartOutlined } from '@ant-design/icons';
+import { BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
@@ -107,7 +107,7 @@ export default function UsagePage() {
 								stateText(timelineState) ??
 								timelineData.reduce((s: number, r: any) => s + (r.apiRequests || 0), 0)
 							}
-							prefix={<BarChartOutlined />}
+							prefix={<BarChart3 size="1em" />}
 						/>
 					</Card>
 				</Col>

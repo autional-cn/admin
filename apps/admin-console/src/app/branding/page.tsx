@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Form, Input, Button, Slider, ColorPicker, Card, Row, Col, Spin } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import { RefreshCw, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBranding, useUpdateBranding } from '@/hooks/use-branding';
 
@@ -74,7 +74,7 @@ export default function BrandingPage() {
 				title={t('branding.title')}
 				actions={
 					<>
-						<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
+						<Button icon={<RefreshCw size="1em" />} onClick={() => window.location.reload()}>
 							{t('branding.refresh')}
 						</Button>
 					</>
@@ -125,7 +125,7 @@ export default function BrandingPage() {
 								<Button
 									type="primary"
 									htmlType="submit"
-									icon={<SaveOutlined />}
+									icon={<Save size="1em" />}
 									loading={updateMut.isPending}
 								>
 									{t('branding.saveConfig')}

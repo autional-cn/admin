@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Select, Button, Spin, Descriptions, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined, ReloadOutlined, SafetyOutlined } from '@ant-design/icons';
+import { RefreshCw, Save, ShieldCheck } from 'lucide-react';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 
 import { apiClient, API_PATHS } from '@autional-cn/shared';
@@ -76,10 +76,10 @@ export default function SodConfigPage() {
 		<div className="p-6 max-w-2xl">
 			<div className="flex items-center justify-between mb-6">
 				<div className="flex items-center gap-2">
-					<SafetyOutlined className="text-xl" />
+					<ShieldCheck size="1em" className="text-xl" />
 					<ConsolePageHeader title={t('sod.title')} />
 				</div>
-				<Button icon={<ReloadOutlined />} onClick={fetchConfig} loading={loading}>
+				<Button icon={<RefreshCw size="1em" />} onClick={fetchConfig} loading={loading}>
 					{t('common.refresh')}
 				</Button>
 			</div>
@@ -126,7 +126,7 @@ export default function SodConfigPage() {
 						</Form.Item>
 
 						<Form.Item>
-							<Button type="primary" htmlType="submit" loading={saving} icon={<SaveOutlined />}>
+							<Button type="primary" htmlType="submit" loading={saving} icon={<Save size="1em" />}>
 								{t('common.save')}
 							</Button>
 						</Form.Item>

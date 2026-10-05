@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { Form, InputNumber, Select, Button, Card, Skeleton } from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import { Save } from 'lucide-react';
 import { usePageTitle } from '@autional-cn/shared';
 import { ConsolePageHeader, ErrorState, SectionCard } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -170,7 +170,7 @@ export default function NhiPolicyPage() {
 					<Button
 						type="primary"
 						htmlType="submit"
-						icon={<SaveOutlined />}
+						icon={<Save size="1em" />}
 						loading={saveMut.isPending}
 						size="large"
 					>

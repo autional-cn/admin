@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select, DatePicker, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	SendOutlined,
-	RollbackOutlined,
-} from '@ant-design/icons';
+	Pencil,
+	Plus,
+	Send,
+	Trash2,
+	Undo2,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
@@ -203,7 +203,7 @@ export default function AnnouncementsPage() {
 						<Button
 							type="text"
 							size="small"
-							icon={<EditOutlined />}
+							icon={<Pencil size="1em" />}
 							onClick={() => openEdit(record)}
 						>
 							{t('common.edit')}
@@ -214,7 +214,7 @@ export default function AnnouncementsPage() {
 							title={t('notifications.announcements.confirmPublish')}
 							onConfirm={() => handlePublish(record.id)}
 						>
-							<Button type="text" size="small" icon={<SendOutlined />}>
+							<Button type="text" size="small" icon={<Send size="1em" />}>
 								{t('notifications.announcements.publish')}
 							</Button>
 						</Popconfirm>
@@ -224,7 +224,7 @@ export default function AnnouncementsPage() {
 							title={t('notifications.announcements.confirmUnpublish')}
 							onConfirm={() => handleUnpublish(record.id)}
 						>
-							<Button type="text" size="small" icon={<RollbackOutlined />}>
+							<Button type="text" size="small" icon={<Undo2 size="1em" />}>
 								{t('notifications.announcements.unpublish')}
 							</Button>
 						</Popconfirm>
@@ -234,7 +234,7 @@ export default function AnnouncementsPage() {
 							title={t('notifications.announcements.confirmDelete')}
 							onConfirm={() => handleDelete(record.id)}
 						>
-							<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+							<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 								{t('common.delete')}
 							</Button>
 						</Popconfirm>
@@ -250,7 +250,7 @@ export default function AnnouncementsPage() {
 				title={t('notifications.announcements.title')}
 				actions={
 					<>
-						<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={openCreate}>
 							{t('notifications.announcements.createAnnouncement')}
 						</Button>
 					</>

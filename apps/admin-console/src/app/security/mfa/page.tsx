@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Form, Radio, Checkbox, Switch, Button } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined } from '@ant-design/icons';
+import { Save } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAuthPolicy, updateAuthPolicy } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
@@ -145,7 +145,7 @@ export default function MFAPolicyPage() {
 
 					<Button
 						type="primary"
-						icon={<SaveOutlined />}
+						icon={<Save size="1em" />}
 						htmlType="submit"
 						loading={updateMut.isPending}
 					>

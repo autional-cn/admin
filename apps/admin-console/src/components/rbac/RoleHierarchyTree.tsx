@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import { Tree, Input, Descriptions, Tag, Spin, Empty, Button, Space } from 'antd';
-import { ApartmentOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Network, RefreshCw, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { extractList } from '@autional-cn/shared';
 import { Drawer } from '@autional-cn/ui/antd';
@@ -86,13 +86,13 @@ export function RoleHierarchyTree() {
 			<div className="flex items-center justify-between mb-4 gap-4">
 				<Input
 					placeholder={t('roleHierarchy.searchPlaceholder')}
-					prefix={<SearchOutlined />}
+					prefix={<Search size="1em" />}
 					value={searchText}
 					onChange={(e) => setSearchText(e.target.value)}
 					allowClear
 					className="max-w-sm"
 				/>
-				<Button icon={<ReloadOutlined />} onClick={() => refetchRoles()}>
+				<Button icon={<RefreshCw size="1em" />} onClick={() => refetchRoles()}>
 					{t('common.refresh')}
 				</Button>
 			</div>
@@ -107,7 +107,7 @@ export function RoleHierarchyTree() {
 				<Tree
 					showLine={{ showLeafIcon: false }}
 					showIcon
-					icon={<ApartmentOutlined />}
+					icon={<Network size="1em" />}
 					loadData={handleLoadData}
 					treeData={treeData}
 					expandedKeys={expandedKeys}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, Row, Col, Button, Typography, List } from 'antd';
-import { DownloadOutlined, BookOutlined, CodeOutlined } from '@ant-design/icons';
+import { Book, Code, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
@@ -29,16 +29,16 @@ export default function SdkPage() {
 						<Card
 							hoverable
 							actions={[
-								<Button type="link" icon={<DownloadOutlined />} key="download">
+								<Button type="link" icon={<Download size="1em" />} key="download">
 									{t('sdks.download')}
 								</Button>,
-								<Button type="link" icon={<BookOutlined />} key="docs">
+								<Button type="link" icon={<Book size="1em" />} key="docs">
 									{t('sdks.docs')}
 								</Button>,
 							]}
 						>
 							<Card.Meta
-								avatar={<CodeOutlined style={{ fontSize: 24, color: 'var(--color-info)' }} />}
+								avatar={<Code size={24} style={{ color: 'var(--color-info)' }} />}
 								title={sdk.name}
 								description={t(sdk.desc)}
 							/>

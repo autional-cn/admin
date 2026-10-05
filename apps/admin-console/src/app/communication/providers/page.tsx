@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Popconfirm, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { fromPageResult, toPageParams, usePageTitle } from '@autional-cn/shared';
@@ -235,7 +235,7 @@ export default function CommunicationProvidersPage() {
 					<Button
 						type="text"
 						size="small"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -255,7 +255,7 @@ export default function CommunicationProvidersPage() {
 						title={t('communication.providers.confirmDelete')}
 						onConfirm={() => record.id && handleDelete(record.id)}
 					>
-						<Button type="text" danger size="small" icon={<DeleteOutlined />}>
+						<Button type="text" danger size="small" icon={<Trash2 size="1em" />}>
 							{t('common.delete')}
 						</Button>
 					</Popconfirm>
@@ -272,7 +272,7 @@ export default function CommunicationProvidersPage() {
 					<>
 						<Button
 							type="primary"
-							icon={<PlusOutlined />}
+							icon={<Plus size="1em" />}
 							onClick={() => {
 								setEditing(null);
 								form.resetFields();

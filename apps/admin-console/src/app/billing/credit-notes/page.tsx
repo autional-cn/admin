@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import { Tag, Button, Modal, Form, Input, InputNumber, Space, Card, Descriptions, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	SearchOutlined,
-	StopOutlined,
-	DeleteOutlined,
-	EyeOutlined,
-} from '@ant-design/icons';
+	Ban,
+	Eye,
+	Plus,
+	Search,
+	Trash2,
+} from 'lucide-react';
 import {
 	useCreateCreditNote,
 	useCreditNote,
@@ -141,7 +141,7 @@ export default function BillingCreditNotesPage() {
 					<Button
 						type="link"
 						size="small"
-						icon={<EyeOutlined />}
+						icon={<Eye size="1em" />}
 						onClick={() => {
 							setDetailModal(true);
 						}}
@@ -155,7 +155,7 @@ export default function BillingCreditNotesPage() {
 							okText={t('creditNotes.confirm')}
 							cancelText={t('creditNotes.cancel')}
 						>
-							<Button type="link" size="small" danger icon={<StopOutlined />}>
+							<Button type="link" size="small" danger icon={<Ban size="1em" />}>
 								{t('creditNotes.cancel')}
 							</Button>
 						</Popconfirm>
@@ -166,7 +166,7 @@ export default function BillingCreditNotesPage() {
 						okText={t('creditNotes.confirm')}
 						cancelText={t('creditNotes.cancel')}
 					>
-						<Button type="link" size="small" danger icon={<DeleteOutlined />}>
+						<Button type="link" size="small" danger icon={<Trash2 size="1em" />}>
 							{t('creditNotes.delete')}
 						</Button>
 					</Popconfirm>
@@ -181,7 +181,7 @@ export default function BillingCreditNotesPage() {
 				title={t('creditNotes.title')}
 				actions={
 					<>
-						<Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModal(true)}>
+						<Button type="primary" icon={<Plus size="1em" />} onClick={() => setCreateModal(true)}>
 							{t('creditNotes.create')}
 						</Button>
 					</>
@@ -201,7 +201,7 @@ export default function BillingCreditNotesPage() {
 						className="w-60"
 						onPressEnter={() => setLookupNumber(searchNumber)}
 					/>
-					<Button icon={<SearchOutlined />} onClick={() => setLookupNumber(searchNumber)}>
+					<Button icon={<Search size="1em" />} onClick={() => setLookupNumber(searchNumber)}>
 						{t('creditNotes.search')}
 					</Button>
 					{lookupNumber && (

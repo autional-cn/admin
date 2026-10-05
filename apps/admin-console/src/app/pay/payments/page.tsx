@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { Tag, Input, Select, Space, Button, Card } from 'antd';
-import { SearchOutlined, EyeOutlined } from '@ant-design/icons';
+import { Eye, Search } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional-cn/shared';
@@ -126,7 +126,7 @@ export default function PayPaymentsPage() {
 			render: (_: unknown, record: PaymentItem) => (
 				<Button
 					type="link"
-					icon={<EyeOutlined />}
+					icon={<Eye size="1em" />}
 					onClick={() => navigate(buildNavHref(`/pay/payments/${record.paymentId}`, tenantSlug))}
 				>
 					{t('payPayments.detail')}
@@ -145,7 +145,7 @@ export default function PayPaymentsPage() {
 				<Space wrap>
 					<Input
 						placeholder={t('payPayments.searchPlaceholder')}
-						prefix={<SearchOutlined />}
+						prefix={<Search size="1em" />}
 						value={searchText}
 						onChange={(e) => setSearchText(e.target.value)}
 						onPressEnter={() => refetch()}

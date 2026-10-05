@@ -12,7 +12,7 @@ import {
 	Typography,
 	Popconfirm,
 } from 'antd';
-import { SaveOutlined, UndoOutlined } from '@ant-design/icons';
+import { Save, Undo2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getRiskConfig, updateRiskConfig, resetRiskConfig } from '@/lib/api.generated';
 import { queryKeys } from '@/lib/query-keys';
@@ -133,11 +133,11 @@ export default function RiskConfigPage() {
 			</Form>
 
 			<Space>
-				<Button type="primary" icon={<SaveOutlined />} loading={isSaving} onClick={handleSave}>
+				<Button type="primary" icon={<Save size="1em" />} loading={isSaving} onClick={handleSave}>
 					保存配置
 				</Button>
 				<Popconfirm title="恢复系统默认风险配置？" onConfirm={() => reset()}>
-					<Button icon={<UndoOutlined />} loading={isResetting}>
+					<Button icon={<Undo2 size="1em" />} loading={isResetting}>
 						恢复默认
 					</Button>
 				</Popconfirm>

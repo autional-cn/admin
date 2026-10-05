@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button, Space, Tag, Modal, Form, Input, Select } from 'antd';
 import { message } from '@/lib/antd-app';
-import { CloseOutlined } from '@ant-design/icons';
+import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useRoleActivations, useRevokeActivation } from '@/hooks/use-role-activations';
 import type { RoleActivation } from '@/hooks/use-role-activations';
@@ -118,7 +118,7 @@ export default function RoleActivationsPage() {
 						<Button
 							type="link"
 							danger
-							icon={<CloseOutlined />}
+							icon={<X size="1em" />}
 							loading={revokeMut.isPending}
 							onClick={() => confirmRevoke(record.id)}
 						>

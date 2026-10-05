@@ -4,17 +4,17 @@ import React, { useState } from 'react';
 import { Tabs, Card, Tag, Button, Space, Modal, Form, Input, Select, InputNumber, Popconfirm } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
-	PlusOutlined,
-	EditOutlined,
-	DeleteOutlined,
-	CalculatorOutlined,
-	GiftOutlined,
-	LockOutlined,
-	UnlockOutlined,
-	ClockCircleOutlined,
-	SwapOutlined,
-	SyncOutlined,
-} from '@ant-design/icons';
+	ArrowLeftRight,
+	Calculator,
+	Clock,
+	Gift,
+	Lock,
+	Pencil,
+	Plus,
+	RefreshCw,
+	Trash2,
+	Unlock,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import {
 	usePointRules,
@@ -326,7 +326,7 @@ export default function PointsPage() {
 				<Space size="small">
 					<Button
 						type="link"
-						icon={<EditOutlined />}
+						icon={<Pencil size="1em" />}
 						onClick={() => {
 							setEditingRule(record);
 							ruleForm.setFieldsValue(record);
@@ -337,7 +337,7 @@ export default function PointsPage() {
 					</Button>
 					<Button
 						type="link"
-						icon={<CalculatorOutlined />}
+						icon={<Calculator size="1em" />}
 						onClick={() => {
 							testForm.setFieldsValue({ ruleId: record.id });
 							setTestResult(null);
@@ -349,7 +349,7 @@ export default function PointsPage() {
 					<Button
 						type="link"
 						danger
-						icon={<DeleteOutlined />}
+						icon={<Trash2 size="1em" />}
 						onClick={() => handleDeleteRule(record.id)}
 					>
 						{t('points.delete')}
@@ -390,13 +390,13 @@ export default function PointsPage() {
 						okText={t('points.confirm')}
 						cancelText={t('points.cancel')}
 					>
-						<Button size="small" icon={<LockOutlined />} type="link" danger>
+						<Button size="small" icon={<Lock size="1em" />} type="link" danger>
 							{t('points.freeze')}
 						</Button>
 					</Popconfirm>
 					<Button
 						size="small"
-						icon={<UnlockOutlined />}
+						icon={<Unlock size="1em" />}
 						type="link"
 						onClick={() => openActionModal(record, 'unfreeze')}
 					>
@@ -404,7 +404,7 @@ export default function PointsPage() {
 					</Button>
 					<Button
 						size="small"
-						icon={<ClockCircleOutlined />}
+						icon={<Clock size="1em" />}
 						type="link"
 						onClick={() => openActionModal(record, 'expire')}
 					>
@@ -412,7 +412,7 @@ export default function PointsPage() {
 					</Button>
 					<Button
 						size="small"
-						icon={<SwapOutlined />}
+						icon={<ArrowLeftRight size="1em" />}
 						type="link"
 						onClick={() => openTransferModal(record)}
 					>
@@ -420,7 +420,7 @@ export default function PointsPage() {
 					</Button>
 					<Button
 						size="small"
-						icon={<SyncOutlined />}
+						icon={<RefreshCw size="1em" />}
 						type="link"
 						onClick={() => openExchangeModal(record)}
 					>
@@ -496,7 +496,7 @@ export default function PointsPage() {
 								<div className="flex justify-end mb-4">
 									<Button
 										type="primary"
-										icon={<PlusOutlined />}
+										icon={<Plus size="1em" />}
 										onClick={() => {
 											setEditingRule(null);
 											ruleForm.resetFields();
@@ -532,7 +532,7 @@ export default function PointsPage() {
 								<div className="flex justify-end mb-4">
 									<Button
 										type="primary"
-										icon={<GiftOutlined />}
+										icon={<Gift size="1em" />}
 										onClick={() => {
 											batchForm.resetFields();
 											setBatchModal(true);
@@ -773,7 +773,7 @@ export default function PointsPage() {
 											type="primary"
 											htmlType="submit"
 											loading={transferMut.isPending}
-											icon={<SwapOutlined />}
+											icon={<ArrowLeftRight size="1em" />}
 										>
 											{t('points.transfer.confirm')}
 										</Button>

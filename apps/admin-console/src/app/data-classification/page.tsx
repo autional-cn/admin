@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, Row, Col, Spin, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SaveOutlined, ReloadOutlined } from '@ant-design/icons';
+import { RefreshCw, Save } from 'lucide-react';
 import {
 	useDataClassification,
 	useUpdateDataClassification,
@@ -84,7 +84,7 @@ export default function DataClassificationPage() {
 				title={t('dataClassification.title')}
 				actions={
 					<>
-						<Button icon={<ReloadOutlined />} onClick={() => window.location.reload()}>
+						<Button icon={<RefreshCw size="1em" />} onClick={() => window.location.reload()}>
 							{t('dataClassification.refresh')}
 						</Button>
 					</>
@@ -109,7 +109,7 @@ export default function DataClassificationPage() {
 								<Button
 									type="primary"
 									htmlType="submit"
-									icon={<SaveOutlined />}
+									icon={<Save size="1em" />}
 									loading={updateMut.isPending}
 								>
 									{t('dataClassification.saveConfig')}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Card, Button, Typography, List } from 'antd';
-import { LinkOutlined, BookOutlined, ApiOutlined } from '@ant-design/icons';
+import { Book, Link2, Plug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
@@ -12,19 +12,19 @@ const docs = [
 	{
 		title: 'apiDocs.restApi',
 		desc: 'apiDocs.restDesc',
-		icon: <ApiOutlined />,
+		icon: <Plug size="1em" />,
 		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/api',
 	},
 	{
 		title: 'apiDocs.sdkGuide',
 		desc: 'apiDocs.sdkDesc',
-		icon: <BookOutlined />,
+		icon: <Book size="1em" />,
 		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/sdks',
 	},
 	{
 		title: 'apiDocs.oauth',
 		desc: 'apiDocs.oauthDesc',
-		icon: <LinkOutlined />,
+		icon: <Link2 size="1em" />,
 		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/oauth',
 	},
 ];
@@ -45,7 +45,7 @@ export default function ApiDocsPage() {
 							actions={[
 								<Button
 									type="link"
-									icon={<LinkOutlined />}
+									icon={<Link2 size="1em" />}
 									href={item.url}
 									target="_blank"
 									key="open"

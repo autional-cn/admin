@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, Form, Input, Select, Button, Row, Col } from 'antd';
 import { message } from '@/lib/antd-app';
-import { SendOutlined } from '@ant-design/icons';
+import { Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBroadcastNotification } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
@@ -73,7 +73,7 @@ export default function BroadcastPage() {
 								<Button
 									type="primary"
 									htmlType="submit"
-									icon={<SendOutlined />}
+									icon={<Send size="1em" />}
 									loading={broadcastMut.isPending}
 									size="large"
 								>

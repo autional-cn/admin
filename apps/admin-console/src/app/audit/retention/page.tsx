@@ -18,7 +18,7 @@ import {
 } from 'antd';
 import dayjs from 'dayjs';
 import { message } from '@/lib/antd-app';
-import { EditOutlined, SaveOutlined, CloseOutlined, CloudDownloadOutlined } from '@ant-design/icons';
+import { DownloadCloud, Pencil, Save, X } from 'lucide-react';
 import { useRetentionPolicy, useSaveRetentionPolicy } from '@/hooks/use-retention-policy';
 import type { RetentionPolicy } from '@/hooks/use-retention-policy';
 import type * as Types from '@autional-cn/shared/generated/types';
@@ -155,7 +155,7 @@ export default function RetentionPolicyPage() {
 				actions={
 					<>
 						{!editing && (
-							<Button icon={<EditOutlined />} onClick={startEdit}>
+							<Button icon={<Pencil size="1em" />} onClick={startEdit}>
 								{t('auditRetention.edit')}
 							</Button>
 						)}
@@ -193,12 +193,12 @@ export default function RetentionPolicyPage() {
 							<Button
 								type="primary"
 								htmlType="submit"
-								icon={<SaveOutlined />}
+								icon={<Save size="1em" />}
 								loading={saveMut.isPending}
 							>
 								{t('common.save')}
 							</Button>
-							<Button icon={<CloseOutlined />} onClick={() => setEditing(false)}>
+							<Button icon={<X size="1em" />} onClick={() => setEditing(false)}>
 								{t('common.cancel')}
 							</Button>
 						</div>
@@ -246,7 +246,7 @@ export default function RetentionPolicyPage() {
 						cancelText={t('common.cancel')}
 						okButtonProps={{ danger: true }}
 					>
-						<Button icon={<CloudDownloadOutlined />} loading={archiveNowLoading}>
+						<Button icon={<DownloadCloud size="1em" />} loading={archiveNowLoading}>
 							{t('auditRetention.archiveNow')}
 						</Button>
 					</Popconfirm>
