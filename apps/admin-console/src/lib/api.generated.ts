@@ -381,6 +381,9 @@ export const listAdminPayments = Generated.adminPayments;
 export const getAdminPayment = Generated.adminPaymentsByPayments;
 export const getAdminPaymentReceipt = Generated.adminPaymentsReceiptByPayments;
 
+// Pay: Admin Refunds (W2-01, A-352 — pay_refund_records 单源)
+export const listAdminRefunds = Generated.adminRefunds;
+
 // Pay: Admin Channels
 export const listPayChannels = Generated.adminPaymentsChannels;
 export const getPayChannel = Generated.adminPaymentsChannelsByChannels;

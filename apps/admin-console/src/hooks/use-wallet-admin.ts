@@ -1,6 +1,6 @@
 'use client';
 
-import { apiClient, extractList, extractItem, useCurrentTenantId } from '@autional-cn/shared';
+import { extractList, extractItem } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Generated from '@autional-cn/shared/generated/api';
@@ -31,29 +31,31 @@ export interface WalletItem {
 	createdAt: string;
 }
 
+// W1-04（A-376）：键对齐 CouponResponse——usage_limit/usage_count 为真源（旧 maxUses/usedCount 无落点恒空）；
+// valid_until 为空串表示无到期（NULL）；min_amount 为 wire 键（表单提交侧用 min_spend）。
 export interface CouponItem {
 	id: string;
 	code: string;
+	name: string;
 	value: string;
 	type: string;
 	status: string;
-	maxUses?: number;
-	usedCount?: number;
-	minAmount?: string;
-	validFrom?: string;
-	validUntil?: string;
+	minAmount: string;
+	validFrom: string;
+	validUntil: string;
+	usageLimit: number;
+	usageCount: number;
 	createdAt: string;
 }
 
+// W1-02（A-365/A-367）：对齐 WithdrawalRequestResponse——真源为 withdrawal_requests；
+// 旧 walletId/currency/bankAccount/note 字段服务端均无落点（A-367 数据源错位的镜像残留）。
 export interface WithdrawalItem {
 	id: string;
 	userId: string;
-	walletId: string;
 	amount: string;
-	currency: string;
 	status: string;
-	bankAccount?: string;
-	note?: string;
+	remark: string;
 	createdAt: string;
 }
 
@@ -173,14 +175,14 @@ export function useDeleteCoupon() {
 }
 
 export function useWithdrawals(params?: Record<string, unknown>) {
-	const tenantId = useCurrentTenantId() ?? '';
 	return useQuery({
 		queryKey: queryKeys.walletAdmin.withdrawals(params),
 		queryFn: async () => {
-			const res = await Generated.adminWalletsTenantsTransactionsByTenants(tenantId, {
-				...params,
-				type: 'withdraw',
-			} as any);
+			// W1-02（A-365）：管理面真源 = GET /admin/wallets/withdrawals（withdrawal_requests），
+			// 旧实现走租户交易端点 type=withdraw（列表/审批实体错位）。
+			const res = await Generated.adminWalletsWithdrawals(
+				params as { status?: string; page?: number; page_size?: number },
+			);
 			return extractList<WithdrawalItem>(res);
 		},
 	});

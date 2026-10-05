@@ -12,6 +12,7 @@ import {
 	getPayReconciliation,
 	runPayReconciliation,
 	listAdminPayments,
+	listAdminRefunds,
 	getAdminPayment,
 	getAdminPaymentReceipt,
 } from '@/lib/api.generated';
@@ -58,7 +59,9 @@ export interface ReconciliationRecord {
 }
 
 export interface RefundRecord {
-	refundId: string;
+	id: string;
+	// 支付详情页签（A-342）遗留键兼容：值 = id；该页签列/行键仍以 refundId 命名（随批 4 收敛）
+	refundId?: string;
 	paymentId: string;
 	status: string;
 	amount: string;
@@ -120,12 +123,19 @@ export function usePayReceipt(id: string) {
 	});
 }
 
+// W2-01（A-352/A-353）：数据源 = GET /pay/v1/admin/refunds（pay_refund_records 单源，与写链同源）；
+// status 入 queryKey（筛选触发新请求）。支付详情页签（A-342）传 payment_id 时按支付单本地过滤
+// （admin 端点为租户级，无 payment_id 参数）；refundId 为遗留键兼容别名（= id）。
 export function usePayRefunds(params?: Record<string, unknown>) {
+	const status = typeof params?.status === 'string' ? params.status : undefined;
+	const paymentId = typeof params?.payment_id === 'string' ? params.payment_id : undefined;
 	return useQuery({
 		queryKey: queryKeys.pay.refunds(params),
 		queryFn: async () => {
-			const res = await listAdminPayments({ ...params, status: 'refunded' } as any);
-			return extractList<PaymentItem>(res);
+			const res = await listAdminRefunds({ status });
+			return extractList<RefundRecord>(res)
+				.filter((r) => !paymentId || r.paymentId === paymentId)
+				.map((r) => ({ ...r, refundId: r.id }));
 		},
 	});
 }

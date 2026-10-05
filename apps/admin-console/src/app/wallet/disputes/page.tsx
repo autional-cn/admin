@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
-import { Tag, Button, Modal, Form, Input, Select, Space } from 'antd';
+import { Tag, Button, Modal, Form, Input, Select } from 'antd';
 import { message } from '@/lib/antd-app';
 
 import { useWalletDisputes, useResolveDispute, type Dispute } from '@/hooks/use-wallets';
@@ -11,6 +11,10 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
+// W1-03（A-370+A-372）：裁决契约键 resolution/remark（旧 result/reason 错配）；
+// 选项值域 = 服务端裁决词表 resolved/rejected（旧 approved/partial 幽灵值被 oneof 拒）；
+// 撤 amount 列（服务端无此字段，toFixed 假声明崩溃）；去幽灵 'open'（按钮条件仅 pending）；
+// 标签本地化 + 文案去资金承诺（原「通过（退款）/部分退款」）。
 export default function WalletDisputesPage() {
 	const { t } = useTranslation();
 	const tenantId = useCurrentTenantId() ?? '';
@@ -21,10 +25,14 @@ export default function WalletDisputesPage() {
 	const [current, setCurrent] = useState<Dispute | null>(null);
 	const [form] = Form.useForm();
 
-	const handleResolve = async (values: { result: string; reason: string }) => {
+	const handleResolve = async (values: { resolution: string; remark: string }) => {
 		if (!current || !tenantId) return;
 		try {
-			await resolveMut.mutateAsync({ tenantId, id: current.id, data: values });
+			await resolveMut.mutateAsync({
+				tenantId,
+				id: current.id,
+				data: { resolution: values.resolution, remark: values.remark },
+			});
 			message.success(t('walletDisputes.resolved'));
 			setResolveModal(false);
 			form.resetFields();
@@ -44,20 +52,23 @@ export default function WalletDisputesPage() {
 		},
 		{ title: t('walletDisputes.colReason'), dataIndex: 'reason', key: 'reason', ellipsis: true },
 		{
-			title: t('walletDisputes.colAmount'),
-			dataIndex: 'amount',
-			key: 'amount',
-			width: 120,
-			render: (v: number) => `¥${v.toFixed(2)}`,
-		},
-		{
 			title: t('walletDisputes.colStatus'),
 			dataIndex: 'status',
 			key: 'status',
 			width: 100,
-			render: (v: string) => (
-				<Tag color={v === 'resolved' ? 'success' : v === 'rejected' ? 'error' : 'warning'}>{v}</Tag>
-			),
+			render: (v: string) => {
+				const colorMap: Record<string, string> = {
+					pending: 'warning',
+					resolved: 'success',
+					rejected: 'error',
+				};
+				const labelMap: Record<string, string> = {
+					pending: t('walletDisputes.statusPending'),
+					resolved: t('walletDisputes.statusResolved'),
+					rejected: t('walletDisputes.statusRejected'),
+				};
+				return <Tag color={colorMap[v] ?? 'default'}>{labelMap[v] ?? v}</Tag>;
+			},
 		},
 		{
 			title: t('walletDisputes.colCreatedAt'),
@@ -74,7 +85,7 @@ export default function WalletDisputesPage() {
 				<Button
 					type="link"
 					size="small"
-					disabled={record.status !== 'open' && record.status !== 'pending'}
+					disabled={record.status !== 'pending'}
 					onClick={() => {
 						setCurrent(record);
 						form.resetFields();
@@ -117,24 +128,23 @@ export default function WalletDisputesPage() {
 			>
 				<Form form={form} layout="vertical" onFinish={handleResolve}>
 					<Form.Item
-						name="result"
-						label={t('walletDisputes.fieldResult')}
+						name="resolution"
+						label={t('walletDisputes.fieldResolution')}
 						rules={[{ required: true }]}
 					>
 						<Select
 							options={[
-								{ value: 'approved', label: t('walletDisputes.resultApproved') },
+								{ value: 'resolved', label: t('walletDisputes.resultResolved') },
 								{ value: 'rejected', label: t('walletDisputes.resultRejected') },
-								{ value: 'partial', label: t('walletDisputes.resultPartial') },
 							]}
 						/>
 					</Form.Item>
 					<Form.Item
-						name="reason"
-						label={t('walletDisputes.fieldReason')}
+						name="remark"
+						label={t('walletDisputes.fieldRemark')}
 						rules={[{ required: true }]}
 					>
-						<Input.TextArea rows={3} placeholder={t('walletDisputes.fieldReasonPlaceholder')} />
+						<Input.TextArea rows={3} placeholder={t('walletDisputes.fieldRemarkPlaceholder')} />
 					</Form.Item>
 				</Form>
 			</Modal>

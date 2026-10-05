@@ -24,10 +24,11 @@ import {
 	useDeleteTrashItem,
 	useCreateFolder,
 	useDeleteFile,
+	useUploadFile,
 	type FileRecord,
 	type TrashRecord,
 } from '@/hooks/use-storage';
-import { uploadFile, downloadFile } from '@/lib/api.generated';
+import { downloadFile } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -85,6 +86,7 @@ export default function StoragePage() {
 	const deleteTrashMut = useDeleteTrashItem();
 	const createFolderMut = useCreateFolder();
 	const deleteFileMut = useDeleteFile();
+	const uploadMut = useUploadFile();
 	const tenantId = useCurrentTenantIdOr('');
 
 	const loading = filesLoading || quotaLoading || statsLoading || trashLoading;
@@ -95,7 +97,7 @@ export default function StoragePage() {
 		// 服务端认 parent_id（旧 'path' 字段被忽略；不传 owner_id——非本人会被拒 403）
 		if (selectedFolder) formData.append('parent_id', selectedFolder);
 		try {
-			await uploadFile(formData);
+			await uploadMut.mutateAsync(formData);
 			message.success(t('storage.uploadSuccess'));
 		} catch (err) {
 			handleApiError(err, t('storage.uploadFailed'));

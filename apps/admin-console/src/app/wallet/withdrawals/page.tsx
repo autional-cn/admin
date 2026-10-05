@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tag, Button, Modal, Form, Input, Select, Space, Card } from 'antd';
+import { Tag, Button, Modal, Form, Input, Select, Space, Card, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
 	useWithdrawals,
@@ -14,6 +14,10 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 
+// W1-02（A-365+A-367）：数据源改接 GET /admin/wallets/withdrawals（withdrawal_requests 真源，
+// 旧交易端点 type=withdraw 列表与审批对象（提现申请实体）错位）；撤 bankAccount 列（响应无此字段）；
+// note→remark（wire 键）；状态词表 = 服务端值域 pending/auto_approved/completed/rejected；
+// 批准加确认弹窗；驳回契约键 remark（旧 reason 键与 RejectWithdrawalRequest.remark 错配）。
 export default function WalletWithdrawalsPage() {
 	const { t } = useTranslation();
 	const [filters, setFilters] = useState<Record<string, unknown>>({});
@@ -27,6 +31,7 @@ export default function WalletWithdrawalsPage() {
 
 	const handleApprove = async (id: string) => {
 		try {
+			// 审批人由服务端从 JWT 派生，请求体不携带身份字段（G2 信任边界）。
 			await approveMut.mutateAsync({ id, data: {} });
 			message.success(t('walletWithdrawals.approved'));
 		} catch (err) {
@@ -34,9 +39,9 @@ export default function WalletWithdrawalsPage() {
 		}
 	};
 
-	const handleReject = async (values: { reason: string }) => {
+	const handleReject = async (values: { remark: string }) => {
 		try {
-			await rejectMut.mutateAsync({ id: selectedId, data: values });
+			await rejectMut.mutateAsync({ id: selectedId, data: { remark: values.remark } });
 			message.success(t('walletWithdrawals.rejected'));
 			setRejectModal(false);
 			rejectForm.resetFields();
@@ -56,13 +61,6 @@ export default function WalletWithdrawalsPage() {
 			render: (v: string) => `¥${parseFloat(v).toFixed(2)}`,
 		},
 		{
-			title: t('walletWithdrawals.colBankAccount'),
-			dataIndex: 'bankAccount',
-			key: 'bankAccount',
-			width: 160,
-			render: (v: string) => v || '-',
-		},
-		{
 			title: t('walletWithdrawals.colStatus'),
 			dataIndex: 'status',
 			key: 'status',
@@ -70,18 +68,20 @@ export default function WalletWithdrawalsPage() {
 			render: (v: string) => {
 				const colorMap: Record<string, string> = {
 					pending: 'processing',
-					approved: 'success',
+					auto_approved: 'cyan',
+					completed: 'success',
 					rejected: 'error',
 				};
 				const labelMap: Record<string, string> = {
 					pending: t('walletWithdrawals.statusPending'),
-					approved: t('walletWithdrawals.statusApproved'),
+					auto_approved: t('walletWithdrawals.statusAutoApproved'),
+					completed: t('walletWithdrawals.statusCompleted'),
 					rejected: t('walletWithdrawals.statusRejected'),
 				};
 				return <Tag color={colorMap[v] ?? 'default'}>{labelMap[v] ?? v}</Tag>;
 			},
 		},
-		{ title: t('walletWithdrawals.colNote'), dataIndex: 'note', key: 'note', ellipsis: true },
+		{ title: t('walletWithdrawals.colRemark'), dataIndex: 'remark', key: 'remark', ellipsis: true },
 		{
 			title: t('walletWithdrawals.colCreatedAt'),
 			dataIndex: 'createdAt',
@@ -97,9 +97,16 @@ export default function WalletWithdrawalsPage() {
 				<Space size="small">
 					{record.status === 'pending' && (
 						<>
-							<Button type="link" size="small" onClick={() => handleApprove(record.id)}>
-								{t('walletWithdrawals.approve')}
-							</Button>
+							<Popconfirm
+								title={t('walletWithdrawals.approveConfirm')}
+								onConfirm={() => handleApprove(record.id)}
+								okText={t('walletWithdrawals.approve')}
+								cancelText={t('common.cancel')}
+							>
+								<Button type="link" size="small">
+									{t('walletWithdrawals.approve')}
+								</Button>
+							</Popconfirm>
 							<Button
 								type="link"
 								danger
@@ -137,7 +144,8 @@ export default function WalletWithdrawalsPage() {
 						onChange={(v) => setFilters({ ...filters, status: v })}
 						options={[
 							{ value: 'pending', label: t('walletWithdrawals.statusPending') },
-							{ value: 'approved', label: t('walletWithdrawals.statusApproved') },
+							{ value: 'auto_approved', label: t('walletWithdrawals.statusAutoApproved') },
+							{ value: 'completed', label: t('walletWithdrawals.statusCompleted') },
 							{ value: 'rejected', label: t('walletWithdrawals.statusRejected') },
 						]}
 					/>
@@ -150,7 +158,7 @@ export default function WalletWithdrawalsPage() {
 				dataSource={withdrawals}
 				loading={isLoading}
 				pagination={{ pageSize: 10 }}
-				scroll={{ x: 1100 }}
+				scroll={{ x: 1000 }}
 			/>
 
 			<Modal
@@ -165,7 +173,7 @@ export default function WalletWithdrawalsPage() {
 			>
 				<Form form={rejectForm} layout="vertical" onFinish={handleReject}>
 					<Form.Item
-						name="reason"
+						name="remark"
 						label={t('walletWithdrawals.rejectReason')}
 						rules={[{ required: true }]}
 					>

@@ -205,6 +205,18 @@ export default function LegalDocumentsPage() {
 		}
 	};
 
+	// W4-01（F2-01）：content 在服务端落入 jsonb 列——非法 JSON 会在 DB 层 22P02 → 500。
+	// 本地前置校验（提交前拦截，不发请求）：JSON.parse 失败给可读提示；required/max 由既有规则承担。
+	const validateContentJson = (_: unknown, value?: string) => {
+		if (!value) return Promise.resolve();
+		try {
+			JSON.parse(value);
+			return Promise.resolve();
+		} catch {
+			return Promise.reject(new Error(t('legalDocuments.contentJsonInvalid')));
+		}
+	};
+
 	const handlePublish = async (id: string) => {
 		try {
 			await apiClient.post(API_PATHS.COMPLIANCE.ADMIN_LEGAL_DOCUMENT_PUBLISH(id));
@@ -434,9 +446,10 @@ export default function LegalDocumentsPage() {
 					<Form.Item
 						name="content"
 						label={t('legalDocuments.column.content')}
-						rules={[{ required: true }, { max: 100000 }]}
+						rules={[{ required: true }, { max: 100000 }, { validator: validateContentJson }]}
+						extra={t('legalDocuments.contentJsonHint')}
 					>
-						{/* content 为纯文本 TextArea（防 XSS，禁富文本渲染器） */}
+						{/* content 为纯文本 TextArea（防 XSS，禁富文本渲染器）；W4-01：须为合法 JSON */}
 						<Input.TextArea rows={10} maxLength={100000} showCount />
 					</Form.Item>
 					<Form.Item name="effectiveAt" label={t('legalDocuments.column.effectiveAt')}>

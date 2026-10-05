@@ -42,12 +42,14 @@ export interface Transaction {
 	[key: string]: unknown;
 }
 
+// W1-03（A-372）：对齐 DisputeListItem——服务端争议无 amount 字段（旧声明 amount:number
+// 导致 toFixed 崩溃）；真实字段 = id/transaction_id/user_id/reason/status/created_at。
 export interface Dispute {
 	id: string;
 	transactionId: string;
+	userId: string;
 	reason: string;
 	status: string;
-	amount: number;
 	createdAt: string;
 	[key: string]: unknown;
 }
@@ -88,16 +90,15 @@ export interface ReconciliationRecord {
 	[key: string]: unknown;
 }
 
+// W0-01（AC-B3-W0-01-1）：写路径失败呈现——禁止 catch → {} / [] 静默吞错。
+// 请求失败必须冒泡给 react-query（error 态 → 消费页 PageError + retry 重试），
+// 否则 401/403/网络错误会被伪装成"空数据"，管理员无从感知失败。
 async function fetchWalletSummary(
 	tenantId: string,
 	signal?: AbortSignal,
 ): Promise<WalletSummary | Record<string, never>> {
-	try {
-		const res = await getWalletSummary(tenantId);
-		return extractItem<WalletSummary>(res) ?? ({} as WalletSummary);
-	} catch {
-		return {};
-	}
+	const res = await getWalletSummary(tenantId);
+	return extractItem<WalletSummary>(res) ?? ({} as WalletSummary);
 }
 
 async function fetchWalletTransactions(
@@ -105,21 +106,13 @@ async function fetchWalletTransactions(
 	params?: Record<string, unknown>,
 	signal?: AbortSignal,
 ): Promise<Transaction[]> {
-	try {
-		const res = await getWalletTransactions(tenantId, params);
-		return extractList<Transaction>(res);
-	} catch {
-		return [];
-	}
+	const res = await getWalletTransactions(tenantId, params);
+	return extractList<Transaction>(res);
 }
 
 async function fetchWalletDisputes(tenantId: string, signal?: AbortSignal): Promise<Dispute[]> {
-	try {
-		const res = await getWalletDisputes(tenantId);
-		return extractList<Dispute>(res);
-	} catch {
-		return [];
-	}
+	const res = await getWalletDisputes(tenantId);
+	return extractList<Dispute>(res);
 }
 
 export function useWalletSummary(tenantId: string) {

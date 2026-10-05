@@ -28,7 +28,9 @@ export default function WalletEventsPage() {
 	const [walletId, setWalletId] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<IntegrityResult | null>(null);
-	const [error, setError] = useState<string | null>(null);
+	// W1-06（AC-B3-W1-06-1/2/4）：三态呈现——区分「钱包不存在（404）」/「空事件集警示」/
+	// 「正常验证结果」；单一 error 字符串无法区分 404 与其他失败。
+	const [error, setError] = useState<{ message: string; notFound: boolean } | null>(null);
 
 	const handleVerify = async () => {
 		if (!walletId.trim()) return;
@@ -39,8 +41,11 @@ export default function WalletEventsPage() {
 			const res = await apiClient.get(API_PATHS.WALLET.ADMIN_WALLET_INTEGRITY(walletId.trim()));
 			setResult(extractItem(res.data));
 		} catch (e: unknown) {
+			// 404 = 钱包不存在（后端存在性前置检查，AC-B3-W1-06-1）；其余 = 普通失败。
+			const ax = e as { response?: { status?: number }; status?: number };
+			const notFound = ax?.response?.status === 404 || ax?.status === 404;
 			const msg = e instanceof Error ? e.message : t('walletEvents.verifyFailed');
-			setError(msg);
+			setError({ message: msg, notFound });
 		} finally {
 			setLoading(false);
 		}
@@ -76,9 +81,42 @@ export default function WalletEventsPage() {
 				</Card>
 			)}
 
-			{error && <Result variant="danger" className="mx-auto max-w-md" title={t('walletEvents.verifyError')} description={error} />}
+			{error &&
+				(error.notFound ? (
+					// AC-B3-W1-06-1：钱包不存在 → 明确「未找到」，绝不出绿勾。
+					<Result
+						variant="info"
+						className="mx-auto max-w-md"
+						title={t('walletEvents.notFoundTitle')}
+						description={t('walletEvents.notFoundDesc')}
+					/>
+				) : (
+					<Result
+						variant="danger"
+						className="mx-auto max-w-md"
+						title={t('walletEvents.verifyError')}
+						description={error.message}
+					/>
+				))}
 
-			{result && (
+			{result && result.total === 0 && (
+				// AC-B3-W1-06-2：空事件集 = 显式警示态（创世事件缺失/数据损坏），不得呈现为通过。
+				<Card>
+					<Result
+						variant="warning"
+						className="mx-auto max-w-md"
+						title={t('walletEvents.emptyTitle')}
+						description={
+							<span>
+								{t('walletEvents.emptyDesc')} · {t('walletEvents.resultWalletPrefix')}{' '}
+								<Text code>{result.walletId}</Text>
+							</span>
+						}
+					/>
+				</Card>
+			)}
+
+			{result && result.total > 0 && (
 				<Card>
 					<Result
 						variant={result.valid ? 'success' : 'danger'}
