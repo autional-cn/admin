@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite --port 13102",
     "build": "tsc && vite build --base /",
+    "build:harness": "vite build --config vite.harness.config.ts",
     "preview": "vite preview --port 13102",
     "lint": "eslint src/",
     "typecheck": "tsc --noEmit",
