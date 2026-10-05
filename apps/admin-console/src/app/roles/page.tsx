@@ -257,7 +257,7 @@ export default function RolesPage() {
 
 	const groupedPermissions = React.useMemo(() => {
 		const groups: Record<string, PermissionItem[]> = {};
-		allPermissions.forEach((p: PermissionItem) => {
+		(permissionsResult?.items ?? []).forEach((p: PermissionItem) => {
 			const cat = CATEGORY_LABELS[p.category] || p.category || 'roles.category.other';
 			if (!groups[cat]) groups[cat] = [];
 			groups[cat].push(p);

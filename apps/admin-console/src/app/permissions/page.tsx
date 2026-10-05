@@ -47,7 +47,7 @@ export default function PermissionsPage() {
 	const deleteMut = useDeletePermission();
 
 	const filteredData = useMemo(() => {
-		let result = data as PermissionRecord[];
+		let result = (permissionsResult?.items ?? []) as PermissionRecord[];
 		if (categoryFilter !== 'all') {
 			result = result.filter((p) => p.category === categoryFilter);
 		}

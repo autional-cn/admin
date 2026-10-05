@@ -37,9 +37,10 @@ export function RoleHierarchyTree() {
 	);
 
 	const filteredRoles = useMemo(() => {
-		if (!searchText) return roles;
+		const rows = rolesResult?.items ?? [];
+		if (!searchText) return rows;
 		const lower = searchText.toLowerCase();
-		return roles.filter(
+		return rows.filter(
 			(r: RoleRecord) =>
 				r.name.toLowerCase().includes(lower) || r.code.toLowerCase().includes(lower),
 		);
