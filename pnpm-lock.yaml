@@ -52,14 +52,14 @@ importers:
         specifier: 0.1.0-rc.31
         version: 0.1.0-rc.31(immer@11.1.18)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(use-sync-external-store@1.7.0(react@19.2.5))
       '@autional-cn/tailwind-preset':
-        specifier: 0.1.0-rc.3
-        version: 0.1.0-rc.3(tailwindcss@3.4.19)
+        specifier: 0.1.0-rc.4
+        version: 0.1.0-rc.4(tailwindcss@3.4.19)
       '@autional-cn/tokens':
-        specifier: 0.1.0-rc.8
-        version: 0.1.0-rc.8
+        specifier: 0.1.0-rc.9
+        version: 0.1.0-rc.9
       '@autional-cn/ui':
         specifier: 0.1.0-rc.41
-        version: 0.1.0-rc.41(@autional-cn/tokens@0.1.0-rc.8)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.23)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react@19.2.5)
+        version: 0.1.0-rc.41(@autional-cn/tokens@0.1.0-rc.9)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.23)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react@19.2.5)
       '@tanstack/react-query':
         specifier: 5.100.9
         version: 5.100.9(react@19.2.5)
@@ -215,13 +215,13 @@ packages:
       react: 19.2.5
       react-dom: 19.2.5
 
-  '@autional-cn/tailwind-preset@0.1.0-rc.3':
-    resolution: {integrity: sha512-yzQqP6YVLQ5g5pz4yRqB7klulYnOhibKo2/R2/FWsbKTOY61Vp6b/l0pdZxLZWVM56B0n6ukSukLfNIpKBorhg==}
+  '@autional-cn/tailwind-preset@0.1.0-rc.4':
+    resolution: {integrity: sha512-D09o43AnQyHrG6x1YyQOPu0RenZDQBcQixk0nXTIHYl0Pibupf7xDMVvGRxY9oeQClHOoQxounSwpmwwX0wByw==}
     peerDependencies:
       tailwindcss: '>=3.0.0'
 
-  '@autional-cn/tokens@0.1.0-rc.8':
-    resolution: {integrity: sha512-aHpSOaHOaa3mmVGofxp9cmtLLr3PqxuVm0NabJ61ZAlKwd0nWu49p/PF94JWo8xeDFAlcT81gqPFb79edwlfKw==}
+  '@autional-cn/tokens@0.1.0-rc.9':
+    resolution: {integrity: sha512-5u8FWsukYsk2Gs/3lUf9RV2Z2japUec2YdEsfJeeQ0ZwfRZij4q55Tkiyg8p80sDnrsl3fR7YNGsiu87aUnSCQ==}
 
   '@autional-cn/tsconfig@0.1.0-rc':
     resolution: {integrity: sha512-XY7N2lbMlR1D+OlkxDAw9Pz9CleV4UZ14RfWkkhGTZbbHvxT/d69H8GXWhyc9/634RoEUyVajYmjT75cZbKF4A==}
@@ -2754,18 +2754,18 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  '@autional-cn/tailwind-preset@0.1.0-rc.3(tailwindcss@3.4.19)':
+  '@autional-cn/tailwind-preset@0.1.0-rc.4(tailwindcss@3.4.19)':
     dependencies:
-      '@autional-cn/tokens': 0.1.0-rc.8
+      '@autional-cn/tokens': 0.1.0-rc.9
       tailwindcss: 3.4.19
 
-  '@autional-cn/tokens@0.1.0-rc.8': {}
+  '@autional-cn/tokens@0.1.0-rc.9': {}
 
   '@autional-cn/tsconfig@0.1.0-rc': {}
 
-  '@autional-cn/ui@0.1.0-rc.41(@autional-cn/tokens@0.1.0-rc.8)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.23)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react@19.2.5)':
+  '@autional-cn/ui@0.1.0-rc.41(@autional-cn/tokens@0.1.0-rc.9)(antd@6.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(dayjs@1.11.23)(i18next@26.0.10(typescript@5.8.3))(lucide-react@0.509.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react-i18next@17.0.7(i18next@26.0.10(typescript@5.8.3))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@5.8.3))(react-router@7.15.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@autional-cn/tokens': 0.1.0-rc.8
+      '@autional-cn/tokens': 0.1.0-rc.9
       i18next: 26.0.10(typescript@5.8.3)
       lucide-react: 0.509.0(react@19.2.5)
       react: 19.2.5
