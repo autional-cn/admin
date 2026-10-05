@@ -41,6 +41,16 @@ const EVENT_OPTIONS = [
 	'mfa.disabled',
 ];
 
+/** A-40：投递状态 → 颜色（Timeline 点 / Tag），值域见 service-tenant domain/webhook.go:26-31。 */
+const DELIVERY_STATUS_COLORS: Record<string, { timeline: string; tag: string }> = {
+	pending: { timeline: 'gray', tag: 'default' },
+	sent: { timeline: 'blue', tag: 'processing' },
+	delivered: { timeline: 'green', tag: 'success' },
+	failed: { timeline: 'red', tag: 'error' },
+	retrying: { timeline: 'orange', tag: 'warning' },
+	permanently_failed: { timeline: 'red', tag: 'error' },
+};
+
 export default function WebhooksPage() {
 	const { t } = useTranslation();
 	const [modalVisible, setModalVisible] = useState(false);
@@ -308,30 +318,42 @@ export default function WebhooksPage() {
 					<Empty description={t('webhooks.noDeliveryLogs')} />
 				) : (
 					<Timeline mode="left">
-						{deliveryLogs.map((log: any) => (
-							<Timeline.Item
-								key={log.id}
-								color={log.status === 'success' ? 'green' : 'red'}
-								label={log.timestamp ? new Date(log.timestamp).toLocaleString() : '-'}
-							>
-								<div className="text-sm">
-									<Tag color={log.status === 'success' ? 'success' : 'error'}>{log.status}</Tag>
-									<span className="text-neutral-600 ml-2">{log.durationMs}ms</span>
-								</div>
-								<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
-									<div className="font-medium">{t('webhooks.request')}</div>
-									<pre className="whitespace-pre-wrap break-all">
-										{log.requestBody ? JSON.stringify(log.requestBody) : '-'}
-									</pre>
-								</div>
-								<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
-									<div className="font-medium">{t('webhooks.response')}</div>
-									<pre className="whitespace-pre-wrap break-all">
-										{log.responseBody ? JSON.stringify(log.responseBody) : '-'}
-									</pre>
-								</div>
-							</Timeline.Item>
-						))}
+						{deliveryLogs.map((log: DeliveryLog) => {
+							const statusColor = DELIVERY_STATUS_COLORS[log.status ?? ''];
+							return (
+								<Timeline.Item
+									key={log.id}
+									color={statusColor?.timeline ?? 'gray'}
+									label={log.createdAt ? new Date(log.createdAt).toLocaleString() : '-'}
+								>
+									<div className="text-sm">
+										<Tag color={statusColor?.tag ?? 'default'}>{log.status || '-'}</Tag>
+										{typeof log.durationMs === 'number' && (
+											<span className="text-neutral-600 ml-2">{log.durationMs}ms</span>
+										)}
+									</div>
+									<div className="mt-1 text-xs text-neutral-600">
+										{log.eventType}
+										{typeof log.statusCode === 'number' && ` · HTTP ${log.statusCode}`}
+										{typeof log.attempt === 'number' &&
+											` · ${t('webhooks.attemptCount', { count: log.attempt })}`}
+									</div>
+									<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
+										<div className="font-medium">{t('webhooks.request')}</div>
+										<pre className="whitespace-pre-wrap break-all">{log.payload || '-'}</pre>
+									</div>
+									<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
+										<div className="font-medium">{t('webhooks.response')}</div>
+										<pre className="whitespace-pre-wrap break-all">{log.response || '-'}</pre>
+									</div>
+									{log.error && (
+										<div className="mt-2 text-xs text-danger-text">
+											{t('webhooks.error')}: {log.error}
+										</div>
+									)}
+								</Timeline.Item>
+							);
+						})}
 					</Timeline>
 				)}
 			</Drawer>
