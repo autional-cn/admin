@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Descriptions, Button, Space, Alert, Popconfirm, Tag, message } from 'antd';
+import { Card, Descriptions, Button, Space, Popconfirm, Tag, message } from 'antd';
+import { Alert } from '@autional-cn/ui';
 import { useAuth } from '@autional-cn/shared';
 
 export default function TrialPage() {
@@ -48,19 +49,17 @@ export default function TrialPage() {
 	return (
 		<div style={{ padding: 24 }}>
 			<Alert
-				type="warning"
-				banner
-				message={`试用剩余 ${formatRemaining(trial.expiresAt)} 天`}
-				description="到期后所有数据将被永久删除。升级为正式版以保留数据。"
+				variant="warning"
+				title={`试用剩余 ${formatRemaining(trial.expiresAt)} 天`}
 				action={
-					<Space>
-						<Popconfirm title="升级后不可退回试用，数据永久保留" onConfirm={handleUpgrade}>
-							<Button type="primary">升级为正式版</Button>
-						</Popconfirm>
-					</Space>
+					<Popconfirm title="升级后不可退回试用，数据永久保留" onConfirm={handleUpgrade}>
+						<Button type="primary">升级为正式版</Button>
+					</Popconfirm>
 				}
-				style={{ marginBottom: 16 }}
-			/>
+				className="mb-4"
+			>
+				到期后所有数据将被永久删除。升级为正式版以保留数据。
+			</Alert>
 
 			<Card title="试用状态">
 				<Descriptions column={1}>
