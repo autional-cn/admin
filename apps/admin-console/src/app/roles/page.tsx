@@ -270,7 +270,7 @@ export default function RolesPage() {
 			if (!ordered[cat]) ordered[cat] = groups[cat];
 		});
 		return ordered;
-	}, [allPermissions]);
+	}, [permissionsResult]);
 
 	const columns = [
 		{

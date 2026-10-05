@@ -61,7 +61,7 @@ export default function PermissionsPage() {
 			);
 		}
 		return result;
-	}, [categoryFilter, keyword, data]);
+	}, [categoryFilter, keyword, permissionsResult]);
 
 	const categories = Array.from(
 		new Set((data as PermissionRecord[]).map((p) => p.category).filter(Boolean)),

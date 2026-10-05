@@ -43,7 +43,7 @@ export function RoleHierarchyTree() {
 			(r: RoleRecord) =>
 				r.name.toLowerCase().includes(lower) || r.code.toLowerCase().includes(lower),
 		);
-	}, [roles, searchText]);
+	}, [rolesResult, searchText]);
 
 	const handleLoadData = useCallback(
 		async (node: EventDataNode<DataNode>) => {
