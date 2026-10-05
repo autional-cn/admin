@@ -6,7 +6,7 @@
  * 「store 尚未落模拟 token」判为未登录，整页弹去登录页。
  * hash 命中即清（replaceState）——防刷新重放，也防 token 留在地址栏/历史记录。
  */
-import { apiClient, useAuthStore } from '@autional-cn/shared';
+import { apiClient, useAuthStore, decodeJwtPayload as decodeJwtPayloadShared } from '@autional-cn/shared';
 import type { User } from '@autional-cn/shared';
 
 // token 为 URL 未编码形态（JWT 字符集 [A-Za-z0-9._-]）
@@ -25,15 +25,9 @@ type JwtPayload = Record<string, unknown> & { custom?: Record<string, unknown> }
 
 function decodeJwtPayload(token?: string | null): JwtPayload | null {
 	if (!token) return null;
-	try {
-		// JWT 段是 base64url（含 -/_），atob 只认标准字母表：先归一化再解
-		// （shared store.ts 同款 JSON.parse(atob(...)) 流程 + base64url 归一化加固）。
-		const part = token.split('.')[1];
-		if (!part) return null;
-		return JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))) as JwtPayload;
-	} catch {
-		return null;
-	}
+	// single source：shared decodeJwtPayload（base64url 归一化 + 填充 + UTF-8；
+	// 此前本地实现漏了填充补齐，段长 %4≠0 时 atob 抛错整链解析失败）。
+	return decodeJwtPayloadShared(token) as JwtPayload | null;
 }
 
 function isImpersonationPayload(payload: JwtPayload | null): boolean {
