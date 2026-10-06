@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuthStore } from '@autional-cn/shared';
+import { classifyQueryState, useAuthStore, type QueryState } from '@autional-cn/shared';
 import { useAdminAuthApi_keysStats } from '@autional-cn/shared/generated/queries';
 import { useActiveSessions } from '@/hooks/use-users';
 import { useRoles } from '@/hooks/use-roles';
@@ -19,7 +19,13 @@ export interface TenantSummary {
 	rolesCount?: number;
 	activeSessionsCount: number;
 	apiKeysCount: number;
-	secretsCount: number;
+	/**
+	 * 密钥数：未就绪（loading/forbidden/error）为 undefined —— W2-03（U426）修「假 0」：
+	 * 消费侧必须按 secretsState 三态渲染（forbidden/error 不显数值），不得 `?? 0` 兜底。
+	 */
+	secretsCount?: number;
+	/** 密钥查询状态（classifyQueryState）；消费侧据此三态渲染（W2-03/U426）。 */
+	secretsState: QueryState;
 }
 
 export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
@@ -59,7 +65,11 @@ export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
 	const { data: apiKeysData } = useAdminAuthApi_keysStats();
 	const apiKeysCount = apiKeysData?.data?.total ?? apiKeysData?.total ?? 0;
 
-	const { data: secretsData } = useQuery({
+	const {
+		data: secretsData,
+		isLoading: secretsLoading,
+		error: secretsError,
+	} = useQuery({
 		queryKey: ['admin-secrets', { page_size: 1 }],
 		staleTime: 60000,
 		queryFn: async () => {
@@ -67,7 +77,13 @@ export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
 			return res ?? null;
 		},
 	});
-	const secretsCount = secretsData?.data?.total ?? secretsData?.total ?? 0;
+	// W2-03（U426）：403（security_admin 视角恒无权限）曾因 `?? 0` 呈假 0；总数保持 undefined，状态交消费侧三态。
+	const secretsCount = secretsData?.data?.total ?? secretsData?.total;
+	const secretsState = classifyQueryState({
+		isLoading: secretsLoading,
+		error: secretsError,
+		data: secretsData,
+	});
 
 	return {
 		tenantName,
@@ -76,6 +92,7 @@ export function useTenantSummary(): TenantSummary & { isLoading: boolean } {
 		activeSessionsCount: activeSessions ?? 0,
 		apiKeysCount,
 		secretsCount,
+		secretsState,
 		isLoading: false,
 	};
 }

@@ -13,8 +13,11 @@ vi.mock('@/hooks/use-roles', () => ({
 }));
 
 vi.mock('@/hooks/use-audit-logs', () => ({
-	useAuditStats: vi.fn(),
 	useAuditLogs: vi.fn(),
+}));
+
+vi.mock('@/hooks/use-audit-alerts', () => ({
+	useAlerts: vi.fn(),
 }));
 
 vi.mock('@/hooks/use-announcements', () => ({
@@ -27,15 +30,16 @@ vi.mock('@/hooks/use-dashboard-summary', () => ({
 
 import { useUsers, useActiveSessions } from '@/hooks/use-users';
 import { useRoles } from '@/hooks/use-roles';
-import { useAuditStats, useAuditLogs } from '@/hooks/use-audit-logs';
+import { useAuditLogs } from '@/hooks/use-audit-logs';
+import { useAlerts } from '@/hooks/use-audit-alerts';
 import { useAnnouncements } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
 
 const mockedUseUsers = vi.mocked(useUsers);
 const mockedUseActiveSessions = vi.mocked(useActiveSessions);
 const mockedUseRoles = vi.mocked(useRoles);
-const mockedUseAuditStats = vi.mocked(useAuditStats);
 const mockedUseAuditLogs = vi.mocked(useAuditLogs);
+const mockedUseAlerts = vi.mocked(useAlerts);
 const mockedUseAnnouncements = vi.mocked(useAnnouncements);
 const mockedUseTenantSummary = vi.mocked(useTenantSummary);
 
@@ -70,8 +74,8 @@ describe('DashboardPage', () => {
 		mockedUseUsers.mockReturnValue(defaultQueryResult() as any);
 		mockedUseActiveSessions.mockReturnValue(defaultQueryResult() as any);
 		mockedUseRoles.mockReturnValue(defaultQueryResult() as any);
-		mockedUseAuditStats.mockReturnValue(defaultQueryResult() as any);
 		mockedUseAuditLogs.mockReturnValue(defaultQueryResult() as any);
+		mockedUseAlerts.mockReturnValue(defaultQueryResult() as any);
 		mockedUseAnnouncements.mockReturnValue(defaultQueryResult({ data: { items: [] } }) as any);
 		mockedUseTenantSummary.mockReturnValue({
 			tenantName: 'Test',
@@ -80,6 +84,7 @@ describe('DashboardPage', () => {
 			activeSessionsCount: 0,
 			apiKeysCount: 0,
 			secretsCount: 0,
+			secretsState: 'ready',
 			isLoading: false,
 		} as any);
 	});
@@ -93,7 +98,6 @@ describe('DashboardPage', () => {
 		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: [{ id: '1' }] }) as any);
 		mockedUseActiveSessions.mockReturnValue(defaultQueryResult({ data: 5 }) as any);
 		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: { items: [], total: 3 } }) as any);
-		mockedUseAuditStats.mockReturnValue(defaultQueryResult({ data: {} }) as any);
 
 		renderDashboard();
 
@@ -107,7 +111,7 @@ describe('DashboardPage', () => {
 		mockedUseUsers.mockReturnValue(defaultQueryResult({ isLoading: true }) as any);
 		mockedUseActiveSessions.mockReturnValue(defaultQueryResult({ isLoading: true }) as any);
 		mockedUseRoles.mockReturnValue(defaultQueryResult({ isLoading: true }) as any);
-		mockedUseAuditStats.mockReturnValue(defaultQueryResult({ isLoading: true }) as any);
+		mockedUseAlerts.mockReturnValue(defaultQueryResult({ isLoading: true }) as any);
 
 		renderDashboard();
 
@@ -163,7 +167,9 @@ describe('DashboardPage', () => {
 		mockedUseUsers.mockReturnValue(defaultQueryResult({ data: [] }) as any);
 		mockedUseActiveSessions.mockReturnValue(defaultQueryResult({ data: 0 }) as any);
 		mockedUseRoles.mockReturnValue(defaultQueryResult({ data: { items: [], total: 0 } }) as any);
-		mockedUseAuditStats.mockReturnValue(defaultQueryResult({ data: {} }) as any);
+		mockedUseAlerts.mockReturnValue(
+			defaultQueryResult({ data: { items: [], pagination: { total: 0 } } }) as any,
+		);
 
 		renderDashboard();
 
@@ -247,13 +253,92 @@ describe('DashboardPage', () => {
 		expect(screen.queryByText('重试')).toBeNull();
 	});
 
-	it('auditStats error：待处理审计告警卡成态（不显 0）', () => {
-		mockedUseAuditStats.mockReturnValue(defaultQueryResult({ error: serverError }) as any);
+	// ---- 批 5 补修（F2）：待处理审计告警卡改真实源（告警列表 status=open 的 total）+ 三态 ----
+	it('alerts 500：待处理审计告警卡呈失败态（不显 0）', () => {
+		mockedUseAlerts.mockReturnValue(defaultQueryResult({ error: serverError }) as any);
 
 		renderDashboard();
 
 		const alertsCard = screen.getByText('待处理审计告警').closest('.ant-card');
 		expect(alertsCard?.textContent).toContain('加载失败');
+	});
+
+	it('alerts 403：待处理审计告警卡呈无权限（不显 0）', () => {
+		mockedUseAlerts.mockReturnValue(defaultQueryResult({ error: forbidden }) as any);
+
+		renderDashboard();
+
+		const alertsCard = screen.getByText('待处理审计告警').closest('.ant-card');
+		expect(alertsCard?.textContent).toContain('无权限访问');
+		expect(alertsCard?.textContent).not.toContain('0');
+	});
+
+	it('alerts ready：待处理审计告警卡显示真实 total（status=open 查询）', () => {
+		mockedUseAlerts.mockReturnValue(
+			defaultQueryResult({ data: { items: [], pagination: { total: 3 } } }) as any,
+		);
+
+		renderDashboard();
+
+		const alertsCard = screen.getByText('待处理审计告警').closest('.ant-card');
+		expect(alertsCard?.textContent).toContain('3');
+		expect(mockedUseAlerts).toHaveBeenCalledWith({ status: 'open', page: 1, page_size: 1 });
+	});
+
+	// ---- W2-03（U426）：密钥卡三态（按 roles 模式），403 不显假 0（回归锁） ----
+	it('secrets 403：密钥卡呈无权限（不显 0，假 0 回归锁）', () => {
+		mockedUseTenantSummary.mockReturnValue({
+			tenantName: 'Test',
+			memberCount: 0,
+			rolesCount: undefined,
+			activeSessionsCount: 0,
+			apiKeysCount: 0,
+			secretsCount: undefined,
+			secretsState: 'forbidden',
+			isLoading: false,
+		} as any);
+
+		renderDashboard();
+
+		const secretsStat = screen.getByText('密钥').closest('.ant-statistic');
+		expect(secretsStat?.textContent).toContain('无权限访问');
+		expect(secretsStat?.textContent).not.toContain('0');
+	});
+
+	it('secrets 500：密钥卡呈失败态（不显 0）', () => {
+		mockedUseTenantSummary.mockReturnValue({
+			tenantName: 'Test',
+			memberCount: 0,
+			rolesCount: undefined,
+			activeSessionsCount: 0,
+			apiKeysCount: 0,
+			secretsCount: undefined,
+			secretsState: 'error',
+			isLoading: false,
+		} as any);
+
+		renderDashboard();
+
+		const secretsStat = screen.getByText('密钥').closest('.ant-statistic');
+		expect(secretsStat?.textContent).toContain('加载失败');
+	});
+
+	it('secrets loading：密钥卡呈占位（不显 0）', () => {
+		mockedUseTenantSummary.mockReturnValue({
+			tenantName: 'Test',
+			memberCount: 0,
+			rolesCount: undefined,
+			activeSessionsCount: 0,
+			apiKeysCount: 0,
+			secretsCount: undefined,
+			secretsState: 'loading',
+			isLoading: false,
+		} as any);
+
+		renderDashboard();
+
+		const secretsStat = screen.getByText('密钥').closest('.ant-statistic');
+		expect(secretsStat?.textContent).toContain('…');
 	});
 
 	it('auditLogs error：最近登录卡成态，不回落「暂无登录记录」（伪空态回归锁）', () => {

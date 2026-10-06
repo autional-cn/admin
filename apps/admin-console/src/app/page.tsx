@@ -17,7 +17,8 @@ import dayjs from 'dayjs';
 import { useUsers } from '@/hooks/use-users';
 import { useActiveSessions } from '@/hooks/use-users';
 import { useRoles } from '@/hooks/use-roles';
-import { useAuditStats, useAuditLogs, type AuditLogRecord } from '@/hooks/use-audit-logs';
+import { useAuditLogs, type AuditLogRecord } from '@/hooks/use-audit-logs';
+import { useAlerts } from '@/hooks/use-audit-alerts';
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
 import { classifyQueryState, type QueryState } from '@autional-cn/shared';
@@ -70,7 +71,13 @@ const DashboardPage = memo(function DashboardPage() {
 		error: rolesError,
 		refetch: rolesRefetch,
 	} = useRoles();
-	const { data: auditStats, isLoading: auditLoading, error: auditStatsError } = useAuditStats();
+	// F2（批 5 补修）：原读 auditStats.alerts/pending 为幻影契约（后端 stats 无此字段，恒 undefined→假 0）；
+	// 真实源 = 告警列表 status=open 的 total（service-audit ListAlerts → NewListResponse total）。
+	const {
+		data: alertsResult,
+		isLoading: alertsLoading,
+		error: alertsError,
+	} = useAlerts({ status: 'open', page: 1, page_size: 1 });
 	const {
 		data: recentLogins,
 		isLoading: logsLoading,
@@ -97,10 +104,10 @@ const DashboardPage = memo(function DashboardPage() {
 		data: activeSessions,
 	});
 	const rolesState = classifyQueryState({ isLoading: rolesLoading, error: rolesError, data: rolesResult });
-	const auditState = classifyQueryState({
-		isLoading: auditLoading,
-		error: auditStatsError,
-		data: auditStats,
+	const alertsState = classifyQueryState({
+		isLoading: alertsLoading,
+		error: alertsError,
+		data: alertsResult,
 	});
 	const logsState = classifyQueryState({
 		isLoading: logsLoading,
@@ -123,7 +130,7 @@ const DashboardPage = memo(function DashboardPage() {
 	// 由 stateText 覆盖显示，杜绝 error → 0（假 0）。
 	const roleCount = rolesResult?.total;
 	const roleStatValue = stateText(rolesState) ?? roleCount ?? summary.rolesCount ?? (rolesState === 'loading' ? '…' : 0);
-	const auditAlerts = auditStats?.alerts ?? auditStats?.pending;
+	const openAlertsCount = alertsResult?.pagination?.total;
 
 	const todayStart = new Date();
 	todayStart.setHours(0, 0, 0, 0);
@@ -216,9 +223,14 @@ const DashboardPage = memo(function DashboardPage() {
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
+						{/* W2-03（U426）：secrets 403/未就绪呈态不显 0（按 roles 模式三态）。 */}
 						<Statistic
 							title={t('dashboard.secrets')}
-							value={summary.secretsCount}
+							value={
+								stateText(summary.secretsState) ??
+								summary.secretsCount ??
+								(summary.secretsState === 'loading' ? '…' : 0)
+							}
 							prefix={<Lock size="1em" className="text-danger" />}
 						/>
 					</Col>
@@ -283,12 +295,12 @@ const DashboardPage = memo(function DashboardPage() {
 			<Row gutter={[16, 16]} className="mt-4">
 				<Col xs={24} sm={12} lg={6}>
 					<Card>
-						{auditState === 'loading' ? (
+						{alertsState === 'loading' ? (
 							<Skeleton active paragraph={{ rows: 0 }} />
 						) : (
 							<Statistic
 								title={t('dashboard.pendingAlerts')}
-								value={stateText(auditState) ?? auditAlerts ?? 0}
+								value={stateText(alertsState) ?? openAlertsCount ?? 0}
 								prefix={<AlertTriangle size="1em" className="text-danger" />}
 							/>
 						)}

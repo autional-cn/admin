@@ -1,8 +1,8 @@
 {
   ".ant-card": "ant card",
-  "403.backHome": "403 返回 Home",
-  "403.subtitle": "403 subtitle",
-  "403.title": "403 标题",
+  "403.backHome": "返回首页",
+  "403.subtitle": "您没有权限访问此页面",
+  "403.title": "禁止访问",
   "@/lib/api.generated": "lib api generated",
   "abac.column.actions": "操作",
   "abac.column.condition": "条件",
