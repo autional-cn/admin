@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import tokens from '@autional-cn/tokens/tokens.json';
 import { useCurrentTenantIdOr, usePageTitle } from '@autional-cn/shared';
 import { Form, Input, Button, Slider, ColorPicker, Card, Row, Col, Spin } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -28,7 +29,9 @@ interface BrandingData {
 // A-150：合法色值兜底与拦截——
 // ① 原初值 'var(--color-primary-700)' 非法 ⇒ ColorPicker 解析失败显 #000000（实测 1s 黑蓝闪烁）；
 // ② ColorPicker onChange 首参为 AggregationColor 实例（无 toJSON）⇒ 提交前统一归一为 hex 字符串。
-const DEFAULT_PRIMARY_COLOR = '#1890ff';
+// A-150 需要一个**合法 hex**（ColorPicker 解析不了 var()），但也不能写死一个可能是错品牌色的字面量 ——
+// 从令牌包的解析值取：改令牌它自动跟着变，且不再是「硬编码设计系统已有的色」（C2）。
+const DEFAULT_PRIMARY_COLOR = tokens.core.color.primary['700'];
 const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 const HEX_COLOR_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
