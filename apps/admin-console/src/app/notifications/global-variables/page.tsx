@@ -5,6 +5,7 @@ import { Button, Space, Tag, Modal, Form, Input, Popconfirm, Tooltip } from 'ant
 import { message } from '@/lib/antd-app';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@autional-cn/shared';
 import {
 	useGlobalVariables,
 	useCreateGlobalVariable,
@@ -28,6 +29,8 @@ const PRESET_KEYS = [
 
 export default function GlobalVariablesPage() {
 	const { t } = useTranslation();
+	// A-172：页面标题（与面包屑同源；原 tab 恒默认站名）
+	usePageTitle(t('notifications.globalVariables.title'));
 	const [modalVisible, setModalVisible] = useState(false);
 	const [editing, setEditing] = useState<Record<string, unknown> | null>(null);
 	const [form] = Form.useForm();
@@ -43,6 +46,12 @@ export default function GlobalVariablesPage() {
 				await updateMut.mutateAsync({ id: editing.id as string, data: { value: values.value } });
 				message.success(t('notifications.globalVariables.updateSuccess'));
 			} else {
+				// A-172：重复 key 前置校验（后端唯一索引 uni_global_var_tenant_app_key 冲突
+				// 仅回报泛化 ErrInternalError → 泛化"保存失败"toast，无"已存在"提示）。
+				if ((data as Array<Record<string, unknown>>).some((r) => r.key === values.key)) {
+					message.error(t('notifications.globalVariables.duplicateKey'));
+					return;
+				}
 				await createMut.mutateAsync(values);
 				message.success(t('notifications.globalVariables.createSuccess'));
 			}
@@ -57,6 +66,14 @@ export default function GlobalVariablesPage() {
 	const openCreate = () => {
 		setEditing(null);
 		form.resetFields();
+		setModalVisible(true);
+	};
+
+	// A-172：预设键 Tag 点击 → 创建弹窗预填键名（原纯展示不可交互）
+	const openCreateWithKey = (key: string) => {
+		setEditing(null);
+		form.resetFields();
+		form.setFieldsValue({ key });
 		setModalVisible(true);
 	};
 
@@ -81,7 +98,13 @@ export default function GlobalVariablesPage() {
 			ellipsis: true,
 		},
 		{
-			title: t('notifications.globalVariables.scope'),
+			// A-170：范围列语义明示（列值 RC-5 已按 camel 直读渲染真实值；本控制台无 X-App-ID
+			// → 落库恒租户级 app_id=''，App 级行由应用侧维护 ⇒ 表头 Tooltip 说明只读口径）。
+			title: (
+				<Tooltip title={t('notifications.globalVariables.scopeHint')}>
+					<span>{t('notifications.globalVariables.scope')}</span>
+				</Tooltip>
+			),
 			// RC-5（TASK-AB1-27 补）：行契约 camel 直读（拦截器深 camel 化；旧 dataIndex 'app_id' 读 camel 源恒
 			// undefined ⇒ 应用级变量被误示「全局」）。
 			// wire 锚：service-notification/internal/handler/dto/dto.go:873-879（json app_id）。
@@ -139,12 +162,17 @@ export default function GlobalVariablesPage() {
 					</>
 				}
 			/>
-			<div className="mb-4 flex gap-2 flex-wrap">
+			<div className="mb-4 flex gap-2 flex-wrap items-center">
 				<span className="text-neutral-600 text-sm">
 					{t('notifications.globalVariables.predefinedKeys')}:
 				</span>
+				{/* A-172：预设键 Tag 可点击 → 创建弹窗预填键名（原纯展示，用户须手抄） */}
 				{PRESET_KEYS.map((k) => (
-					<Tag key={k}>{k}</Tag>
+					<Tooltip key={k} title={t('notifications.globalVariables.presetClickHint')}>
+						<Tag className="cursor-pointer" onClick={() => openCreateWithKey(k)}>
+							{k}
+						</Tag>
+					</Tooltip>
 				))}
 			</div>
 			{error && (

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { usePageTitle } from '@autional-cn/shared';
 import {
 	useAnnouncements,
 	useCreateAnnouncement,
@@ -21,6 +22,7 @@ import {
 	useUnpublishAnnouncement,
 	type AnnouncementRecord,
 } from '@/hooks/use-announcements';
+import { useRolesForSelect } from '@/hooks/use-roles-for-select';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -34,12 +36,10 @@ const STATUS_COLORS: Record<string, string> = {
 	expired: 'warning',
 };
 
-function formatTime(value?: string) {
-	return value ? new Date(value).toLocaleString('zh-CN') : '-';
-}
-
 export default function AnnouncementsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	// A-161：页面标题（与面包屑同源；原 tab 恒默认站名）
+	usePageTitle(t('notifications.announcements.title'));
 	const [modalVisible, setModalVisible] = useState(false);
 	const [editing, setEditing] = useState<AnnouncementRecord | null>(null);
 	const [page, setPage] = useState(1);
@@ -47,6 +47,13 @@ export default function AnnouncementsPage() {
 	const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 	const [search, setSearch] = useState('');
 	const [form] = Form.useForm();
+
+	// A-160：目标角色字典源（同门户用户与权限的角色数据；mode="tags" 保留自由输入）
+	const roleOptions = useRolesForSelect();
+
+	// A-161：日期随 i18n.language 本地化（原硬编码 'zh-CN' → EN 界面仍中文格式）
+	const formatTime = (value?: string) =>
+		value ? new Date(value).toLocaleString(i18n.language) : '-';
 
 	// RC-5（TASK-AB1-27）：查询入参 camel 书面写（分页键经 hook 内 toPageParams 单点转 wire snake）
 	const { data, isLoading, error, refetch } = useAnnouncements({
@@ -339,10 +346,11 @@ export default function AnnouncementsPage() {
 						<TextArea rows={6} placeholder={t('notifications.announcements.contentPlaceholder')} />
 					</Form.Item>
 					<Form.Item name="targetRoles" label={t('notifications.announcements.targetRoles')}>
+						{/* A-160：字典选项来自角色列表（值=角色码；原 options=[] 纯手输，拼错静默投向零人） */}
 						<Select
 							mode="tags"
 							placeholder={t('notifications.announcements.targetRolesPlaceholder')}
-							options={[]}
+							options={roleOptions}
 						/>
 					</Form.Item>
 					<Form.Item name="publishAt" label={t('notifications.announcements.publishAt')}>

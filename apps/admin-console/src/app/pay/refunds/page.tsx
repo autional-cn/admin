@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePageTitle } from '@autional-cn/shared';
 import { Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
 import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +16,8 @@ const statusTagColor: Record<string, string> = {
 };
 
 export default function PayRefundsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	usePageTitle(t('payRefunds.title')); // A-355①：tab 标题（旧实现恒「Autional 管理控制台」，第 23 例）
 	// W2-01（A-353）：筛选状态直连 hook 入参（入 queryKey → 触发新请求，wire ?status=...）
 	const [status, setStatus] = useState<string | undefined>(undefined);
 	const [detailModal, setDetailModal] = useState(false);
@@ -70,7 +72,8 @@ export default function PayRefundsPage() {
 			dataIndex: 'createdAt',
 			key: 'createdAt',
 			width: 160,
-			render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
+			// A-355②：toLocaleString 无 locale（旧恒跑宿主默认）
+			render: (v: string) => (v ? new Date(v).toLocaleString(i18n.language) : '-'),
 		},
 		{
 			title: t('payRefunds.actions'),
@@ -100,7 +103,8 @@ export default function PayRefundsPage() {
 			<Card size="small" className="mb-4">
 				<Space wrap>
 					<Select
-						placeholder={t('payRefunds.status')}
+						// A-355④：占位「状态」歧义（支付 vs 退款）——收窄为「退款状态」
+						placeholder={t('payRefunds.statusFilter')}
 						allowClear
 						className="w-30"
 						value={status}
@@ -150,7 +154,10 @@ export default function PayRefundsPage() {
 							</Tag>
 						</Descriptions.Item>
 						<Descriptions.Item label={t('payRefunds.createdAt')}>
-							{selected.createdAt ? new Date(selected.createdAt).toLocaleString() : '-'}
+							{/* A-355②：locale 补全 */}
+							{selected.createdAt
+								? new Date(selected.createdAt).toLocaleString(i18n.language)
+								: '-'}
 						</Descriptions.Item>
 					</Descriptions>
 				)}

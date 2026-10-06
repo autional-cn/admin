@@ -1,6 +1,7 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractListResult, extractItem } from '@autional-cn/shared';
+import type { ListResult } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -105,14 +106,25 @@ async function fetchWalletTransactions(
 	tenantId: string,
 	params?: Record<string, unknown>,
 	signal?: AbortSignal,
-): Promise<Transaction[]> {
+): Promise<ListResult<Transaction>> {
+	// A-315②：消费服务端分页元数据（旧实现 extractList 只取 items + 页面零参上行
+	// ⇒ 服务端默认 20/页 vs 本地 10/页截断）。
 	const res = await getWalletTransactions(tenantId, params);
-	return extractList<Transaction>(res);
+	return extractListResult<Transaction>(res);
 }
 
-async function fetchWalletDisputes(tenantId: string, signal?: AbortSignal): Promise<Dispute[]> {
-	const res = await getWalletDisputes(tenantId);
-	return extractList<Dispute>(res);
+// A-374④/A-375①：争议列表补 status/page/page_size 上行 + 透出服务端分页
+// （旧零参 ⇒ 服务端默认 20/页 vs 本地 10/页截断；错误态上抛由 W0-01 已定，此处不吞错）。
+async function fetchWalletDisputes(
+	tenantId: string,
+	params?: Record<string, unknown>,
+	signal?: AbortSignal,
+): Promise<ListResult<Dispute>> {
+	const res = await getWalletDisputes(
+		tenantId,
+		params as { status?: string; page?: number; page_size?: number } | undefined,
+	);
+	return extractListResult<Dispute>(res);
 }
 
 export function useWalletSummary(tenantId: string) {
@@ -135,11 +147,12 @@ export function useWalletTransactions(tenantId: string, params?: Record<string, 
 	});
 }
 
-export function useWalletDisputes(tenantId: string) {
+export function useWalletDisputes(tenantId: string, params?: Record<string, unknown>) {
 	return useQuery({
-		queryKey: queryKeys.wallets.disputes(tenantId),
+		// A-375①：status/分页入 queryKey（筛选触发新请求）
+		queryKey: queryKeys.wallets.disputes(tenantId, params),
 		queryFn: async ({ signal }) => {
-			return fetchWalletDisputes(tenantId, signal);
+			return fetchWalletDisputes(tenantId, params, signal);
 		},
 		enabled: !!tenantId,
 	});

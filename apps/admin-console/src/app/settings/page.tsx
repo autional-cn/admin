@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, Select, Avatar, Modal, Typography } from 'antd';
 import { message } from '@/lib/antd-app';
 import {
-	Clock,
 	Globe,
 	Lock,
 	Mail,
@@ -12,7 +11,7 @@ import {
 	ShieldCheck,
 	User,
 } from 'lucide-react';
-import { useAuthStore, processPasswordForTransmission } from '@autional-cn/shared';
+import { useAuthStore, processPasswordForTransmission, usePageTitle } from '@autional-cn/shared';
 import { PublicAuthConfigByAuthConfig } from '@autional-cn/shared/generated/api';
 // W2-04（A-437）：保存资料改走 self 自助三通道（旧 updateUser 走 admin 端点恒 61002205）。
 import {
@@ -30,11 +29,16 @@ import { useTranslation } from 'react-i18next';
 
 const PREFERENCE_KEYS = {
 	language: 'admin-console-lang',
-	timezone: 'admin-console-timezone',
 };
+
+// A-442②：头像占位改为内联 data-URI 常量 —— 原输入框 placeholder 硬编码外域示例 URL
+//（未入 i18n 且指向不存在资源）；无头像时的 Avatar 兜底同源，data-URI 不产生任何外域请求。
+const AVATAR_PLACEHOLDER_DATA_URI =
+	'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjIyIiByPSIxMSIgZmlsbD0iIzk0YTNiOCIvPjxwYXRoIGQ9Ik0xMiA1NmMwLTEwIDktMTcgMjAtMTdzMjAgNyAyMCAxN3oiIGZpbGw9IiM5NGEzYjgiLz48L3N2Zz4=';
 
 export default function SettingsPage() {
 	const { t, i18n } = useTranslation();
+	usePageTitle(t('settings.title'));
 	const [profileForm] = Form.useForm();
 	const [passwordForm] = Form.useForm();
 	const [prefForm] = Form.useForm();
@@ -54,8 +58,7 @@ export default function SettingsPage() {
 
 	useEffect(() => {
 		const savedLang = localStorage.getItem(PREFERENCE_KEYS.language) || i18n.language || 'zh-CN';
-		const savedTimezone = localStorage.getItem(PREFERENCE_KEYS.timezone) || 'Asia/Shanghai';
-		prefForm.setFieldsValue({ language: savedLang, timezone: savedTimezone });
+		prefForm.setFieldsValue({ language: savedLang });
 	}, [prefForm, i18n.language]);
 
 	React.useEffect(() => {
@@ -67,9 +70,8 @@ export default function SettingsPage() {
 		}
 	}, [user, profileForm]);
 
-	const handleSavePreferences = (values: { language: string; timezone: string }) => {
+	const handleSavePreferences = (values: { language: string }) => {
 		localStorage.setItem(PREFERENCE_KEYS.language, values.language);
-		localStorage.setItem(PREFERENCE_KEYS.timezone, values.timezone);
 		i18n.changeLanguage(values.language);
 		message.success(t('settings.preferencesSaved'));
 	};
@@ -224,7 +226,7 @@ export default function SettingsPage() {
 					<Avatar
 						size={64}
 						icon={<User size="1em" />}
-						src={user?.avatarUrl}
+						src={user?.avatarUrl || AVATAR_PLACEHOLDER_DATA_URI}
 						className="!bg-info"
 					/>
 					<div>
@@ -246,7 +248,7 @@ export default function SettingsPage() {
 						</div>
 					</Form.Item>
 					<Form.Item name="avatarUrl" label={t('settings.avatarUrl')}>
-						<Input placeholder="https://example.com/avatar.png" />
+						<Input placeholder={AVATAR_PLACEHOLDER_DATA_URI} />
 					</Form.Item>
 					<Button type="primary" icon={<Save size="1em" />} htmlType="submit" loading={loading}>
 						{t('settings.saveProfile')}
@@ -259,7 +261,7 @@ export default function SettingsPage() {
 					form={prefForm}
 					layout="vertical"
 					onFinish={handleSavePreferences}
-					initialValues={{ language: 'zh-CN', timezone: 'Asia/Shanghai' }}
+					initialValues={{ language: 'zh-CN' }}
 				>
 					<Form.Item name="language" label={t('settings.language')}>
 						<Select
@@ -267,16 +269,6 @@ export default function SettingsPage() {
 							options={[
 								{ label: t('settings.langZhCN'), value: 'zh-CN' },
 								{ label: t('settings.langEnUS'), value: 'en-US' },
-							]}
-						/>
-					</Form.Item>
-					<Form.Item name="timezone" label={t('settings.timezone')}>
-						<Select
-							prefix={<Clock size="1em" />}
-							options={[
-								{ label: t('settings.timezoneShanghai'), value: 'Asia/Shanghai' },
-								{ label: t('settings.timezoneTokyo'), value: 'Asia/Tokyo' },
-								{ label: t('settings.timezoneUTC'), value: 'UTC' },
 							]}
 						/>
 					</Form.Item>
@@ -294,6 +286,7 @@ export default function SettingsPage() {
 						rules={[{ required: true, message: t('settings.oldPasswordRequired') }]}
 					>
 						<Input.Password
+							autoComplete="current-password"
 							prefix={<Lock size="1em" />}
 							placeholder={t('settings.oldPasswordPlaceholder')}
 						/>
@@ -304,6 +297,7 @@ export default function SettingsPage() {
 						rules={[{ required: true, message: t('settings.newPasswordRequired') }]}
 					>
 						<Input.Password
+							autoComplete="new-password"
 							prefix={<Lock size="1em" />}
 							placeholder={t('settings.newPasswordPlaceholder')}
 						/>
@@ -324,6 +318,7 @@ export default function SettingsPage() {
 						]}
 					>
 						<Input.Password
+							autoComplete="new-password"
 							prefix={<Lock size="1em" />}
 							placeholder={t('settings.confirmPasswordPlaceholder')}
 						/>
@@ -360,6 +355,7 @@ export default function SettingsPage() {
 							rules={[{ required: true, message: t('settings.oldPasswordRequired') }]}
 						>
 							<Input.Password
+								autoComplete="current-password"
 								prefix={<Lock size="1em" />}
 								placeholder={t('settings.oldPasswordPlaceholder')}
 							/>

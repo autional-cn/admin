@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePageTitle } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, DatePicker, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -33,7 +34,8 @@ interface CouponFormValues {
 }
 
 export default function WalletCouponsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	usePageTitle(t('walletCoupons.title'));
 	const { data: coupons = [], isLoading, error, refetch } = useCoupons();
 	const createMut = useCreateCoupon();
 	const updateMut = useUpdateCoupon();
@@ -95,6 +97,22 @@ export default function WalletCouponsPage() {
 		setModalOpen(true);
 	};
 
+	// A-379②：删除成功/失败 toast（对照创建/编辑有反馈；旧 Popconfirm 直发 mutate 零反馈）。
+	const handleDelete = async (id: string) => {
+		try {
+			await deleteMut.mutateAsync(id);
+			message.success(t('walletCoupons.deleteSuccess'));
+		} catch (err) {
+			handleApiError(err, t('walletCoupons.deleteFailed'));
+		}
+	};
+
+	// A-379④：有效性本地化 + 零值抑制（无 locale 时恒系统区域；零值券曝露 "1/1/1"）。
+	const formatDate = (v?: string) => {
+		if (!v || v.startsWith('0001-01-01')) return '-';
+		return new Date(v).toLocaleDateString(i18n.language);
+	};
+
 	const columns = [
 		{ title: t('walletCoupons.colCode'), dataIndex: 'code', key: 'code' },
 		{
@@ -114,8 +132,11 @@ export default function WalletCouponsPage() {
 			title: t('walletCoupons.colValue'),
 			dataIndex: 'value',
 			key: 'value',
-			render: (v: string, r: CouponItem) =>
-				r.type === 'percentage' ? `${v}%` : `¥${parseFloat(v).toFixed(2)}`,
+			// A-379③：按类型分支（旧无分支 ⇒ free_shipping 券恒显 "¥0.00"）
+			render: (v: string, r: CouponItem) => {
+				if (r.type === 'free_shipping') return t('walletCoupons.typeFreeShipping');
+				return r.type === 'percentage' ? `${v}%` : `¥${parseFloat(v).toFixed(2)}`;
+			},
 		},
 		{
 			title: t('walletCoupons.colMinAmount'),
@@ -132,7 +153,7 @@ export default function WalletCouponsPage() {
 			title: t('walletCoupons.colValidity'),
 			key: 'validity',
 			render: (_: unknown, r: CouponItem) =>
-				`${r.validFrom ? new Date(r.validFrom).toLocaleDateString() : '-'} ~ ${r.validUntil ? new Date(r.validUntil).toLocaleDateString() : '-'}`,
+				`${formatDate(r.validFrom)} ~ ${formatDate(r.validUntil)}`,
 		},
 		{
 			title: t('walletCoupons.colStatus'),
@@ -154,7 +175,7 @@ export default function WalletCouponsPage() {
 					</Button>
 					<Popconfirm
 						title={t('walletCoupons.confirmDelete')}
-						onConfirm={() => deleteMut.mutate(record.id)}
+						onConfirm={() => handleDelete(record.id)}
 						okText={t('walletCoupons.ok')}
 						cancelText={t('walletCoupons.cancel')}
 					>

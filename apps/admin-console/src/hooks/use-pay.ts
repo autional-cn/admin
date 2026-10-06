@@ -1,11 +1,11 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractItem, extractListResult } from '@autional-cn/shared';
+import type { ListResult } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	listPayChannels,
-	getPayChannel,
 	createPayChannel,
 	updatePayChannel,
 	deletePayChannel,
@@ -16,6 +16,14 @@ import {
 	getAdminPayment,
 	getAdminPaymentReceipt,
 } from '@/lib/api.generated';
+import * as Generated from '@autional-cn/shared/generated/api';
+
+// A-344②：404 = 确定性结果（支付不存在），全局 retry:1（main.tsx:27）只会把一次 404 放大成双发
+// （详情+收据两查询各 ×2 = 实测 4×404）；仅对 404 关闭重试，其余错误仍保留 1 次重试。
+function retryUnlessNotFound(failureCount: number, error: unknown): boolean {
+	if ((error as { response?: { status?: number } })?.response?.status === 404) return false;
+	return failureCount < 1;
+}
 
 export interface Channel {
 	id: string;
@@ -92,9 +100,16 @@ export function usePayChannels(tenantId: string) {
 export function usePayPayments(params?: Record<string, unknown>) {
 	return useQuery({
 		queryKey: queryKeys.pay.payments(params),
-		queryFn: async () => {
-			const res = await listAdminPayments(params as any);
-			return extractList<PaymentItem>(res);
+		queryFn: async (): Promise<ListResult<PaymentItem>> => {
+			// A-341：服务端分页参接线（camel 书面写；拦截器 snake 化上 wire，pageSize→page_size）。
+			// generated 该端点入参类型仍为 snake 字面量（签名未收编），故收窄直传。
+			const res = await listAdminPayments(params as unknown as {
+				app_id?: string;
+				status?: string;
+				page?: number;
+				page_size?: number;
+			});
+			return extractListResult<PaymentItem>(res);
 		},
 	});
 }
@@ -107,6 +122,8 @@ export function usePayPaymentDetail(id: string) {
 			return extractItem<PaymentItem>(res);
 		},
 		enabled: !!id,
+		// A-344②：404 不重试（全局 retry:1 ⇒ 伪 ID 实测 4×404 双发）
+		retry: retryUnlessNotFound,
 	});
 }
 
@@ -118,6 +135,8 @@ export function usePayReceipt(id: string) {
 			return extractItem<Receipt>(res);
 		},
 		enabled: !!id,
+		// A-344②：同详情——404 不重试，杜绝收据腿的第二发 404
+		retry: retryUnlessNotFound,
 	});
 }
 
@@ -152,6 +171,16 @@ export function useRunPayReconciliation() {
 	const qc = useQueryClient();
 	return useMutation({
 		mutationFn: (params?: Record<string, unknown>) => runPayReconciliation(params as any),
+		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.pay.all }),
+	});
+}
+
+// A-349：删除对账记录（DELETE 端点 router.go:139 早已存在、生成函数 api.ts:8298 零 UI 消费；
+// api.generated.ts 垫片不在本波面，故直读 generated）。
+export function useDeletePayReconciliation() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (id: string) => Generated.adminPaymentsReconciliationByReconciliationDelete(id),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.pay.all }),
 	});
 }

@@ -159,7 +159,11 @@ describe('legal-documents 契约收敛（A-274 / AC-AB1-41）', () => {
 		expect(screen.getByText('服务条款')).toBeTruthy();
 		expect(screen.getByText('简体中文')).toBeTruthy();
 		expect(screen.getByText('草稿')).toBeTruthy();
-		expect(screen.getByText('2026-01-15T10:00:00Z')).toBeTruthy();
+		// A-278②（W1e）：生效时间列已本地化（旧 = 裸显 RFC3339）→ 断言改为本地化渲染值
+		// （期望值同进程动态计算，时区无关；i18n.language=zh-CN 见 test/setup.ts）
+		expect(screen.getByText(new Date('2026-01-15T10:00:00Z').toLocaleString('zh-CN'))).toBeTruthy();
+		// 旧形态（RFC3339 原文）零命中
+		expect(screen.queryByText('2026-01-15T10:00:00Z')).toBeNull();
 		// 旧缺陷残留（伪 key / 空占位）零命中
 		expect(screen.queryByText(/docType\.undefined|effectiveAt\.undefined/)).toBeNull();
 		expect(screen.queryByText('—')).toBeNull();

@@ -21,6 +21,8 @@ interface PermissionRecord {
 	name: string;
 	description: string;
 	category: string;
+	/** A-16：系统内置权限标识（wire 预留；后端 PermissionResponse 暂无 is_system 字段，见记录偏差）。 */
+	isSystem?: boolean;
 }
 
 export default function PermissionsPage() {
@@ -91,7 +93,9 @@ export default function PermissionsPage() {
 		}
 	};
 
-	const handleDelete = (id: string) => {
+	const handleDelete = (record: PermissionRecord) => {
+		// A-16 守卫：系统权限不可删除（按钮已禁用，此处双保险防直接调用）。
+		if (record.isSystem) return;
 		modal.confirm({
 			title: t('permissions.confirmDelete'),
 			content: t('permissions.deleteWarning'),
@@ -99,7 +103,7 @@ export default function PermissionsPage() {
 			okButtonProps: { danger: true },
 			onOk: async () => {
 				try {
-					await deleteMut.mutateAsync(id);
+					await deleteMut.mutateAsync(record.id);
 					message.success(t('permissions.deleteSuccess'));
 				} catch (err) {
 					handleApiError(err, t('permissions.deleteError'));
@@ -115,7 +119,17 @@ export default function PermissionsPage() {
 			key: 'code',
 			render: (v: string) => <Tag>{v}</Tag>,
 		},
-		{ title: t('common.name'), dataIndex: 'name', key: 'name' },
+		{
+			title: t('common.name'),
+			dataIndex: 'name',
+			key: 'name',
+			render: (v: string, record: PermissionRecord) => (
+				<Space size={4}>
+					{v}
+					{record.isSystem && <Tag color="gold">{t('permissions.systemTag')}</Tag>}
+				</Space>
+			),
+		},
 		{
 			title: t('permissions.column.description'),
 			dataIndex: 'description',
@@ -148,7 +162,8 @@ export default function PermissionsPage() {
 						type="link"
 						danger
 						icon={<Trash2 size="1em" />}
-						onClick={() => handleDelete(record.id)}
+						disabled={record.isSystem}
+						onClick={() => handleDelete(record)}
 					>
 						{t('common.delete')}
 					</Button>

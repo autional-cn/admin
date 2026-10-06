@@ -989,6 +989,7 @@ export default function CompliancePage() {
 					policyForm.resetFields();
 				}}
 				onOk={() => policyForm.submit()}
+				closable={{ 'aria-label': t('common.close') }}
 				className="w-full max-w-[560px]"
 			>
 				<Form form={policyForm} layout="vertical" onFinish={handleSavePolicy}>
@@ -1061,6 +1062,7 @@ export default function CompliancePage() {
 					consentForm.resetFields();
 				}}
 				onOk={() => consentForm.submit()}
+				closable={{ 'aria-label': t('common.close') }}
 				className="w-full max-w-[560px]"
 			>
 				<Form form={consentForm} layout="vertical" onFinish={handleCreateConsent}>
@@ -1133,6 +1135,7 @@ export default function CompliancePage() {
 					erasureForm.resetFields();
 				}}
 				onOk={() => erasureForm.submit()}
+				closable={{ 'aria-label': t('common.close') }}
 				className="w-full max-w-[560px]"
 			>
 				<Form form={erasureForm} layout="vertical" onFinish={handleCreateErasure}>

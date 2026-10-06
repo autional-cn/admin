@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useCurrentTenantId } from '@autional-cn/shared';
-import { Tree, Card, Button, Space, Tag, Modal, Form, Input, Empty } from 'antd';
+import { Tree, Card, Button, Space, Tag, Modal, Form, Input, Empty, Typography } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { Network, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { DataNode } from 'antd/es/tree';
@@ -22,6 +22,7 @@ import { createDepartmentSchema } from '@/lib/validators';
 interface DeptRecord {
 	id: string;
 	name: string;
+	code?: string;
 	parentId?: string;
 	memberCount: number;
 }
@@ -194,8 +195,16 @@ export default function DepartmentsPage() {
 							<div className="text-neutral-600 space-y-2">
 								<p>
 									{t('departments.departmentId')}
-									{selectedDept.id}
+									<Typography.Text copyable={{ text: selectedDept.id }} title={selectedDept.id}>
+										{selectedDept.id.length > 8 ? `${selectedDept.id.slice(0, 8)}…` : selectedDept.id}
+									</Typography.Text>
 								</p>
+								{selectedDept.code && (
+									<p>
+										{t('departments.departmentCode')}
+										{selectedDept.code}
+									</p>
+								)}
 								<p>
 									{t('departments.memberCount')}
 									{selectedDept.memberCount} {t('departments.people')}

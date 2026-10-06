@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantIdOr } from '@autional-cn/shared';
 import { Tabs, Card, Button, Tree, Progress, Space, Upload, Modal, Form, Input, Row, Col } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -57,39 +56,47 @@ export default function StoragePage() {
 	const [selectedFolder, setSelectedFolder] = useState<string>('');
 	const [newFolderVisible, setNewFolderVisible] = useState(false);
 	const [newFolderForm] = Form.useForm();
+	// A-301：文件/回收站受控分页（服务端 page/page_size + total 驱动）
+	const [filesPage, setFilesPage] = useState(1);
+	const [filesPageSize, setFilesPageSize] = useState(10);
+	const [trashPage, setTrashPage] = useState(1);
+	const [trashPageSize, setTrashPageSize] = useState(10);
 
 	const {
-		data: files = [],
+		data: filesResult,
 		isLoading: filesLoading,
 		error: filesError,
 		refetch: filesRefetch,
-	} = useFiles(selectedFolder ? { parentId: selectedFolder } : undefined);
+	} = useFiles({
+		parentId: selectedFolder || undefined,
+		page: filesPage,
+		pageSize: filesPageSize,
+	});
+	const files = filesResult?.items ?? [];
+	const filesTotal = filesResult?.pagination?.total ?? 0;
 	const {
 		data: quota,
-		isLoading: quotaLoading,
 		error: storageQuotaError,
 		refetch: storageQuotaRefetch,
 	} = useStorageQuota();
 	const {
 		data: stats,
-		isLoading: statsLoading,
 		error: storageStatsError,
 		refetch: storageStatsRefetch,
 	} = useStorageStats();
 	const {
-		data: trash = [],
+		data: trashResult,
 		isLoading: trashLoading,
 		error: storageTrashError,
 		refetch: storageTrashRefetch,
-	} = useStorageTrash();
+	} = useStorageTrash({ page: trashPage, pageSize: trashPageSize });
+	const trash = trashResult?.items ?? [];
+	const trashTotal = trashResult?.pagination?.total ?? 0;
 	const restoreMut = useRestoreTrashItem();
 	const deleteTrashMut = useDeleteTrashItem();
 	const createFolderMut = useCreateFolder();
 	const deleteFileMut = useDeleteFile();
 	const uploadMut = useUploadFile();
-	const tenantId = useCurrentTenantIdOr('');
-
-	const loading = filesLoading || quotaLoading || statsLoading || trashLoading;
 
 	const handleUpload = async (file: File) => {
 		const formData = new FormData();
@@ -125,10 +132,10 @@ export default function StoragePage() {
 
 	const handleCreateFolder = async (values: { name: string }) => {
 		try {
+			// A-302③：撤 ownerId（CreateFolderRequest 无此字段，服务端静默忽略的无效字段）
 			await createFolderMut.mutateAsync({
 				name: values.name,
 				parentId: selectedFolder || undefined,
-				ownerId: tenantId,
 			});
 			message.success(t('storage.createFolderSuccess', { name: values.name }));
 			setNewFolderVisible(false);
@@ -348,7 +355,11 @@ export default function StoragePage() {
 									<Tree
 										treeData={treeData}
 										selectedKeys={[selectedFolder]}
-										onSelect={(keys) => setSelectedFolder((keys[0] as string) || '')}
+										onSelect={(keys) => {
+											setSelectedFolder((keys[0] as string) || '');
+											// A-301：切换目录回到第 1 页（避免旧页码落在新过滤集之外）
+											setFilesPage(1);
+										}}
 									/>
 								</div>
 								<div className="flex-1 min-w-0">
@@ -357,7 +368,17 @@ export default function StoragePage() {
 										columns={fileColumns}
 										dataSource={files}
 										loading={filesLoading}
-										pagination={{ pageSize: 10 }}
+										pagination={{
+											// A-301：服务端分页受控（旧本地 pageSize:10 无参上行 ⇒ 截断）
+											current: filesPage,
+											pageSize: filesPageSize,
+											total: filesTotal,
+											showSizeChanger: true,
+											onChange: (p, ps) => {
+												setFilesPage(p);
+												setFilesPageSize(ps);
+											},
+										}}
 										scroll={{ x: 800 }}
 									/>
 								</div>
@@ -373,7 +394,17 @@ export default function StoragePage() {
 								columns={trashColumns}
 								dataSource={trash}
 								loading={trashLoading}
-								pagination={{ pageSize: 10 }}
+								pagination={{
+									// A-301：回收站服务端分页受控
+									current: trashPage,
+									pageSize: trashPageSize,
+									total: trashTotal,
+									showSizeChanger: true,
+									onChange: (p, ps) => {
+										setTrashPage(p);
+										setTrashPageSize(ps);
+									},
+								}}
 								scroll={{ x: 800 }}
 							/>
 						),

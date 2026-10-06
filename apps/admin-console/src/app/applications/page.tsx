@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import {
 	useApplications,
+	useAppTypes,
 	useCreateApplication,
 	useUpdateApplication,
 	useDeleteApplication,
@@ -31,6 +32,9 @@ import { createApplicationSchema } from '@/lib/validators';
 
 const { Option } = Select;
 
+/** A-43：内置应用类型（表单固定项；API 自定义类型去重后追加）。 */
+const BUILTIN_APP_TYPES = ['oidc', 'saml', 'custom'];
+
 export default function ApplicationsPage() {
 	const { t } = useTranslation();
 	const [modalVisible, setModalVisible] = useState(false);
@@ -40,6 +44,8 @@ export default function ApplicationsPage() {
 	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	const { data = [], isLoading, error, refetch } = useApplications(tenantId);
+	// A-43：租户自定义应用类型（type 回显名称 + 表单选项）
+	const { data: appTypes = [] } = useAppTypes(tenantId);
 	const createMut = useCreateApplication();
 	const updateMut = useUpdateApplication();
 	const deleteMut = useDeleteApplication();
@@ -57,6 +63,10 @@ export default function ApplicationsPage() {
 		saml: 'SAML',
 		custom: t('applications.type.custom'),
 	};
+
+	// A-43：类型展示名 = 内置标签 → API 自定义类型名 → 原值兜底
+	const typeLabel = (type: string) =>
+		TYPE_LABELS[type] || appTypes.find((at) => at.code === type)?.name || type;
 
 	const STATUS_LABELS: Record<string, string> = {
 		active: t('applications.status.active'),
@@ -137,7 +147,7 @@ export default function ApplicationsPage() {
 			dataIndex: 'type',
 			key: 'type',
 			render: (type: string) => (
-				<Tag color={TYPE_COLORS[type] || 'default'}>{TYPE_LABELS[type] || type}</Tag>
+				<Tag color={TYPE_COLORS[type] || 'default'}>{typeLabel(type)}</Tag>
 			),
 		},
 		{
@@ -170,13 +180,6 @@ export default function ApplicationsPage() {
 					{STATUS_LABELS[status] || status}
 				</Tag>
 			),
-		},
-		{
-			title: t('applications.column.redirectUri'),
-			dataIndex: 'redirectUris',
-			key: 'redirectUris',
-			ellipsis: true,
-			render: (uris: string[]) => (uris && uris.length > 0 ? uris[0] : '-'),
 		},
 		{
 			title: t('common.actions'),
@@ -316,6 +319,14 @@ export default function ApplicationsPage() {
 							<Option value="oidc">OIDC</Option>
 							<Option value="saml">SAML</Option>
 							<Option value="custom">{t('applications.type.custom')}</Option>
+							{/* A-43：租户自定义应用类型（去重内置三项后追加） */}
+							{appTypes
+								.filter((at) => at.code && !BUILTIN_APP_TYPES.includes(at.code))
+								.map((at) => (
+									<Option key={at.code} value={at.code}>
+										{at.name || at.code}
+									</Option>
+								))}
 						</Select>
 					</Form.Item>
 					<Form.Item name="description" label={t('applications.form.description')}>
@@ -339,7 +350,7 @@ export default function ApplicationsPage() {
 						</Descriptions.Item>
 						<Descriptions.Item label={t('applications.detail.type')}>
 							<Tag color={TYPE_COLORS[detailRecord.type] || 'default'}>
-								{TYPE_LABELS[detailRecord.type] || detailRecord.type}
+								{typeLabel(detailRecord.type)}
 							</Tag>
 						</Descriptions.Item>
 						<Descriptions.Item label={t('applications.detail.clientId')} span={2}>
@@ -364,15 +375,6 @@ export default function ApplicationsPage() {
 						<Descriptions.Item label={t('applications.detail.createdAt')}>
 							{detailRecord.createdAt ? new Date(detailRecord.createdAt).toLocaleString() : '-'}
 						</Descriptions.Item>
-						{detailRecord.redirectUris && detailRecord.redirectUris.length > 0 && (
-							<Descriptions.Item label={t('applications.detail.redirectUri')} span={2}>
-								{detailRecord.redirectUris.map((uri, i) => (
-									<div key={i} className="font-mono text-xs">
-										{uri}
-									</div>
-								))}
-							</Descriptions.Item>
-						)}
 						{detailRecord.description && (
 							<Descriptions.Item label={t('applications.detail.description')} span={2}>
 								{detailRecord.description}

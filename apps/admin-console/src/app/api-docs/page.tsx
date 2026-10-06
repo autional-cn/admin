@@ -5,6 +5,7 @@ import { Card, Button, Typography, List } from 'antd';
 import { Book, Link2, Plug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ConsolePageHeader } from '@autional-cn/ui';
+import { DOCS_BASE } from '@/lib/docs';
 
 const { Title, Paragraph } = Typography;
 
@@ -13,19 +14,19 @@ const docs = [
 		title: 'apiDocs.restApi',
 		desc: 'apiDocs.restDesc',
 		icon: <Plug size="1em" />,
-		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/api',
+		url: DOCS_BASE + '/api',
 	},
 	{
 		title: 'apiDocs.sdkGuide',
 		desc: 'apiDocs.sdkDesc',
 		icon: <Book size="1em" />,
-		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/sdks',
+		url: DOCS_BASE + '/sdk',
 	},
 	{
 		title: 'apiDocs.oauth',
 		desc: 'apiDocs.oauthDesc',
 		icon: <Link2 size="1em" />,
-		url: (import.meta.env.VITE_DOCS_URL || 'https://docs.autional.com') + '/oauth',
+		url: DOCS_BASE + '/auth-concepts',
 	},
 ];
 

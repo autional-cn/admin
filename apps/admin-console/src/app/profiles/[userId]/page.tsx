@@ -127,7 +127,11 @@ export default function ProfileDetailPage() {
 								{profile.nickname || '-'}
 							</Descriptions.Item>
 							<Descriptions.Item label={t('profileDetail.field.gender')}>
-								{profile.gender || '-'}
+								{profile.gender
+									? t(`profileDetail.gender.${String(profile.gender).toLowerCase()}`, {
+											defaultValue: String(profile.gender),
+										})
+									: '-'}
 							</Descriptions.Item>
 							<Descriptions.Item label={t('profileDetail.field.birthdate')}>
 								{profile.birthdate || '-'}

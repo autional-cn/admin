@@ -92,6 +92,8 @@ export const getDataClassification = (tenantId: string) =>
 export const updateDataClassification = (tenantId: string, data: Record<string, unknown>) =>
 	Generated.adminTenantsDataClassificationByTenantsPost(tenantId, data);
 export const getApplications = Generated.adminTenantsApplicationsByTenants;
+// A-43：租户自定义应用类型（表单 Select 选项 + 列表 type 回显名称）
+export const getAppTypes = Generated.adminTenantsAppTypesByTenants;
 export const createApplication = Generated.adminTenantsApplicationsByTenantsPost;
 export const updateApplication = Generated.adminTenantsApplicationsByTenantsByApplicationsPut;
 export const deleteApplication = Generated.adminTenantsApplicationsByTenantsByApplicationsDelete;
@@ -148,8 +150,7 @@ export const triggerArchive = Generated.adminAuditArchivePost;
 // Audit: Alerts
 export const getAlerts = (params?: Record<string, unknown>, _signal?: AbortSignal) =>
 	Generated.adminAuditAlerts(params);
-export const getAlertById = (id: string, _signal?: AbortSignal) =>
-	Generated.adminAuditAlertsByAlerts(id);
+// A-205（W1e）：getAlertById 死包装删（useAlertDetail 死链同步删；grep 零消费）
 export const updateAlertStatus = (id: string, data: any, _signal?: AbortSignal) =>
 	Generated.adminAuditAlertsStatusByAlertsPut(id, data);
 export const assignAlert = (id: string, data: any, _signal?: AbortSignal) =>
@@ -158,8 +159,7 @@ export const assignAlert = (id: string, data: any, _signal?: AbortSignal) =>
 // Audit: Anomalies
 export const getAnomalies = (params?: Record<string, unknown>, _signal?: AbortSignal) =>
 	Generated.adminAuditAnomalies(params);
-export const getAnomalyById = (id: string, _signal?: AbortSignal) =>
-	Generated.adminAuditAnomaliesByAnomalies(id);
+// A-214（W1e）：getAnomalyById 死包装删（useAnomalyDetail 死链同步删；grep 零消费）
 export const updateAnomalyStatus = (id: string, data: any, _signal?: AbortSignal) =>
 	Generated.adminAuditAnomaliesStatusByAnomaliesPut(id, data);
 export const assignAnomaly = (id: string, data: any, _signal?: AbortSignal) =>
@@ -261,8 +261,7 @@ export const updatePaymentGateway = Generated.adminBillingPaymentGatewaysByPayme
 export const createCreditNote = Generated.adminBillingInvoiceCreditNoteByInvoicePost;
 
 // Billing: Refund Approvals
-export const createRefundApproval = Generated.adminBillingRefundApprovalPost;
-export const getRefundApproval = Generated.adminBillingRefundApprovalByRefundApproval;
+// A-409⑦：createRefundApproval/getRefundApproval 零消费（全仓 grep 仅定义自身）→ 裁剪
 export const approveRefund = Generated.adminBillingRefundApprovalApproveByRefundApprovalPost;
 export const rejectRefund = Generated.adminBillingRefundApprovalRejectByRefundApprovalPost;
 export const executeRefund = Generated.adminBillingRefundApprovalExecuteByRefundApprovalPost;
@@ -368,6 +367,8 @@ export const batchUnfreezeWallets = Generated.adminWalletsBatchUnfreezePost;
 // Wallet: Policy
 export const getWalletPolicy = Generated.adminWalletsTenantsAppsPolicyByTenantsByApps;
 export const updateWalletPolicy = Generated.adminWalletsTenantsAppsPolicyByTenantsByAppsPut;
+// A-385⑥：DELETE /policy 端点接线（此前生成函数零消费）
+export const deleteWalletPolicy = Generated.adminWalletsTenantsAppsPolicyByTenantsByAppsDelete;
 
 // Wallet: App Summary
 export const getWalletAppSummary = Generated.adminWalletsTenantsAppsSummaryByTenantsByApps;
@@ -399,6 +400,10 @@ export const runPayReconciliation = Generated.adminPaymentsReconciliationPost;
 export const listVerifications = Generated.adminVerifications;
 export const getVerificationStats = Generated.adminVerificationsStats;
 export const overrideVerification = Generated.adminVerificationsOverrideByVerificationsPost;
+// A-264（W1e）：导出 CSV + 人工复核双动作入口（导出返回原始 CSV 文本；拦截器对非信封实体透传）
+export const exportVerifications = Generated.adminVerificationsExport;
+export const manualReviewVerification = Generated.adminVerificationsManualReviewByVerificationsPost;
+export const resolveVerificationReview = Generated.adminVerificationsResolveReviewByVerificationsPost;
 
 // Points: Rules
 export const getPointRules = Generated.adminPointRules;

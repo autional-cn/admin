@@ -3,6 +3,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Form, Input, InputNumber, Button, Card, Select } from 'antd';
+import { usePageTitle } from '@autional-cn/shared';
 import { message } from '@/lib/antd-app';
 import { useAdjustWalletBalance } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
@@ -26,6 +27,7 @@ interface AdjustWalletResult {
 
 export default function WalletAdjustPage() {
 	const { t } = useTranslation();
+	usePageTitle(t('walletAdjust.title')); // A-364②：tab 标题（旧实现恒「Autional 管理控制台」，第 25 例）
 	const adjustMut = useAdjustWalletBalance();
 	const [form] = Form.useForm<AdjustFormValues>();
 	const [adjustResult, setAdjustResult] = React.useState<AdjustWalletResult | null>(null);

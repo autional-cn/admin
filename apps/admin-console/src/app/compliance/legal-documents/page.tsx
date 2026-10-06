@@ -18,6 +18,7 @@ import {
 	fromPageResult,
 	toPageParams,
 	useCurrentTenantIdOr,
+	usePageTitle,
 } from '@autional-cn/shared';
 import dayjs from 'dayjs';
 
@@ -50,7 +51,9 @@ const PAGE_SIZE = 20;
 const FETCH_LIMIT = 50;
 
 export default function LegalDocumentsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	// A-278③（W1e）：无 usePageTitle（第 16 例，实测 tab 恒"Autional 管理控制台"）→ 挂载
+	usePageTitle(t('legalDocuments.title'));
 	const tenantId = useCurrentTenantIdOr('default-tenant');
 
 	/** status → Tag 颜色映射（AC-004） */
@@ -247,7 +250,7 @@ export default function LegalDocumentsPage() {
 		});
 	};
 
-	/** 归档确认（AC-009：仅 published 行可触发） */
+	/** 归档确认（A-276：draft（作废草稿）与 published 行均可触发） */
 	const confirmArchive = (record: LegalDocumentItem) => {
 		modal.confirm({
 			title: t('legalDocuments.archiveConfirmTitle'),
@@ -300,7 +303,8 @@ export default function LegalDocumentsPage() {
 			dataIndex: 'effectiveAt',
 			key: 'effectiveAt',
 			width: 190,
-			render: (v: string | null) => v || '\u2014',
+			// A-278\u2461\uff08W1e\uff09\uff1a\u751f\u6548\u65f6\u95f4\u5217\u96f6\u683c\u5f0f\u5316\uff08\u88f8\u663e RFC3339\uff09\u2192 \u672c\u5730\u5316\u65f6\u95f4
+			render: (v: string | null) => (v ? new Date(v).toLocaleString(i18n.language) : '-'),
 		},
 		{
 			title: t('legalDocuments.column.actions'),
@@ -316,7 +320,9 @@ export default function LegalDocumentsPage() {
 							{t('legalDocuments.publish')}
 						</Button>
 					)}
-					{record.status === 'published' && (
+					{/* A-276（W1e）：弃用草稿无归档路径（旧仅 published 行）→ draft 亦可直接归档，
+					    避免"发布（effective_at 空时置 now）→归档"绕行造成的非预期短时上线风险 */}
+					{(record.status === 'draft' || record.status === 'published') && (
 						<Button type="link" size="small" danger onClick={() => confirmArchive(record)}>
 							{t('legalDocuments.archive')}
 						</Button>
@@ -418,7 +424,7 @@ export default function LegalDocumentsPage() {
 						<Select
 							options={DOC_TYPE_OPTIONS}
 							disabled={!!editingDoc}
-							placeholder={t('legalDocuments.filter.docType')}
+							placeholder={t('legalDocuments.form.docTypePlaceholder')}
 						/>
 					</Form.Item>
 					<Form.Item
@@ -441,7 +447,7 @@ export default function LegalDocumentsPage() {
 						label={t('legalDocuments.column.lang')}
 						rules={[{ required: true }]}
 					>
-						<Select options={LANG_OPTIONS} placeholder={t('legalDocuments.filter.lang')} />
+						<Select options={LANG_OPTIONS} placeholder={t('legalDocuments.form.langPlaceholder')} />
 					</Form.Item>
 					<Form.Item
 						name="content"

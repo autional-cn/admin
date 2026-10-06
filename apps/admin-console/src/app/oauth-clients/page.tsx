@@ -38,6 +38,13 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 const { Option } = Select;
 const { Text } = Typography;
 
+/** A-48：OAuth 客户端状态 → Tag 颜色（值域见 service-share micro-share/auth/oauth_client.go:22-24）。 */
+const OAUTH_STATUS_COLORS: Record<string, string> = {
+	active: 'success',
+	suspended: 'warning',
+	inactive: 'default',
+};
+
 export default function OAuthClientsPage() {
 	const { t } = useTranslation();
 	const [modalVisible, setModalVisible] = useState(false);
@@ -135,6 +142,7 @@ export default function OAuthClientsPage() {
 						type="text"
 						size="small"
 						icon={<Copy size="1em" />}
+						aria-label={t('oauthClients.copyClientId')}
 						onClick={() => {
 							navigator.clipboard.writeText(v);
 							message.success(t('oauthClients.copied'));
@@ -154,7 +162,9 @@ export default function OAuthClientsPage() {
 			dataIndex: 'status',
 			key: 'status',
 			render: (status: string) => (
-				<Tag color={status === 'active' ? 'success' : 'default'}>{status}</Tag>
+				<Tag color={OAUTH_STATUS_COLORS[status] ?? 'default'}>
+					{t(`oauthClients.status.${status}`, { defaultValue: status })}
+				</Tag>
 			),
 		},
 		{
@@ -182,6 +192,7 @@ export default function OAuthClientsPage() {
 						type="text"
 						size="small"
 						icon={<Pencil size="1em" />}
+						aria-label={t('common.edit')}
 						onClick={() => {
 							setEditing(record);
 							form.setFieldsValue({
@@ -196,7 +207,13 @@ export default function OAuthClientsPage() {
 						title={t('oauthClients.confirmDelete')}
 						onConfirm={() => handleDelete(record.clientId)}
 					>
-						<Button type="text" size="small" danger icon={<Trash2 size="1em" />} />
+						<Button
+							type="text"
+							size="small"
+							danger
+							icon={<Trash2 size="1em" />}
+							aria-label={t('common.delete')}
+						/>
 					</Popconfirm>
 				</Space>
 			),
@@ -305,6 +322,7 @@ export default function OAuthClientsPage() {
 										type="text"
 										size="small"
 										icon={<Copy size="1em" />}
+										aria-label={t('oauthClients.copyClientId')}
 										onClick={() => {
 											navigator.clipboard.writeText(detailClient.clientId);
 											message.success(t('oauthClients.copied'));
@@ -313,14 +331,16 @@ export default function OAuthClientsPage() {
 								</Space>
 							</Descriptions.Item>
 							<Descriptions.Item label={t('common.status')}>
-								<Tag color={detailClient.status === 'active' ? 'success' : 'default'}>
-									{detailClient.status}
+								<Tag color={OAUTH_STATUS_COLORS[detailClient.status] ?? 'default'}>
+									{t(`oauthClients.status.${detailClient.status}`, {
+										defaultValue: detailClient.status,
+									})}
 								</Tag>
 							</Descriptions.Item>
 							<Descriptions.Item label={t('oauthClients.column.grantTypes')}>
 								{(detailClient.grantTypes || []).join(', ')}
 							</Descriptions.Item>
-							<Descriptions.Item label={t('oauthClients.form.redirectUris')}>
+							<Descriptions.Item label={t('oauthClients.detailRedirectUris')}>
 								{(detailClient.redirectUris || []).join(', ') || '-'}
 							</Descriptions.Item>
 						</Descriptions>
@@ -419,7 +439,12 @@ export default function OAuthClientsPage() {
 														})
 													}
 												>
-													<Button type="text" size="small" icon={<Ban size="1em" />} />
+													<Button
+														type="text"
+														size="small"
+														icon={<Ban size="1em" />}
+														aria-label={t('oauthClients.deactivateSecret')}
+													/>
 												</Popconfirm>
 												<Popconfirm
 													title={t('oauthClients.confirmDeleteSecret')}
@@ -430,7 +455,13 @@ export default function OAuthClientsPage() {
 														})
 													}
 												>
-													<Button type="text" size="small" danger icon={<Trash2 size="1em" />} />
+													<Button
+														type="text"
+														size="small"
+														danger
+														icon={<Trash2 size="1em" />}
+														aria-label={t('oauthClients.deleteSecret')}
+													/>
 												</Popconfirm>
 											</Space>
 										),

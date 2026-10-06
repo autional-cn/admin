@@ -16,6 +16,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@autional-cn/shared';
 
 function formatDateTime(v?: string) {
 	if (!v) return '-';
@@ -24,7 +25,18 @@ function formatDateTime(v?: string) {
 
 export default function BillingAlertsPage() {
 	const { t } = useTranslation();
-	const { data: alerts = [], isLoading, error, refetch } = useBillingAlerts();
+	usePageTitle(t('billingAlerts.title'));
+	// A-426③：服务端分页接线（服务端默认 page_size=20 + 旧本地 10/页 ⇒ >20 条不可达）
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+	const {
+		data: alertResult,
+		isLoading,
+		error,
+		refetch,
+	} = useBillingAlerts({ page, page_size: pageSize });
+	const alerts = alertResult?.items ?? [];
+	const total = alertResult?.pagination?.total ?? 0;
 	const createMut = useCreateBillingAlert();
 	const updateMut = useUpdateBillingAlert();
 	const deleteMut = useDeleteBillingAlert();
@@ -208,7 +220,17 @@ export default function BillingAlertsPage() {
 				columns={columns}
 				dataSource={alerts}
 				loading={isLoading}
-				pagination={{ pageSize: 10 }}
+				// A-426③：受控分页（page/page_size 上行 + total 来自服务端信封）
+				pagination={{
+					current: page,
+					pageSize,
+					total,
+					showSizeChanger: true,
+					onChange: (p, ps) => {
+						setPage(p);
+						setPageSize(ps);
+					},
+				}}
 				scroll={{ x: 1100 }}
 			/>
 

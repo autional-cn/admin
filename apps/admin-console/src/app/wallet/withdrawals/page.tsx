@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePageTitle } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Space, Card, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -19,9 +20,15 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 // note→remark（wire 键）；状态词表 = 服务端值域 pending/auto_approved/completed/rejected；
 // 批准加确认弹窗；驳回契约键 remark（旧 reason 键与 RejectWithdrawalRequest.remark 错配）。
 export default function WalletWithdrawalsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	usePageTitle(t('walletWithdrawals.title')); // A-369③：tab 标题（旧实现恒「Autional 管理控制台」，第 26 例）
 	const [filters, setFilters] = useState<Record<string, unknown>>({});
-	const { data: withdrawals = [], isLoading, error, refetch } = useWithdrawals(filters);
+	// A-369⑤：服务端分页受控（服务端默认 page_size=20 vs 旧本地 10/页伪全量 ⇒ 第 11 条起不可达）
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+	const { data: result, isLoading, error, refetch } = useWithdrawals({ ...filters, page, pageSize });
+	const withdrawals = result?.items ?? [];
+	const total = result?.pagination?.total ?? 0;
 	const approveMut = useApproveWithdrawal();
 	const rejectMut = useRejectWithdrawal();
 
@@ -58,7 +65,9 @@ export default function WalletWithdrawalsPage() {
 			dataIndex: 'amount',
 			key: 'amount',
 			width: 120,
-			render: (v: string) => `¥${parseFloat(v).toFixed(2)}`,
+			// A-369①：去硬编码 ¥（wire 六键无币种字段，dto.go:605-612；钱包币种可 USD ⇒ ¥ 无依据，
+			// 宁缺勿伪）；仅数值两段式格式化。
+			render: (v: string) => parseFloat(v).toFixed(2),
 		},
 		{
 			title: t('walletWithdrawals.colStatus'),
@@ -87,7 +96,8 @@ export default function WalletWithdrawalsPage() {
 			dataIndex: 'createdAt',
 			key: 'createdAt',
 			width: 160,
-			render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
+			// A-369②：toLocaleString 无 locale（旧恒跑宿主默认）
+			render: (v: string) => (v ? new Date(v).toLocaleString(i18n.language) : '-'),
 		},
 		{
 			title: t('walletWithdrawals.colActions'),
@@ -141,7 +151,10 @@ export default function WalletWithdrawalsPage() {
 						allowClear
 						className="w-30"
 						value={filters.status}
-						onChange={(v) => setFilters({ ...filters, status: v })}
+						onChange={(v) => {
+							setFilters({ ...filters, status: v });
+							setPage(1);
+						}}
 						options={[
 							{ value: 'pending', label: t('walletWithdrawals.statusPending') },
 							{ value: 'auto_approved', label: t('walletWithdrawals.statusAutoApproved') },
@@ -157,7 +170,16 @@ export default function WalletWithdrawalsPage() {
 				columns={columns}
 				dataSource={withdrawals}
 				loading={isLoading}
-				pagination={{ pageSize: 10 }}
+				// A-369⑤：服务端真 total 驱动页数（旧本地 pageSize:10 ⇒ 伪全量）
+				pagination={{
+					current: page,
+					pageSize,
+					total,
+					onChange: (p, ps) => {
+						setPage(p);
+						setPageSize(ps);
+					},
+				}}
 				scroll={{ x: 1000 }}
 			/>
 

@@ -8,7 +8,7 @@ import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/sh
 import { buildNavHref } from '@/lib/nav';
 import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient, extractItem, extractList } from '@autional-cn/shared';
+import { extractItem, extractList } from '@autional-cn/shared';
 import type { RobotInfo } from '@autional-cn/shared/generated/types';
 import {
 	adminRobots,
@@ -20,23 +20,18 @@ import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
+import { useOwnerDisplay } from '@/hooks/use-owner-display';
+import { ROBOT_STATUS_VARIANT, statusVariantOf } from '@/lib/nhi';
 
 
 // TASK-AB1-27（RC-5 契约收敛）：契约类型直读（generated types，键名 camel）。
 // wire 锚：service-identity robot/domain/robot.go:90-92（workload_subtype/firmware_ver snake json tag）
 // 经响应拦截器深 camel 化；主键 = identityId（契约无 id）。
-type RobotRecord = RobotInfo;
+// W1b（A-84）：owner_principal_id 为 additive 增量键（generated 快照未含）→ 局部增强类型。
+type RobotRecord = RobotInfo & { ownerPrincipalId?: string };
 
-const STATUS_VARIANT: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'neutral'> = {
-	active: 'success',
-	offline: 'danger',
-	maintenance: 'warning',
-	provisioning: 'info',
-};
-
-function statusVariant(s: string): 'success' | 'warning' | 'danger' | 'info' | 'neutral' {
-	return STATUS_VARIANT[s] || 'neutral';
-}
+// A-85：状态词表单源 = src/lib/nhi.ts（旧本地表含后端不存在的 offline/maintenance/provisioning、
+// 缺 commissioning/degraded/decommissioned —— 两页各抄一份即漂移根源，已收敛）。
 
 function formatDate(iso: string): string {
 	if (!iso) return '-';
@@ -67,6 +62,9 @@ export default function RobotsPage() {
 	const tenantId = useCurrentTenantId() ?? '';
 	const [modalVisible, setModalVisible] = useState(false);
 	const [form] = Form.useForm();
+
+	// A-84：owner_principal_id → 成员显示名解析（列表/详情共用单点 hook）
+	const { resolve: resolveOwner } = useOwnerDisplay();
 
 	const {
 		data: robots = [],
@@ -137,16 +135,17 @@ export default function RobotsPage() {
 			dataIndex: 'status',
 			key: 'status',
 			render: (v: string) => (
-				<StatusBadge variant={statusVariant(v)}>
+				<StatusBadge variant={statusVariantOf(ROBOT_STATUS_VARIANT, v)}>
 					{t(`robots.status.${v}`, { defaultValue: v || '-' })}
 				</StatusBadge>
 			),
 		},
 		{
+			// A-84：owner 显示名（owner_principal_id 优先；历史行回退 owner_id；均无 → '-'）
 			title: t('robots.column.owner'),
-			dataIndex: 'ownerId',
-			key: 'ownerId',
-			render: (v: string) => v || '-',
+			key: 'owner',
+			render: (_: unknown, record: RobotRecord) =>
+				resolveOwner(record.ownerPrincipalId, record.ownerId),
 		},
 		{
 			title: t('robots.column.created'),
@@ -192,7 +191,7 @@ export default function RobotsPage() {
 	];
 
 	return (
-		<div className="p-6">
+		<div>
 			<ConsolePageHeader
 				title={t('robots.title')}
 				description={t('robots.subtitle')}
@@ -226,20 +225,9 @@ export default function RobotsPage() {
 				/>
 			)}
 
+			{/* A-86：删空态重复 CTA（页头 CTA 已同屏可复用） */}
 			{!isLoading && !error && robots.length === 0 && (
-				<div className="flex flex-col items-center gap-4">
-					<EmptyState title={t('robots.emptyTitle')} description={t('robots.emptyDesc')} />
-					<Button
-						type="primary"
-						icon={<Plus size="1em" />}
-						onClick={() => {
-							form.resetFields();
-							setModalVisible(true);
-						}}
-					>
-						{t('robots.createBtn')}
-					</Button>
-				</div>
+				<EmptyState title={t('robots.emptyTitle')} description={t('robots.emptyDesc')} />
 			)}
 
 			{!isLoading && !error && robots.length > 0 && (

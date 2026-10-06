@@ -17,7 +17,6 @@ import {
 	useCreateApiKey,
 	useDeleteApiKey,
 	useRotateApiKey,
-	useUpdateApiKeyStatus,
 } from '@/hooks/use-api-keys';
 
 vi.mock('@/lib/antd-app', () => ({
@@ -29,13 +28,11 @@ vi.mock('@/hooks/use-api-keys', () => ({
 	useCreateApiKey: vi.fn(),
 	useDeleteApiKey: vi.fn(),
 	useRotateApiKey: vi.fn(),
-	useUpdateApiKeyStatus: vi.fn(),
 }));
 
 const RECORD = {
 	id: 'key-1',
 	name: 'CI 发布密钥',
-	keyPrefix: 'ak_live_abc',
 	scopes: ['read'],
 	status: 'active',
 	environment: 'live',
@@ -44,7 +41,8 @@ const RECORD = {
 /** 一次性凭据原文（mock fixture；真实链路 = wire 顶层 rawKey 键）。 */
 const RAW_KEY = 'ak-live-REVEAL_0123456789abcdef';
 
-const REFRESH_CONFIRM = '轮换此密钥？当前密钥将立即失效。';
+/** A-53：确认文案已对齐后端 24h 宽限期语义（旧文案「立即失效」矛盾）。 */
+const REFRESH_CONFIRM = '轮换此密钥？当前密钥将在 24 小时宽限期后失效。';
 
 function renderPage() {
 	const queryClient = new QueryClient({
@@ -85,8 +83,9 @@ describe('api-keys 一次性凭据（A-49 / RC-B4-02）', () => {
 		vi.clearAllMocks();
 		rotateMutate = vi.fn();
 		createMutate = vi.fn();
+		// A-52：hook 现返回服务端分页形状 { items, total }（fromPageResult 契约）
 		vi.mocked(useApiKeys).mockReturnValue({
-			data: [RECORD],
+			data: { items: [RECORD], total: 1 },
 			isLoading: false,
 			error: null,
 			refetch: vi.fn(),
@@ -94,12 +93,16 @@ describe('api-keys 一次性凭据（A-49 / RC-B4-02）', () => {
 		vi.mocked(useCreateApiKey).mockReturnValue({ mutateAsync: createMutate } as unknown as ReturnType<typeof useCreateApiKey>);
 		vi.mocked(useDeleteApiKey).mockReturnValue({ mutateAsync: vi.fn() } as unknown as ReturnType<typeof useDeleteApiKey>);
 		vi.mocked(useRotateApiKey).mockReturnValue({ mutateAsync: rotateMutate } as unknown as ReturnType<typeof useRotateApiKey>);
-		vi.mocked(useUpdateApiKeyStatus).mockReturnValue({ mutateAsync: vi.fn() } as unknown as ReturnType<typeof useUpdateApiKeyStatus>);
 	});
 
 	it('AC-B4-W2-03-1/3（轮换）：rawKey 呈一次性展示框（原文入框 + 「仅显示一次」警示）', { timeout: 20000 }, async () => {
 		rotateMutate.mockResolvedValue({ rawKey: RAW_KEY });
 		renderPage();
+
+		// A-47/A-52：操作列按钮有显式可访问名（accessible name），且状态列本地化渲染
+		expect(screen.getByRole('button', { name: '轮换' })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: '吊销' })).toBeInTheDocument();
+		expect(screen.getByText('活跃')).toBeInTheDocument();
 
 		fireEvent.click(await screen.findByText('轮换'));
 		// 弹层确已打开（防「根本没打开」型假绿）

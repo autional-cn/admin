@@ -10,7 +10,6 @@ import {
 	useCreateApiKey,
 	useDeleteApiKey,
 	useRotateApiKey,
-	useUpdateApiKeyStatus,
 } from '@/hooks/use-api-keys';
 import type { ApiKeyRecord } from '@/hooks/use-api-keys';
 import { handleApiError } from '@/lib/error-handler';
@@ -19,6 +18,13 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 
 const { Option } = Select;
 
+/** 状态标签色（A-52：inactive 与 revoked 语义区分）。 */
+const STATUS_COLORS: Record<string, string> = {
+	active: 'success',
+	inactive: 'warning',
+	revoked: 'error',
+};
+
 export default function ApiKeysPage() {
 	const { t } = useTranslation();
 	const [modalVisible, setModalVisible] = useState(false);
@@ -26,11 +32,26 @@ export default function ApiKeysPage() {
 	const [revealedKey, setRevealedKey] = useState<string | null>(null);
 	const [form] = Form.useForm();
 
-	const { data = [], isLoading, error, refetch } = useApiKeys();
+	// A-52：筛选（status/environment/search）+ 服务端分页状态
+	const [searchInput, setSearchInput] = useState('');
+	const [search, setSearch] = useState('');
+	const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+	const [environmentFilter, setEnvironmentFilter] = useState<string | undefined>(undefined);
+	const [page, setPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+
+	const { data, isLoading, error, refetch } = useApiKeys({
+		page,
+		pageSize,
+		status: statusFilter,
+		environment: environmentFilter,
+		search: search || undefined,
+	});
+	const items = data?.items ?? [];
+	const total = data?.total ?? 0;
 	const createMut = useCreateApiKey();
 	const deleteMut = useDeleteApiKey();
 	const rotateMut = useRotateApiKey();
-	const statusMut = useUpdateApiKeyStatus();
 
 	const handleCopyKey = async () => {
 		if (!revealedKey) return;
@@ -83,26 +104,8 @@ export default function ApiKeysPage() {
 		}
 	};
 
-	const handleToggleStatus = async (record: ApiKeyRecord) => {
-		const nextStatus = record.status === 'active' ? 'inactive' : 'active';
-		try {
-			await statusMut.mutateAsync({ id: record.id, status: nextStatus });
-			message.success(nextStatus === 'active' ? t('apiKeys.resumed') : t('apiKeys.revoked'));
-		} catch (err) {
-			handleApiError(err, t('apiKeys.operationFailed'));
-		}
-	};
-
 	const columns = [
 		{ title: t('apiKeys.column.name'), dataIndex: 'name', key: 'name' },
-		{
-			title: t('apiKeys.column.keyPrefix'),
-			dataIndex: 'keyPrefix',
-			key: 'keyPrefix',
-			render: (v: string) => (
-				<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded">{v}...</code>
-			),
-		},
 		{
 			title: t('apiKeys.column.scopes'),
 			dataIndex: 'scopes',
@@ -124,11 +127,38 @@ export default function ApiKeysPage() {
 			render: (v: string) => (v ? t(`apiKeys.environment.${v}`, { defaultValue: v }) : '-'),
 		},
 		{
+			// A-52：补列 —— 后端 ApiKeyResponse 已返回 usage_count。
+			title: t('apiKeys.column.usageCount'),
+			dataIndex: 'usageCount',
+			key: 'usageCount',
+			render: (v?: number) => v ?? 0,
+		},
+		{
+			// A-52：补列 —— 后端 ApiKeyResponse 已返回 expires_at（可空 = 永不过期）。
+			title: t('apiKeys.column.expiresAt'),
+			dataIndex: 'expiresAt',
+			key: 'expiresAt',
+			render: (v?: string) => (v ? new Date(v).toLocaleString() : '-'),
+		},
+		{
+			// A-52：补列 —— 后端 ApiKeyResponse 已返回 last_used_at / last_used_ip。
+			title: t('apiKeys.column.lastUsedAt'),
+			dataIndex: 'lastUsedAt',
+			key: 'lastUsedAt',
+			render: (v?: string) => (v ? new Date(v).toLocaleString() : '-'),
+		},
+		{
+			title: t('apiKeys.column.lastUsedIp'),
+			dataIndex: 'lastUsedIp',
+			key: 'lastUsedIp',
+			render: (v?: string) => v || '-',
+		},
+		{
 			title: t('common.status'),
 			dataIndex: 'status',
 			key: 'status',
 			render: (status: string) => (
-				<Tag color={status === 'active' ? 'success' : 'default'}>
+				<Tag color={STATUS_COLORS[status] ?? 'default'}>
 					{t(`apiKeys.status.${status}`, { defaultValue: status })}
 				</Tag>
 			),
@@ -139,12 +169,23 @@ export default function ApiKeysPage() {
 			render: (_: any, record: ApiKeyRecord) => (
 				<Space size="small">
 					<Popconfirm title={t('apiKeys.confirmRotate')} onConfirm={() => handleRotate(record.id)}>
-						<Button type="text" size="small" icon={<RefreshCw size="1em" />}>
+						<Button
+							type="text"
+							size="small"
+							icon={<RefreshCw size="1em" />}
+							aria-label={t('apiKeys.rotate')}
+						>
 							{t('apiKeys.rotate')}
 						</Button>
 					</Popconfirm>
 					<Popconfirm title={t('apiKeys.confirmRevoke')} onConfirm={() => handleDelete(record.id)}>
-						<Button type="text" size="small" danger icon={<Trash2 size="1em" />}>
+						<Button
+							type="text"
+							size="small"
+							danger
+							icon={<Trash2 size="1em" />}
+							aria-label={t('apiKeys.revoke')}
+						>
 							{t('apiKeys.revoke')}
 						</Button>
 					</Popconfirm>
@@ -159,6 +200,7 @@ export default function ApiKeysPage() {
 
 			<ConsolePageHeader
 				title={t('apiKeys.title')}
+				description={t('apiKeys.myKeysHint')}
 				actions={
 					<>
 						<Button
@@ -175,17 +217,70 @@ export default function ApiKeysPage() {
 				}
 			/>
 
+			<div className="flex gap-3 mb-4 flex-wrap">
+				<Input.Search
+					placeholder={t('apiKeys.searchPlaceholder')}
+					allowClear
+					value={searchInput}
+					onChange={(e) => setSearchInput(e.target.value)}
+					onSearch={(v) => {
+						setSearch(v);
+						setPage(1);
+					}}
+					className="max-w-md"
+				/>
+				<Select
+					allowClear
+					placeholder={t('apiKeys.filter.status')}
+					value={statusFilter}
+					onChange={(v) => {
+						setStatusFilter(v);
+						setPage(1);
+					}}
+					className="w-40"
+					options={[
+						{ label: t('apiKeys.status.active'), value: 'active' },
+						{ label: t('apiKeys.status.inactive'), value: 'inactive' },
+						{ label: t('apiKeys.status.revoked'), value: 'revoked' },
+					]}
+				/>
+				<Select
+					allowClear
+					placeholder={t('apiKeys.filter.environment')}
+					value={environmentFilter}
+					onChange={(v) => {
+						setEnvironmentFilter(v);
+						setPage(1);
+					}}
+					className="w-40"
+					options={[
+						{ label: t('apiKeys.environment.live'), value: 'live' },
+						{ label: t('apiKeys.environment.test'), value: 'test' },
+					]}
+				/>
+			</div>
+
 			{isLoading ? (
 				<Spin className="flex justify-center py-12" />
-			) : data.length === 0 ? (
+			) : items.length === 0 ? (
 				<Empty description={t('apiKeys.noData')} />
 			) : (
 				<DataTable
 					rowKey="id"
 					columns={columns}
-					dataSource={data}
-					pagination={{ pageSize: 10 }}
-					scroll={{ x: 800 }}
+					dataSource={items}
+					pagination={{
+						current: page,
+						pageSize,
+						total,
+						showSizeChanger: true,
+						pageSizeOptions: [10, 20, 50],
+						onChange: (p, ps) => {
+							setPage(p);
+							setPageSize(ps);
+						},
+					}}
+					scroll={{ x: 1200 }}
 				/>
 			)}
 

@@ -11,9 +11,11 @@ import {
 	Search,
 	XCircle,
 } from 'lucide-react';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractItem, usePageTitle } from '@autional-cn/shared';
+import { ConsolePageHeader } from '@autional-cn/ui';
+import { message } from '@/lib/antd-app';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface IntegrityResult {
 	walletId: string;
@@ -25,6 +27,7 @@ interface IntegrityResult {
 
 export default function WalletEventsPage() {
 	const { t } = useTranslation();
+	usePageTitle(t('walletEvents.title')); // A-393①：tab 标题（旧实现恒「Autional 管理控制台」，第 31 例）
 	const [walletId, setWalletId] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [result, setResult] = useState<IntegrityResult | null>(null);
@@ -33,7 +36,11 @@ export default function WalletEventsPage() {
 	const [error, setError] = useState<{ message: string; notFound: boolean } | null>(null);
 
 	const handleVerify = async () => {
-		if (!walletId.trim()) return;
+		// A-393②：空输入不再静默（旧 return 零请求零反馈）——Enter 路径给提示；按钮侧另有禁用态。
+		if (!walletId.trim()) {
+			message.warning(t('walletEvents.inputRequired'));
+			return;
+		}
 		setLoading(true);
 		setError(null);
 		setResult(null);
@@ -53,12 +60,8 @@ export default function WalletEventsPage() {
 
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-				<Title level={3} className="!mb-0">
-					{t('walletEvents.title')}
-				</Title>
-				<Text type="secondary">{t('walletEvents.description')}</Text>
-			</div>
+			{/* A-393①：标题层级对齐（旧 Title level={3}=H3 手工页头，其余 7 页均 ConsolePageHeader=H1） */}
+			<ConsolePageHeader title={t('walletEvents.title')} description={t('walletEvents.description')} />
 
 			<Card>
 				<Space.Compact className="w-full max-w-[500px]">
@@ -69,7 +72,14 @@ export default function WalletEventsPage() {
 						onPressEnter={handleVerify}
 						prefix={<Link2 size="1em" />}
 					/>
-					<Button type="primary" icon={<Search size="1em" />} onClick={handleVerify} loading={loading}>
+					<Button
+						type="primary"
+						icon={<Search size="1em" />}
+						onClick={handleVerify}
+						loading={loading}
+						// A-393②：空输入禁用态（旧可点击但零反应）
+						disabled={!walletId.trim()}
+					>
 						{t('walletEvents.verifyBtn')}
 					</Button>
 				</Space.Compact>

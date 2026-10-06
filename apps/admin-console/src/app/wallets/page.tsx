@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
 import { Card, Tag, Button, Statistic, Row, Col, Space, Modal, Form, Input, Select, DatePicker, Tabs, InputNumber } from 'antd';
 import { message, modal } from '@/lib/antd-app';
@@ -34,6 +34,7 @@ import {
 	useBatchUnfreeze,
 } from '@/hooks/use-wallets';
 import { useWalletPolicy, useUpdateWalletPolicy } from '@/hooks/use-wallet-admin';
+import { useApplications } from '@/hooks/use-applications';
 import type { Transaction, Dispute, Coupon, FraudRule } from '@/hooks/use-wallets';
 
 import { handleApiError } from '@/lib/error-handler';
@@ -43,7 +44,11 @@ import { ConsolePageHeader } from '@autional-cn/ui';
 
 export default function WalletsPage() {
 	const { t } = useTranslation();
+	usePageTitle(t('wallets.title'));
 	const [activeTab, setActiveTab] = useState('overview');
+	// A-315②：交易表服务端分页受控（服务端真 total 驱动页数）
+	const [txPage, setTxPage] = useState(1);
+	const [txPageSize, setTxPageSize] = useState(10);
 	const [txFilters, setTxFilters] = useState({
 		user: '',
 		type: undefined as string | undefined,
@@ -80,18 +85,21 @@ export default function WalletsPage() {
 		refetch: walletSummaryRefetch,
 	} = useWalletSummary(tenantId);
 	const {
-		data: transactions = [],
+		data: txResult,
 		isLoading: txLoading,
-		refetch: refetchTx,
 		error: walletTransactionsError,
 		refetch: walletTransactionsRefetch,
-	} = useWalletTransactions(tenantId);
+	} = useWalletTransactions(tenantId, { page: txPage, pageSize: txPageSize });
+	const transactions = txResult?.items ?? [];
+	const txTotal = txResult?.pagination?.total ?? 0;
 	const {
-		data: disputes = [],
+		data: disputeResult,
 		isLoading: disputeLoading,
 		error: walletDisputesError,
 		refetch: walletDisputesRefetch,
 	} = useWalletDisputes(tenantId);
+	// A-374④：disputes hook 改透出 ListResult（服务端分页），消费面取 items
+	const disputes = disputeResult?.items ?? [];
 
 	const {
 		data: coupons = [],
@@ -121,6 +129,8 @@ export default function WalletsPage() {
 	const batchUnfreezeMut = useBatchUnfreeze();
 	const { data: walletPolicy, isLoading: policyLoading } = useWalletPolicy(tenantId, policyAppId);
 	const updatePolicyMut = useUpdateWalletPolicy();
+	// A-315⑥：应用数据源（旧实现手输 appId ⇒ 用户不知真实应用 ID，策略恒查不到）
+	const { data: applications = [] } = useApplications(tenantId);
 
 	React.useEffect(() => {
 		if (fraudRules.length > 0 && !fraudForm.getFieldValue('rules')) {
@@ -144,7 +154,7 @@ export default function WalletsPage() {
 			params.startTime = txFilters.dateRange[0];
 			params.endTime = txFilters.dateRange[1];
 		}
-		refetchTx();
+		walletTransactionsRefetch();
 	};
 
 	const handleResolveDispute = async (values: { result: string; reason: string }) => {
@@ -247,6 +257,14 @@ export default function WalletsPage() {
 		}
 	};
 
+	// A-315④：交易类型词表（wire 枚举 → i18n 文案；旧实现直渲英文枚举值）。
+	const txTypeLabels: Record<string, string> = {
+		recharge: t('wallets.recharge'),
+		withdraw: t('wallets.withdraw'),
+		transfer: t('wallets.transfer'),
+		adjustment: t('wallets.adjustment'),
+	};
+
 	const txColumns: any[] = [
 		{ title: t('wallets.txId'), dataIndex: 'id', key: 'id', ellipsis: true },
 		{
@@ -266,7 +284,8 @@ export default function WalletsPage() {
 					transfer: 'blue',
 					adjustment: 'orange',
 				};
-				return <Tag color={colorMap[v] || 'default'}>{v}</Tag>;
+				// A-315④：枚举 → 词表文案（未知值回落原值）
+				return <Tag color={colorMap[v] || 'default'}>{txTypeLabels[v] ?? v}</Tag>;
 			},
 		},
 		{
@@ -343,7 +362,9 @@ export default function WalletsPage() {
 			title: t('wallets.discountValue'),
 			dataIndex: 'discountValue',
 			key: 'discountValue',
-			render: (v: number) => (v != null ? (v > 0 ? `¥${v}` : `${v}%`) : '-'),
+			// A-315⑤：按折扣类型分支（旧实现以「v > 0」猜币符 ⇒ 0 元固定额误渲 "0%"）
+			render: (v: number, r: Coupon) =>
+				v != null ? (r.discountType === 'percentage' ? `${v}%` : `¥${v}`) : '-',
 		},
 		{
 			title: t('wallets.minAmount'),
@@ -608,7 +629,17 @@ export default function WalletsPage() {
 									columns={txColumns}
 									dataSource={transactions}
 									loading={txLoading}
-									pagination={{ pageSize: 10 }}
+									pagination={{
+										// A-315②：服务端分页受控（旧本地 pageSize:10 切页 ⇒ 第 21 条起不可达）
+										current: txPage,
+										pageSize: txPageSize,
+										total: txTotal,
+										showSizeChanger: true,
+										onChange: (p, ps) => {
+											setTxPage(p);
+											setTxPageSize(ps);
+										},
+									}}
 									scroll={{ x: 800 }}
 								/>
 							</>
@@ -830,11 +861,17 @@ export default function WalletsPage() {
 										<span className="text-neutral-600 text-sm">
 											{t('wallets.tenantId')}: {tenantId || '-'}
 										</span>
-										<Input
+										<Select
 											placeholder={t('wallets.appIdRequired')}
-											value={policyAppId}
-											onChange={(e) => setPolicyAppId(e.target.value)}
-											className="!w-[200px]"
+											value={policyAppId || undefined}
+											onChange={(v) => setPolicyAppId(v)}
+											options={applications.map((app) => ({
+												value: app.id,
+												label: `${app.name} (${app.code})`,
+											}))}
+											showSearch
+											optionFilterProp="label"
+											className="!w-[240px]"
 										/>
 									</Space>
 								</div>

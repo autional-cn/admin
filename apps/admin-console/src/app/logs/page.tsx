@@ -9,15 +9,28 @@ import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
 import { fromPageResult, toPageParams } from '@autional-cn/shared';
 import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { ConsolePageHeader, StatusBadge } from '@autional-cn/ui';
 
 /** /auth/me/audit-logs 行契约（service-identity dto.AuditLogResponse 实读，经拦截器深 camel 化）。 */
 interface AuditLogItem {
 	id: string;
 	action: string;
 	status?: string;
+	resource?: string;
+	resourceId?: string;
+	ip?: string;
+	userAgent?: string;
 	details?: string;
 	createdAt: string;
+}
+
+/**
+ * A-69：action 归一单点 —— 沿用审计端点三种命名风格（LOGIN / admin_list / auth.login_success）。
+ * 去点号前缀 + 小写后查 logs.action.* 键；未收录动作回退原值（不伪造翻译）。
+ */
+function normalizeAction(action: string): string {
+	const last = action.includes('.') ? action.slice(action.lastIndexOf('.') + 1) : action;
+	return last.toLowerCase();
 }
 
 export default function LogsPage() {
@@ -43,9 +56,46 @@ export default function LogsPage() {
 			key: 'createdAt',
 			render: (v: string) => (v ? new Date(v).toLocaleString() : '-'),
 		},
-		{ title: t('logs.column.action'), dataIndex: 'action', key: 'action' },
-		{ title: t('logs.column.target'), dataIndex: 'targetType', key: 'targetType' },
-		{ title: t('logs.column.detail'), dataIndex: 'message', key: 'message', ellipsis: true },
+		{
+			// A-69：action i18n（归一后查键，未收录回退原值）
+			title: t('logs.column.action'),
+			dataIndex: 'action',
+			key: 'action',
+			render: (v: string) =>
+				v ? t(`logs.action.${normalizeAction(v)}`, { defaultValue: v }) : '-',
+		},
+		{
+			// A-69：status 语义字符串（success/failed/空=未知）徽标化
+			title: t('common.status'),
+			dataIndex: 'status',
+			key: 'status',
+			render: (v?: string) =>
+				v === 'success' ? (
+					<StatusBadge variant="success">{t('logs.status.success')}</StatusBadge>
+				) : v === 'failed' ? (
+					<StatusBadge variant="danger">{t('logs.status.failed')}</StatusBadge>
+				) : (
+					'-'
+				),
+		},
+		// A-69：以下四列对齐 dto.AuditLogResponse 实读键（resource/resource_id/ip/user_agent）——
+		// 旧列 targetType/message 恒空（wire 键实为 resource/details，A-65 遗留同源修正）。
+		{ title: t('logs.column.target'), dataIndex: 'resource', key: 'resource' },
+		{
+			title: t('logs.column.targetId'),
+			dataIndex: 'resourceId',
+			key: 'resourceId',
+			render: (v?: string) => v || '-',
+		},
+		{ title: t('logs.column.ip'), dataIndex: 'ip', key: 'ip', render: (v?: string) => v || '-' },
+		{
+			title: t('logs.column.userAgent'),
+			dataIndex: 'userAgent',
+			key: 'userAgent',
+			ellipsis: true,
+			render: (v?: string) => v || '-',
+		},
+		{ title: t('logs.column.detail'), dataIndex: 'details', key: 'details', ellipsis: true },
 	];
 
 	return (

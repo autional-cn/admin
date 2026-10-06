@@ -1,6 +1,8 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractList, extractListResult, extractItem } from '@autional-cn/shared';
+import type { ListResult } from '@autional-cn/shared';
+import { retryUnlessNotFound } from '@/lib/nhi';
 import { queryKeys } from '@/lib/query-keys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Generated from '@autional-cn/shared/generated/api';
@@ -15,6 +17,7 @@ import {
 	getFraudRules,
 	getWalletPolicy,
 	updateWalletPolicy,
+	deleteWalletPolicy,
 	adjustWallet,
 } from '@/lib/api.generated';
 
@@ -91,9 +94,11 @@ export interface WalletPolicy {
 export function useWalletList(params?: Record<string, unknown>) {
 	return useQuery({
 		queryKey: queryKeys.walletAdmin.list(params),
-		queryFn: async () => {
+		queryFn: async (): Promise<ListResult<WalletItem>> => {
+			// A-362⑥：消费服务端 total（服务端真分页 page/page_size；旧实现只取 items
+			// + 本地 10/页 ⇒ 第 21 条起不可达）。
 			const res = await Generated.adminWallets(params);
-			return extractList<WalletItem>(res);
+			return extractListResult<WalletItem>(res);
 		},
 	});
 }
@@ -180,10 +185,11 @@ export function useWithdrawals(params?: Record<string, unknown>) {
 		queryFn: async () => {
 			// W1-02（A-365）：管理面真源 = GET /admin/wallets/withdrawals（withdrawal_requests），
 			// 旧实现走租户交易端点 type=withdraw（列表/审批实体错位）。
+			// A-369⑤：透出 pagination（旧 extractList 丢 total ⇒ 本地 10/页伪全量）。
 			const res = await Generated.adminWalletsWithdrawals(
 				params as { status?: string; page?: number; page_size?: number },
 			);
-			return extractList<WithdrawalItem>(res);
+			return extractListResult<WithdrawalItem>(res);
 		},
 	});
 }
@@ -224,6 +230,8 @@ export function useWalletPolicy(tenantId: string, appId: string) {
 			return extractItem<WalletPolicy>(res);
 		},
 		enabled: !!tenantId && !!appId,
+		// A-385④：404（尚未配置策略）零重试 —— 消「404 双请求 + console 噪声」（A-86/A-93 同法）。
+		retry: retryUnlessNotFound,
 	});
 }
 
@@ -239,6 +247,16 @@ export function useUpdateWalletPolicy() {
 			appId: string;
 			data: Record<string, unknown>;
 		}) => updateWalletPolicy(tenantId, appId, data) as Promise<unknown>,
+		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.walletAdmin.all }),
+	});
+}
+
+/** A-385⑥：DELETE /policy 端点接线（此前零 UI 消费；删除后策略回退全局默认）。 */
+export function useDeleteWalletPolicy() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({ tenantId, appId }: { tenantId: string; appId: string }) =>
+			deleteWalletPolicy(tenantId, appId),
 		onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.walletAdmin.all }),
 	});
 }

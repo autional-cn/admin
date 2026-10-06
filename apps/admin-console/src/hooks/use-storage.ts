@@ -1,6 +1,6 @@
 'use client';
 
-import { extractList, extractItem } from '@autional-cn/shared';
+import { extractListResult, extractItem } from '@autional-cn/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -64,8 +64,10 @@ export function useFiles(params?: {
 	return useQuery({
 		queryKey: queryKeys.storage.files(params),
 		queryFn: async () => {
+			// A-301：消费服务端 total（旧实现 extractList 只取 items、零分页参上行
+			// ⇒ 服务端默认 page_size=20 vs 本地 10/页，第 21 条起静默不可达）。
 			const res = await getFiles(params);
-			return extractList<FileRecord>(res);
+			return extractListResult<FileRecord>(res);
 		},
 	});
 }
@@ -90,12 +92,13 @@ export function useStorageStats() {
 	});
 }
 
-export function useStorageTrash() {
+export function useStorageTrash(params?: { page?: number; pageSize?: number }) {
 	return useQuery({
-		queryKey: queryKeys.storage.trash,
+		queryKey: queryKeys.storage.trash.list(params),
 		queryFn: async () => {
-			const res = await getStorageTrash();
-			return extractList<TrashRecord>(res);
+			// A-301：回收站同族接线（page/page_size 上行 + 服务端 total）。
+			const res = await getStorageTrash(params);
+			return extractListResult<TrashRecord>(res);
 		},
 	});
 }
@@ -111,7 +114,8 @@ function invalidateStorageData(queryClient: QueryClient) {
 	queryClient.invalidateQueries({ queryKey: ['files'] });
 	queryClient.invalidateQueries({ queryKey: queryKeys.storage.quota });
 	queryClient.invalidateQueries({ queryKey: queryKeys.storage.stats });
-	queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash });
+	// A-301：trash 分页入键后以 all 前缀失效（覆盖全部 page/page_size 变体）。
+	queryClient.invalidateQueries({ queryKey: queryKeys.storage.trash.all });
 }
 
 export function useRestoreTrashItem() {

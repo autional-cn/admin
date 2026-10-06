@@ -19,7 +19,8 @@ import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/u
 import { handleApiError } from '@/lib/error-handler';
 import { DataTable, DateRangeFilter, Drawer, PageError } from '@autional-cn/ui/antd';
 import type { DataTablePagination, DateRangeValue } from '@autional-cn/ui/antd';
-import { extractItem, extractList, useCurrentTenantId } from '@autional-cn/shared';
+import { extractItem, extractList, useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { useOwnerDisplay } from '@/hooks/use-owner-display';
 import {
 	adminAuditExportDownloadByExport,
 	adminAuditExportJobs,
@@ -36,6 +37,9 @@ export default function AuditLogsPage() {
 	const { t } = useTranslation();
 	const tenantId = useCurrentTenantId() ?? '';
 	const isRestricted = useIsAuditRestricted();
+	// A-200（W1e）：页面标题 + 操作人 ULID → 显示名解析（未命中回退原值）
+	usePageTitle(t('audit.title'));
+	const { resolve: resolveOwner } = useOwnerDisplay();
 
 	const ACTION_OPTIONS = [
 		{ label: t('audit.action.create'), value: 'create' },
@@ -285,7 +289,14 @@ export default function AuditLogsPage() {
 			width: 170,
 			render: (v: number) => (v ? new Date(v).toLocaleString() : '-'),
 		},
-		{ title: t('audit.column.operator'), dataIndex: 'operatorId', key: 'operatorId', width: 120 },
+		{
+			title: t('audit.column.operator'),
+			dataIndex: 'operatorId',
+			key: 'operatorId',
+			width: 120,
+			// A-200（W1e）：裸 ULID → 成员显示名（未命中回退原值）
+			render: (v: string) => resolveOwner(v),
+		},
 		{
 			title: t('audit.column.action'),
 			dataIndex: 'action',
@@ -331,7 +342,8 @@ export default function AuditLogsPage() {
 			dataIndex: 'duration',
 			key: 'duration',
 			width: 80,
-			render: (v: number) => (v !== undefined ? `${v}ms` : '-'),
+			// A-200（W1e）：0ms 为「未记录耗时」哨兵（后端零值）→ 回落 '-'
+			render: (v: number) => (v ? `${v}ms` : '-'),
 		},
 		{
 			title: t('common.actions'),
@@ -507,7 +519,7 @@ export default function AuditLogsPage() {
 							<Col span={8} className="text-neutral-600">
 								{t('audit.detail.operator')}
 							</Col>
-							<Col span={16}>{currentRecord.operatorId}</Col>
+							<Col span={16}>{resolveOwner(currentRecord.operatorId)}</Col>
 						</Row>
 						<Row>
 							<Col span={8} className="text-neutral-600">
@@ -572,7 +584,7 @@ export default function AuditLogsPage() {
 								{t('audit.detail.duration')}
 							</Col>
 							<Col span={16}>
-								{currentRecord.duration !== undefined ? `${currentRecord.duration}ms` : '-'}
+								{currentRecord.duration ? `${currentRecord.duration}ms` : '-'}
 							</Col>
 						</Row>
 						<Row>

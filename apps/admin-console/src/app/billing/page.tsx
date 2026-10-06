@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
 import { Card, Tag, Descriptions, Tabs, Button, Spin, Empty, Row, Col, Statistic, Modal, Form, Input, InputNumber, Select, Space } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import {
@@ -46,10 +46,11 @@ import type { BillingRecord, Plan, PaymentGateway, RefundApproval } from '@/hook
  * 同文件三处（记录金额 + 方案月费/年费）统一收口（Q-03 / ADR-B4-04）。
  */
 export function formatAmount(v: unknown): string {
-	if (typeof v === 'number') return Number.isFinite(v) ? `$${v.toFixed(2)}` : '-';
+	// A-292②：全门户 CNY 口径 —— 统一 ¥（此前 $）
+	if (typeof v === 'number') return Number.isFinite(v) ? `¥${v.toFixed(2)}` : '-';
 	if (typeof v === 'string' && v.trim() !== '') {
 		const n = Number(v);
-		if (Number.isFinite(n)) return `$${n.toFixed(2)}`;
+		if (Number.isFinite(n)) return `¥${n.toFixed(2)}`;
 	}
 	return '-';
 }
@@ -70,64 +71,72 @@ function isNotFoundError(err: unknown): boolean {
 
 export default function BillingPage() {
 	const { t } = useTranslation();
+	// A-292①：页面标题（第 17 例收敛）
+	usePageTitle(t('billing.title'));
 	const tenantId = useCurrentTenantId() ?? '';
 	const [activeTab, setActiveTab] = useState('subscription');
+	// A-290：网关服务端分页状态（服务端默认 page_size=20 + 旧本地 10/页 ⇒ >20 条不可达）
+	const [gatewayPage, setGatewayPage] = useState(1);
+	const [gatewayPageSize, setGatewayPageSize] = useState(10);
 
+	// A-292④：8 路 GET 按激活页签惰性取数（首屏仅当前 Tab 1 路）
 	const {
 		data: subscription,
 		isLoading: subLoading,
 		error: subError,
 		refetch: subRefetch,
-	} = useBillingSubscription(tenantId);
+	} = useBillingSubscription(tenantId, activeTab === 'subscription');
 
 	const {
 		data: usage,
 		isLoading: usageLoading,
 		error: usageError,
 		refetch: usageRefetch,
-	} = useBillingUsage(tenantId);
+	} = useBillingUsage(tenantId, activeTab === 'usage');
 
 	const {
 		data: statistics,
 		isLoading: statsLoading,
 		error: statsError,
 		refetch: statsRefetch,
-	} = useBillingStatistics(tenantId);
+	} = useBillingStatistics(tenantId, activeTab === 'statistics');
 
 	const {
 		data: records = [],
 		isLoading: recordsLoading,
 		error: recordsError,
 		refetch: recordsRefetch,
-	} = useBillingRecords(tenantId);
+	} = useBillingRecords(tenantId, activeTab === 'records');
 
 	const {
 		data: plans = [],
 		isLoading: plansLoading,
 		error: plansError,
 		refetch: plansRefetch,
-	} = usePlans();
+	} = usePlans(activeTab === 'plans');
 
 	const {
-		data: paymentGateways = [],
+		data: gatewayResult,
 		isLoading: gatewaysLoading,
 		error: gatewaysError,
 		refetch: gatewaysRefetch,
-	} = usePaymentGateways();
+	} = usePaymentGateways({ page: gatewayPage, page_size: gatewayPageSize }, activeTab === 'gateways');
+	const paymentGateways = gatewayResult?.items ?? [];
+	const gatewayTotal = gatewayResult?.pagination?.total ?? 0;
 
 	const {
 		data: refundApprovals = [],
 		isLoading: refundsLoading,
 		error: refundsError,
 		refetch: refundsRefetch,
-	} = useRefundApprovals();
+	} = useRefundApprovals(activeTab === 'refunds');
 
 	const {
 		data: dunningSettings,
 		isLoading: dunningLoading,
 		error: dunningError,
 		refetch: dunningRefetch,
-	} = useDunningSettings(tenantId);
+	} = useDunningSettings(tenantId, activeTab === 'dunning');
 
 	const createPlanMut = useCreatePlan();
 	const updatePlanMut = useUpdatePlan();
@@ -166,10 +175,34 @@ export default function BillingPage() {
 		paypal: t('billing.gateways.channel.paypal'),
 	};
 
+	// A-288 / A-292③：wire 枚举 → 本地化词表（记录状态/类型、网关状态不再裸显英文）
+	const recordStatusLabels: Record<string, string> = {
+		paid: t('billing.records.status.paid'),
+		completed: t('billing.records.status.completed'),
+		pending: t('billing.records.status.pending'),
+		failed: t('billing.records.status.failed'),
+	};
+	const recordStatusColors: Record<string, string> = {
+		paid: 'success',
+		completed: 'success',
+		pending: 'processing',
+		failed: 'error',
+	};
+	const recordTypeLabels: Record<string, string> = {
+		subscription: t('billing.records.type.subscription'),
+		usage: t('billing.records.type.usage'),
+		invoice: t('billing.records.type.invoice'),
+	};
+	const gatewayStatusLabels: Record<string, string> = {
+		active: t('common.enable'),
+		inactive: t('common.disable'),
+		disabled: t('common.disable'),
+	};
+
 	const handleSavePlan = async (values: any) => {
 		try {
 			if (editingPlan) {
-				await updatePlanMut.mutateAsync({ id: editingPlan.id, data: values });
+				await updatePlanMut.mutateAsync({ id: editingPlan.planId, data: values });
 				message.success(t('billing.planUpdated'));
 			} else {
 				await createPlanMut.mutateAsync(values);
@@ -250,11 +283,12 @@ export default function BillingPage() {
 		});
 	};
 
-	const handleExecuteRefund = async (values: { remark: string }) => {
+	const handleExecuteRefund = async (values: { userId: string; remark?: string }) => {
 		if (!executingRefund || !tenantId) return;
 		try {
+			// A-289：wire 必填 user_id（ExecuteRefundRequest dto.go:619-630）；旧 remark-only 必 400
 			await executeRefundMut.mutateAsync({
-				id: executingRefund.id,
+				id: executingRefund.refundId,
 				data: { ...values },
 			});
 			message.success(t('billing.refundExecuted'));
@@ -277,12 +311,12 @@ export default function BillingPage() {
 	};
 
 	const recordColumns = [
-		{ title: t('billing.records.column.id'), dataIndex: 'id', key: 'id', ellipsis: true },
+		{ title: t('billing.records.column.id'), dataIndex: 'recordId', key: 'recordId', ellipsis: true },
 		{
 			title: t('billing.records.column.type'),
 			dataIndex: 'type',
 			key: 'type',
-			render: (v: string) => <Tag>{v}</Tag>,
+			render: (v: string) => <Tag>{recordTypeLabels[v] ?? v}</Tag>,
 		},
 		{
 			title: t('billing.records.column.amount'),
@@ -296,9 +330,7 @@ export default function BillingPage() {
 			dataIndex: 'status',
 			key: 'status',
 			render: (v: string) => (
-				<Tag color={v === 'completed' ? 'success' : v === 'pending' ? 'processing' : 'default'}>
-					{v}
-				</Tag>
+				<Tag color={recordStatusColors[v] ?? 'default'}>{recordStatusLabels[v] ?? v}</Tag>
 			),
 		},
 		{
@@ -318,9 +350,10 @@ export default function BillingPage() {
 	const planColumns = [
 		{ title: t('common.name'), dataIndex: 'name', key: 'name' },
 		{
-			title: t('billing.plans.column.code'),
-			dataIndex: 'code',
-			key: 'code',
+			// A-291：wire PlanDetail 无 code 键（恒空）→ 改主键 plan_id 列
+			title: t('billing.plans.column.planId'),
+			dataIndex: 'planId',
+			key: 'planId',
 			render: (v: string) => <Tag>{v || '-'}</Tag>,
 		},
 		{
@@ -350,12 +383,6 @@ export default function BillingPage() {
 					: '-',
 		},
 		{
-			title: t('common.status'),
-			dataIndex: 'status',
-			key: 'status',
-			render: (v: string) => <Tag color={v === 'active' ? 'success' : 'default'}>{v || '-'}</Tag>,
-		},
-		{
 			title: t('common.actions'),
 			key: 'action',
 			render: (_: any, record: Plan) => (
@@ -375,7 +402,7 @@ export default function BillingPage() {
 						type="link"
 						danger
 						icon={<Trash2 size="1em" />}
-						onClick={() => handleDeletePlan(record.id)}
+						onClick={() => handleDeletePlan(record.planId)}
 					>
 						{t('common.delete')}
 					</Button>
@@ -396,7 +423,9 @@ export default function BillingPage() {
 			title: t('common.status'),
 			dataIndex: 'status',
 			key: 'status',
-			render: (v: string) => <Tag color={v === 'active' ? 'success' : 'default'}>{v || '-'}</Tag>,
+			render: (v: string) => (
+				<Tag color={v === 'active' ? 'success' : 'default'}>{gatewayStatusLabels[v] ?? (v || '-')}</Tag>
+			),
 		},
 		{
 			title: t('common.createdAt'),
@@ -426,8 +455,8 @@ export default function BillingPage() {
 	const refundColumns = [
 		{
 			title: t('billing.refunds.column.id'),
-			dataIndex: 'id',
-			key: 'id',
+			dataIndex: 'refundId',
+			key: 'refundId',
 			ellipsis: true,
 			width: 180,
 		},
@@ -435,12 +464,14 @@ export default function BillingPage() {
 			title: t('billing.refunds.column.amount'),
 			dataIndex: 'amount',
 			key: 'amount',
-			render: (v: number) => `$${v?.toFixed(2) || '-'}`,
+			// A-289：string 金额同族崩溃（A-279 型）→ formatAmount 单点（含 ¥）
+			render: (v: unknown) => formatAmount(v),
 		},
 		{
-			title: t('billing.refunds.column.reason'),
-			dataIndex: 'reason',
-			key: 'reason',
+			// A-289：wire RefundApprovalResponse 无 reason 键（恒空）→ 改 approved_by
+			title: t('billing.refunds.column.approvedBy'),
+			dataIndex: 'approvedBy',
+			key: 'approvedBy',
 			ellipsis: true,
 		},
 		{
@@ -464,9 +495,10 @@ export default function BillingPage() {
 			),
 		},
 		{
-			title: t('billing.refunds.column.createdAt'),
-			dataIndex: 'createdAt',
-			key: 'createdAt',
+			// A-289：wire 无 created_at 键（恒空）→ 改 approved_at
+			title: t('billing.refunds.column.approvedAt'),
+			dataIndex: 'approvedAt',
+			key: 'approvedAt',
 			render: (v: string) => (v ? new Date(v).toLocaleDateString() : '-'),
 		},
 		{
@@ -479,7 +511,7 @@ export default function BillingPage() {
 							<Button
 								type="link"
 								icon={<Check size="1em" />}
-								onClick={() => handleApproveRefund(record.id)}
+								onClick={() => handleApproveRefund(record.refundId)}
 							>
 								{t('billing.approve')}
 							</Button>
@@ -487,7 +519,7 @@ export default function BillingPage() {
 								type="link"
 								danger
 								icon={<X size="1em" />}
-								onClick={() => handleRejectRefund(record.id)}
+								onClick={() => handleRejectRefund(record.refundId)}
 							>
 								{t('billing.reject')}
 							</Button>
@@ -686,7 +718,7 @@ export default function BillingPage() {
 									<Card size="small">
 										<Statistic
 											title={t('billing.statistics.totalRevenue')}
-											prefix="$"
+											prefix="¥"
 											value={statistics.totalRevenue}
 										/>
 									</Card>
@@ -707,7 +739,7 @@ export default function BillingPage() {
 									<Card size="small">
 										<Statistic
 											title={t('billing.statistics.mrr')}
-											prefix="$"
+											prefix="¥"
 											value={statistics.mrr}
 										/>
 									</Card>
@@ -744,7 +776,7 @@ export default function BillingPage() {
 						/>
 					)}
 					<DataTable
-						rowKey="id"
+						rowKey="recordId"
 						columns={recordColumns}
 						dataSource={records}
 						loading={recordsLoading}
@@ -781,7 +813,7 @@ export default function BillingPage() {
 						/>
 					)}
 					<DataTable
-						rowKey="id"
+						rowKey="planId"
 						columns={planColumns}
 						dataSource={plans}
 						loading={plansLoading}
@@ -822,7 +854,17 @@ export default function BillingPage() {
 						columns={gatewayColumns}
 						dataSource={paymentGateways}
 						loading={gatewaysLoading}
-						pagination={{ pageSize: 10 }}
+						// A-290：受控分页（page/page_size 上行 + total 来自服务端信封）
+						pagination={{
+							current: gatewayPage,
+							pageSize: gatewayPageSize,
+							total: gatewayTotal,
+							showSizeChanger: true,
+							onChange: (p, ps) => {
+								setGatewayPage(p);
+								setGatewayPageSize(ps);
+							},
+						}}
 						locale={{ emptyText: <Empty description={t('billing.gateways.noGateways')} /> }}
 						scroll={{ x: 800 }}
 					/>
@@ -842,7 +884,7 @@ export default function BillingPage() {
 						/>
 					)}
 					<DataTable
-						rowKey="id"
+						rowKey="refundId"
 						columns={refundColumns}
 						dataSource={refundApprovals}
 						loading={refundsLoading}
@@ -875,14 +917,7 @@ export default function BillingPage() {
 							<Form.Item name="autoCancelDays" label={t('billing.dunning.form.autoCancelDays')}>
 								<InputNumber className="w-full" min={0} max={180} />
 							</Form.Item>
-							<Form.Item name="status" label={t('common.status')} initialValue="active">
-								<Select
-									options={[
-										{ value: 'active', label: t('common.enable') },
-										{ value: 'inactive', label: t('common.disable') },
-									]}
-								/>
-							</Form.Item>
+							{/* A-287：DunningSettingsRequest 无 status 键（唯一被后端忽略的键）→ 死控件撤除 */}
 							<Button type="primary" htmlType="submit" loading={updateDunningMut.isPending}>
 								{t('billing.dunning.form.saveBtn')}
 							</Button>
@@ -1033,6 +1068,14 @@ export default function BillingPage() {
 				className="w-full max-w-[560px]"
 			>
 				<Form form={executeForm} layout="vertical" onFinish={handleExecuteRefund}>
+					{/* A-289：execute 必填收款用户（wire user_id）→ 补必填输入（W1g refunds2 同构） */}
+					<Form.Item
+						name="userId"
+						label={t('billing.refunds.form.userId')}
+						rules={[{ required: true }]}
+					>
+						<Input placeholder={t('billing.refunds.form.userIdPlaceholder')} />
+					</Form.Item>
 					<Form.Item name="remark" label={t('billing.refunds.form.remark')}>
 						<Input.TextArea rows={3} placeholder={t('billing.refunds.form.remarkPlaceholder')} />
 					</Form.Item>

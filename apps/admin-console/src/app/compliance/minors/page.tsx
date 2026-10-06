@@ -1,7 +1,7 @@
 'use client';
 // @generated-api-exempt: 2 key(s) [IDENTITY.ADMIN_CONSENTS, TENANT.MINORS_PROTECTION] lack generated func
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DataTable, PageError } from '@autional-cn/ui/antd';
 import { Card, Form, InputNumber, Switch, Button, Spin, TimePicker, Space, Statistic, Row, Col, Tabs, Tag } from 'antd';
 import {
@@ -32,6 +32,9 @@ interface MinorsProtectionConfig {
 	contentFilterEnabled: boolean;
 	childDefaultMaxPrivacy: boolean;
 	minorDataRetentionDays: number;
+	// A-272（W1e，分支②补展示）：wire 含两阈值字段而前端 10 键接口零 UI → 补只读展示
+	minorsAgeThreshold?: number;
+	digitalConsentAge?: number;
 }
 
 /** wire 锚：service-identity dto/user.go:272-296 AuthUserResponse（isMinor/ageGroup/pendingParentalConsent…）。 */
@@ -90,6 +93,10 @@ export default function MinorsProtectionPage() {
 	const [users, setUsers] = useState<MinorUser[]>([]);
 	const [usersLoading, setUsersLoading] = useState(false);
 	const [userTotal, setUserTotal] = useState(0);
+	// A-271（W1e）：统计卡首屏恒 0（懒加载）→ 挂载即载 + 三态（加载中 '-' / 已载真值）。
+	// requestedRef 同步置位：挂载在飞请求不被首次 Tab 点击二次触发（保 pagination 测试 1 次调用不变量）。
+	const usersRequestedRef = useRef(false);
+	const [usersLoaded, setUsersLoaded] = useState(false);
 	// W4-02（A-273）：真服务端分页——当前页由请求回填，翻页触发新请求（旧实现 pageSize=100 单页假分页）。
 	const [userPage, setUserPage] = useState(1);
 	const [consents, setConsents] = useState<ConsentRecord[]>([]);
@@ -104,6 +111,8 @@ export default function MinorsProtectionPage() {
 
 	useEffect(() => {
 		loadConfig();
+		// A-271（W1e）：users 挂载即载（旧实现仅 Tab 点击懒加载 → 统计卡恒 0 直到点击）
+		loadUsers();
 	}, []);
 
 	const loadConfig = async () => {
@@ -142,6 +151,7 @@ export default function MinorsProtectionPage() {
 	};
 
 	const loadUsers = async (page: number = userPage) => {
+		usersRequestedRef.current = true;
 		setUsersLoading(true);
 		try {
 			// 请求侧 camel 书面写（拦截器 snake 化）；分页经 toPageParams 单点。
@@ -154,6 +164,7 @@ export default function MinorsProtectionPage() {
 			setUsers(result.items);
 			setUserTotal(result.total);
 			setUserPage(page);
+			setUsersLoaded(true);
 		} catch (err) {
 			handleApiError(err, t('compliance.minors.loadUsersFailed'));
 		} finally {
@@ -183,7 +194,8 @@ export default function MinorsProtectionPage() {
 
 	const handleTabChange = (key: string) => {
 		setActiveTab(key);
-		if (key === 'users' && users.length === 0) loadUsers();
+		// A-271（W1e）：挂载已在飞/已载（ref 同步置位）→ Tab 点击不二次触发
+		if (key === 'users' && !usersRequestedRef.current) loadUsers();
 		if (key === 'consents' && consents.length === 0) loadConsents();
 	};
 
@@ -264,7 +276,7 @@ export default function MinorsProtectionPage() {
 	if (loading) return <Spin size="large" className="block mx-auto my-[100px]" />;
 
 	return (
-		<div className="p-6">
+		<div>
 			<ConsolePageHeader title={t('compliance.minors.title')} description={t('compliance.minors.subtitle')} />
 
 			{/* 配置不可知时统计卡整体退场：绝不呈现伪 0（「0 分钟/关闭」= 把失败伪装成未配置）。 */}
@@ -272,9 +284,10 @@ export default function MinorsProtectionPage() {
 				<Row gutter={16} className="mb-6">
 					<Col span={8}>
 						<Card>
+							{/* A-271（W1e）：三态——加载中 '-' / 已载真值（首屏不再恒 0 伪值） */}
 							<Statistic
 								title={t('compliance.minors.userCount')}
-								value={userTotal}
+								value={usersLoaded ? userTotal : undefined}
 								prefix={<User size="1em" />}
 							/>
 						</Card>
@@ -403,6 +416,13 @@ export default function MinorsProtectionPage() {
 											<InputNumber min={30} max={3650} className="w-full" />
 										</Form.Item>
 									</Form>
+									{/* A-272（W1e，分支②补展示）：wire 两阈值字段（minors_age_threshold/digital_consent_age）原零 UI → 只读回显 */}
+									<div className="text-neutral-600 text-sm">
+										{t('compliance.minors.ageThresholdLabel')}：
+										{config?.minorsAgeThreshold ?? '-'} ·{' '}
+										{t('compliance.minors.digitalConsentAgeLabel')}：
+										{config?.digitalConsentAge ?? '-'}
+									</div>
 								</SectionCard>
 
 								<div className="mt-6 text-right">
@@ -436,7 +456,8 @@ export default function MinorsProtectionPage() {
 									total: userTotal,
 									onChange: (p) => loadUsers(p),
 									showSizeChanger: false,
-									showTotal: (total) => t('paginationTotal', { count: total }),
+									// A-270（W1e）：模板为 {{total}} 而旧传 { count } ⇒ DOM 字面量；改传 { total }
+									showTotal: (total) => t('paginationTotal', { total }),
 								}}
 								scroll={{ x: 800 }}
 							/>

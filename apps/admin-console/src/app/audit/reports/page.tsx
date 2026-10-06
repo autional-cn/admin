@@ -8,14 +8,13 @@ import {
 	Select,
 	Spin,
 	Tag,
-	Timeline,
 	List,
 	Statistic,
 	Row,
 	Col,
 	Typography,
 } from 'antd';
-import { ClipboardCheck, FileLock } from 'lucide-react';
+import { ClipboardCheck, Download, FileLock } from 'lucide-react';
 import { extractItem, useCurrentTenantId } from '@autional-cn/shared';
 import {
 	adminAuditReportsSecurity,
@@ -45,9 +44,28 @@ const SEVERITY_COLORS: Record<string, string> = {
 };
 
 export default function AuditReportsPage() {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const tenantId = useCurrentTenantId() ?? '';
 	const isRestricted = useIsAuditRestricted();
+
+	// A-231（W1e）：报告导出（客户端 Blob 下载——两端点纯只读计算、无后端导出端点）。
+	const downloadReport = (filename: string, payload: unknown) => {
+		try {
+			const blob = new Blob([JSON.stringify(payload, null, 2)], {
+				type: 'application/json;charset=utf-8',
+			});
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			a.remove();
+			URL.revokeObjectURL(url);
+		} catch {
+			message.error(t('auditReports.exportFailed'));
+		}
+	};
 
 	const PERIOD_OPTIONS = [
 		{ label: t('auditReports.period.last7Days'), value: '7d' },
@@ -121,6 +139,11 @@ export default function AuditReportsPage() {
 		return r.description || map[r.type ?? ''] || t('auditReports.risk.defaultDesc');
 	};
 
+	// A-231（W1e）：period/generatedAt 两字段零渲染 → 周期经选项词表回显、生成时间本地化（秒级时间戳）
+	const periodLabelOf = (period?: string) =>
+		PERIOD_OPTIONS.find((o) => o.value === period)?.label ?? period ?? '-';
+	const generatedAtOf = (ts?: number) => (ts ? new Date(ts * 1000).toLocaleString(i18n.language) : '-');
+
 	const riskRecommendation = (r: SecurityRiskResp) => {
 		const map: Record<string, string> = {
 			brute_force: t('auditReports.risk.bruteForce.rec'),
@@ -150,6 +173,16 @@ export default function AuditReportsPage() {
 				>
 					{t('auditReports.generate')}
 				</Button>
+				{/* A-231（W1e）：导出入口（生成后可用；客户端 Blob 下载） */}
+				<Button
+					icon={<Download size="1em" />}
+					onClick={() =>
+						downloadReport(`security-report-${secData?.period ?? secPeriod}-${Date.now()}.json`, secData)
+					}
+					disabled={!secData}
+				>
+					{t('auditReports.export')}
+				</Button>
 			</div>
 
 			{secLoading && <Spin className="flex justify-center py-16" />}
@@ -158,6 +191,11 @@ export default function AuditReportsPage() {
 
 			{secData && !secLoading && !secError && (
 				<>
+					{/* A-231（W1e）：报告周期 / 生成时间回显（旧实现两字段零渲染） */}
+					<div className="text-neutral-600 text-sm mb-4">
+						{t('auditReports.periodLabel')}：{periodLabelOf(secData.period)} ·{' '}
+						{t('auditReports.generatedAtLabel')}：{generatedAtOf(secData.generatedAt)}
+					</div>
 					<Row gutter={24} className="mb-6">
 						<Col xs={12} sm={6}>
 							<Card size="small">
@@ -286,6 +324,19 @@ export default function AuditReportsPage() {
 				>
 					{t('auditReports.generate')}
 				</Button>
+				{/* A-231（W1e）：导出入口（生成后可用；客户端 Blob 下载） */}
+				<Button
+					icon={<Download size="1em" />}
+					onClick={() =>
+						downloadReport(
+							`compliance-report-${compData?.standard ?? compStandard}-${Date.now()}.json`,
+							compData,
+						)
+					}
+					disabled={!compData}
+				>
+					{t('auditReports.export')}
+				</Button>
 			</div>
 
 			{compLoading && <Spin className="flex justify-center py-16" />}
@@ -296,6 +347,11 @@ export default function AuditReportsPage() {
 
 			{compData && !compLoading && !compError && (
 				<>
+					{/* A-231（W1e）：报告周期 / 生成时间回显（旧实现两字段零渲染） */}
+					<div className="text-neutral-600 text-sm mb-4">
+						{t('auditReports.periodLabel')}：{periodLabelOf(compData.period)} ·{' '}
+						{t('auditReports.generatedAtLabel')}：{generatedAtOf(compData.generatedAt)}
+					</div>
 					<Row gutter={24} className="mb-6">
 						<Col xs={24} sm={8}>
 							<Card size="small">

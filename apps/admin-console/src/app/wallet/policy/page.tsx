@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
 import { useTranslation } from 'react-i18next';
-import { Form, Input, InputNumber, Select, Button, Card, Spin, Switch, Space, Empty } from 'antd';
-import { message } from '@/lib/antd-app';
+import { Form, InputNumber, Select, Button, Card, Spin, Switch, Space, Empty } from 'antd';
+import { message, modal } from '@/lib/antd-app';
 
 import {
 	useWalletPolicy,
 	useUpdateWalletPolicy,
+	useDeleteWalletPolicy,
 	type WalletPolicy,
 } from '@/hooks/use-wallet-admin';
+import { useApplications } from '@/hooks/use-applications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional-cn/ui/antd';
 import { ConsolePageHeader } from '@autional-cn/ui';
@@ -26,16 +28,36 @@ function policyToFormValues(policy: WalletPolicy) {
 
 export default function WalletPolicyPage() {
 	const { t } = useTranslation();
+	usePageTitle(t('walletPolicy.title'));
 	const tenantId = useCurrentTenantId() ?? '';
-	const [appId, setAppId] = useState('default');
+	// A-385②③：应用选择器（旧手输魔串 'default'/ULID 且每击键即 GET）——选择器值 = 应用真 ID
+	const [appId, setAppId] = useState('');
+	const { data: applications = [] } = useApplications(tenantId);
 	const { data: policy, isLoading, error, refetch } = useWalletPolicy(tenantId, appId);
 	const updateMut = useUpdateWalletPolicy();
+	const deleteMut = useDeleteWalletPolicy();
 	const [form] = Form.useForm();
 	// AC-B3-W1-05-1：无策略（404）→ 创建入口；点按进入空白表单，提交走同一 PUT（upsert 创建路径）。
 	const [creating, setCreating] = useState(false);
 
 	// 404 = 尚未配置策略（ADM-014），其余错误走 PageError。
 	const isNotFound = (error as any)?.response?.status === 404 || (error as any)?.status === 404;
+
+	// A-385⑥：DELETE /policy 接线（此前端点零 UI 消费；删除后策略回退全局默认）。
+	const handleDeletePolicy = () => {
+		modal.confirm({
+			title: t('walletPolicy.deleteConfirm'),
+			okButtonProps: { danger: true },
+			onOk: async () => {
+				try {
+					await deleteMut.mutateAsync({ tenantId, appId });
+					message.success(t('walletPolicy.deleteSuccess'));
+				} catch (err) {
+					handleApiError(err, t('walletPolicy.deleteFailed'));
+				}
+			},
+		});
+	};
 
 	const handleSave = async (values: Record<string, unknown>) => {
 		try {
@@ -66,11 +88,27 @@ export default function WalletPolicyPage() {
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<Form.Item label={t('walletPolicy.appId')} className="mb-0">
-					<Input value={appId} onChange={(e) => setAppId(e.target.value)} placeholder="default" />
+					<Select
+						value={appId || undefined}
+						onChange={(v) => {
+							setAppId(v);
+							// A-385②：切换应用退出创建态（避免把上一应用的创建意图带到新应用）
+							setCreating(false);
+						}}
+						options={applications.map((app) => ({
+							value: app.id,
+							label: `${app.name} (${app.code})`,
+						}))}
+						showSearch
+						optionFilterProp="label"
+						placeholder={t('walletPolicy.selectAppPlaceholder')}
+					/>
 				</Form.Item>
 			</Card>
 
-			{isLoading ? (
+			{!appId ? (
+				<div className="text-center text-neutral-600 py-12">{t('walletPolicy.selectApp')}</div>
+			) : isLoading ? (
 				<div className="flex justify-center py-8">
 					<Spin />
 				</div>
@@ -150,9 +188,16 @@ export default function WalletPolicyPage() {
 								min={0}
 							/>
 						</Form.Item>
-						<Button type="primary" htmlType="submit" loading={updateMut.isPending}>
-							{t('walletPolicy.save')}
-						</Button>
+						<Space>
+							<Button type="primary" htmlType="submit" loading={updateMut.isPending}>
+								{t('walletPolicy.save')}
+							</Button>
+							{policy && (
+								<Button danger onClick={handleDeletePolicy} loading={deleteMut.isPending}>
+									{t('walletPolicy.deletePolicy')}
+								</Button>
+							)}
+						</Space>
 					</Form>
 				</Card>
 			)}
