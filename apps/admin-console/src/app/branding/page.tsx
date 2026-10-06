@@ -219,7 +219,7 @@ export default function BrandingPage() {
 					<Col xs={24} lg={12}>
 						<Card title={t('branding.livePreview')} bodyStyle={{ background: bg }}>
 							<div
-								className="mx-auto max-w-sm p-8 shadow-lg"
+								className="mx-auto max-w-sm p-8 shadow-card"
 								style={{
 									background: '#fff',
 									borderRadius: radius,
