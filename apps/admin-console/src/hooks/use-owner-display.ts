@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useCurrentTenantId } from '@autional-cn/shared';
+import { useCurrentTenantId } from '@autional/shared';
 import { useMembers } from '@/hooks/use-members';
 
 /**

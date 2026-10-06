@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { apiClient, useAuthStore } from '@autional-cn/shared';
+import { apiClient, useAuthStore } from '@autional/shared';
 
 // W4-01（A-244）：列表 hook 返回契约改为 PageResult 形状（{items,total}——页面消费 result.items/result.total）；
 // 自评分/策略卡两查询（A-245）随页面改经 useComplianceScore/useCompliancePolicy 出数，此处以字面量注入

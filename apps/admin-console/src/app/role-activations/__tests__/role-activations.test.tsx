@@ -6,7 +6,7 @@ import { render, screen, waitFor, fireEvent, cleanup, configure } from '@testing
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
 import i18n from 'i18next';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import RoleActivationsPage from '../page';
 
 vi.mock('@/lib/antd-app', () => ({

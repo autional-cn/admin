@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { Tag } from 'antd';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import { useFraudRules, type FraudRule } from '@/hooks/use-wallet-admin';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 export default function WalletFraudRulesPage() {

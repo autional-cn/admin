@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DataTable } from '@autional-cn/ui/antd';
+import { DataTable } from '@autional/ui/antd';
 import { Button, Space, Tag, Modal, Form, Input, InputNumber, Select, Popconfirm, Skeleton } from 'antd';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import {
@@ -11,15 +11,15 @@ import {
 	extractItem,
 	toPageParams,
 	fromPageResult,
-} from '@autional-cn/shared';
+} from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
-import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	adminAgents,
 	adminAgentsPost,
 	adminAgentsByAgentsDelete,
-} from '@autional-cn/shared/generated/api';
+} from '@autional/shared/generated/api';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { message } from '@/lib/antd-app';
@@ -27,7 +27,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
 import { useOwnerDisplay } from '@/hooks/use-owner-display';
 import { AGENT_STATUS_VARIANT, statusVariantOf } from '@/lib/nhi';
-import type { AgentInfo, CreateAgentRequest } from '@autional-cn/shared/generated/types';
+import type { AgentInfo, CreateAgentRequest } from '@autional/shared/generated/types';
 
 /** 列表行 = 生成契约 AgentInfo（identity_id / rotation_days / jit_ttl 等经拦截器深 camel；列表 id 即 identityId）。 */
 type AgentRecord = AgentInfo & { ownerPrincipalId?: string };

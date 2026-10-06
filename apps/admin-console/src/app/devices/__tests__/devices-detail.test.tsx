@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import DeviceDetailPage from '../[id]/page';
 
 vi.mock('@/lib/antd-app', () => ({

@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import UsagePage from '../page';
 
-vi.mock('@autional-cn/shared', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('@autional-cn/shared')>();
+vi.mock('@autional/shared', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@autional/shared')>();
 	return { ...actual, useCurrentTenantIdOr: () => 'tenant-1' };
 });
 

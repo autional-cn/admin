@@ -4,8 +4,8 @@ import React from 'react';
 import { Card, Row, Col, Button, Typography } from 'antd';
 import { Book, Code, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useTenantSlug } from '@autional-cn/shared';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { useTenantSlug } from '@autional/shared';
+import { ConsolePageHeader } from '@autional/ui';
 import { buildNavHref } from '@/lib/nav';
 import { DOCS_BASE } from '@/lib/docs';
 
@@ -18,7 +18,7 @@ const { Text } = Typography;
 const sdks = [
 	{ name: 'Go SDK', lang: 'go', desc: 'sdk.go.desc', install: null },
 	{ name: 'Python SDK', lang: 'python', desc: 'sdk.python.desc', install: null },
-	{ name: 'Node.js SDK', lang: 'node', desc: 'sdk.node.desc', install: 'npm install @autional-cn/node' },
+	{ name: 'Node.js SDK', lang: 'node', desc: 'sdk.node.desc', install: 'npm install @autional/node' },
 	{ name: 'Java SDK', lang: 'java', desc: 'sdk.java.desc', install: null },
 	{ name: '.NET SDK', lang: 'dotnet', desc: 'sdk.dotnet.desc', install: null },
 ];

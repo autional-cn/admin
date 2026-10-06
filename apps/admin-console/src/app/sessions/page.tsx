@@ -7,9 +7,9 @@ import { Trash2 } from 'lucide-react';
 import { useSessions, useActiveSessionCount, useDeleteSession } from '@/hooks/use-sessions';
 import type { SessionRecord } from '@/hooks/use-sessions';
 import { handleApiError } from '@/lib/error-handler';
-import { DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
-import { classifyQueryState } from '@autional-cn/shared';
+import { DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
+import { classifyQueryState } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 import { QueryStateFallback } from '@/components/common/QueryStateFallback';
 

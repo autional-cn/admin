@@ -5,7 +5,7 @@ import { Card, Tabs, Form, Input, Button, Tag, Row, Col, Space, Spin, Statistic,
 import { message } from '@/lib/antd-app';
 import { CheckCircle2, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import {
 	useCommunicationDashboard,
 	useMessageLogs,
@@ -14,8 +14,8 @@ import {
 } from '@/hooks/use-communication';
 import { getCommunicationHealth } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 interface HealthStatus {
 	channel: string;

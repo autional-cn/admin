@@ -1,6 +1,6 @@
 'use client';
 
-import { apiClient, API_PATHS, extractItem, extractList, fromPageResult, toPageParams } from '@autional-cn/shared';
+import { apiClient, API_PATHS, extractItem, extractList, fromPageResult, toPageParams } from '@autional/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,14 +13,14 @@ import {
 	getRetentionPolicies,
 	getISOControls,
 } from '@/lib/api.generated';
-import * as Generated from '@autional-cn/shared/generated/api';
+import * as Generated from '@autional/shared/generated/api';
 import type {
 	CreateErasureRequest,
 	CreateRetentionPolicyRequest,
 	UpdateRetentionPolicyRequest,
 	CreateConsentRequest,
 	RevokeConsentRequest,
-} from '@autional-cn/shared/generated/types';
+} from '@autional/shared/generated/types';
 
 interface DSAR {
 	id: string;

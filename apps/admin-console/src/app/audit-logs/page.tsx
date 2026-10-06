@@ -17,19 +17,19 @@ import {
 } from 'lucide-react';
 import { useAuditLogs, useVerifyAuditChain, useExportAuditLogs } from '@/hooks/use-audit-logs';
 import { handleApiError } from '@/lib/error-handler';
-import { DataTable, DateRangeFilter, Drawer, PageError } from '@autional-cn/ui/antd';
-import type { DataTablePagination, DateRangeValue } from '@autional-cn/ui/antd';
-import { extractItem, extractList, useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { DataTable, DateRangeFilter, Drawer, PageError } from '@autional/ui/antd';
+import type { DataTablePagination, DateRangeValue } from '@autional/ui/antd';
+import { extractItem, extractList, useCurrentTenantId, usePageTitle } from '@autional/shared';
 import { useOwnerDisplay } from '@/hooks/use-owner-display';
 import {
 	adminAuditExportDownloadByExport,
 	adminAuditExportJobs,
 	adminAuditHashchainByHashchain,
 	adminAuditMerkleProof,
-} from '@autional-cn/shared/generated/api';
+} from '@autional/shared/generated/api';
 import { useTranslation } from 'react-i18next';
-import { useIsAuditRestricted, AuditStatsOnly } from '@autional-cn/shared';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { useIsAuditRestricted, AuditStatsOnly } from '@autional/shared';
+import { ConsolePageHeader } from '@autional/ui';
 
 const { Text, Paragraph } = Typography;
 

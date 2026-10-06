@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantIdOr, classifyQueryState, type QueryState } from '@autional-cn/shared';
+import { useCurrentTenantIdOr, classifyQueryState, type QueryState } from '@autional/shared';
 import { Card, Row, Col, Statistic, Select, Spin, Empty } from 'antd';
 import { BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { getUsageTimeline, getUsageEndpoints } from '@/lib/api.generated';
 
-import { DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { QueryStateFallback } from '@/components/common/QueryStateFallback';
 
 export default function UsagePage() {

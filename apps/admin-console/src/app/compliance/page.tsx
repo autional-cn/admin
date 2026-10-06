@@ -31,11 +31,11 @@ import {
 	useCompliancePolicy,
 } from '@/hooks/use-compliance';
 import { handleApiError } from '@/lib/error-handler';
-import { DataTable, Drawer, PageError } from '@autional-cn/ui/antd';
-import { useIsAuditRestricted, AuditStatsOnly, useTenantSlug, usePageTitle } from '@autional-cn/shared';
+import { DataTable, Drawer, PageError } from '@autional/ui/antd';
+import { useIsAuditRestricted, AuditStatsOnly, useTenantSlug, usePageTitle } from '@autional/shared';
 import { QueryStateFallback } from '@/components/common/QueryStateFallback';
-import type { CreateRetentionPolicyRequest, UpdateRetentionPolicyRequest } from '@autional-cn/shared/generated/types';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import type { CreateRetentionPolicyRequest, UpdateRetentionPolicyRequest } from '@autional/shared/generated/types';
+import { ConsolePageHeader } from '@autional/ui';
 import { buildNavHref } from '@/lib/nav';
 import { useNavigate } from 'react-router';
 import { useIsAdminRole } from '@/hooks/use-is-admin-role';

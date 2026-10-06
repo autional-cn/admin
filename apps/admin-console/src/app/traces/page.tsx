@@ -3,7 +3,7 @@
 import React from 'react';
 import { Empty } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { ConsolePageHeader } from '@autional/ui';
 
 export default function TracesPage() {
 	const { t } = useTranslation();

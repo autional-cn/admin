@@ -14,7 +14,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Routes, Route } from 'react-router';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import AgentDetailPage from '../[id]/page';
 import { message } from '@/lib/antd-app';
 

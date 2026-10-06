@@ -3,11 +3,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Form, Input, InputNumber, Button, Card, Select } from 'antd';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import { message } from '@/lib/antd-app';
 import { useAdjustWalletBalance } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { ConsolePageHeader } from '@autional/ui';
 
 // W1-01（A-363）：payload 与 AdjustBalanceRequest{amount*,type*,reason*} 逐键对齐——
 // type 为必选控件（值域 deposit=增加 / withdraw=扣减，与服务端 switch 一致）；

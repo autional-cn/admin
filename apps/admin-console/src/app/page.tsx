@@ -21,8 +21,8 @@ import { useAuditLogs, type AuditLogRecord } from '@/hooks/use-audit-logs';
 import { useAlerts } from '@/hooks/use-audit-alerts';
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
-import { classifyQueryState, type QueryState } from '@autional-cn/shared';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { classifyQueryState, type QueryState } from '@autional/shared';
+import { ConsolePageHeader } from '@autional/ui';
 import { QueryStateFallback } from '@/components/common/QueryStateFallback';
 
 const DashboardPage = memo(function DashboardPage() {

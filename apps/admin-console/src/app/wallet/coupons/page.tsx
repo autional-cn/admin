@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal, Form, Input, Select, InputNumber, Space, Popconfirm, DatePicker, Tag } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -15,9 +15,9 @@ import {
 	type CouponItem,
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import type { CreateCouponRequest } from '@autional-cn/shared/generated/types';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import type { CreateCouponRequest } from '@autional/shared/generated/types';
+import { ConsolePageHeader } from '@autional/ui';
 
 // W1-04（A-376）：表单键与 CreateCouponRequest/UpdateCouponRequest 逐一对齐——
 // min_spend（string）/ expires_at（RFC3339）/ valid_from（RFC3339）/ usage_limit（int>=1）；

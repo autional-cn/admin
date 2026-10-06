@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Space, Popconfirm, InputNumber } from 'antd';
 import { message } from '@/lib/antd-app';
@@ -16,9 +16,9 @@ import {
 } from '@/hooks/use-wallet-admin';
 
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import type { CreateWalletRequest } from '@autional-cn/shared/generated/types';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import type { CreateWalletRequest } from '@autional/shared/generated/types';
+import { ConsolePageHeader } from '@autional/ui';
 
 // A-362①：币符按钱包币种（USD → $，其余默认 ¥；旧实现硬编码 ¥ 而创建弹窗币种可选 USD）
 const currencySymbol = (currency?: string) => (currency === 'USD' ? '$' : '¥');

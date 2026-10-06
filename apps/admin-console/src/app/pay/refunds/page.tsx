@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import { Tag, Select, Space, Card, Button, Modal, Descriptions } from 'antd';
 import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePayRefunds, type RefundRecord } from '@/hooks/use-pay';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 const statusTagColor: Record<string, string> = {
 	pending: 'processing',

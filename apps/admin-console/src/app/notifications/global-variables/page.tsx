@@ -5,7 +5,7 @@ import { Button, Space, Tag, Modal, Form, Input, Popconfirm, Tooltip } from 'ant
 import { message } from '@/lib/antd-app';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import {
 	useGlobalVariables,
 	useCreateGlobalVariable,
@@ -13,8 +13,8 @@ import {
 	useDeleteGlobalVariable,
 } from '@/hooks/use-global-variables';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 const { TextArea } = Input;
 

@@ -5,14 +5,14 @@ import { Card, Row, Col, Statistic, Skeleton, Tag, Typography, Empty, Segmented 
 import { ArrowUp, Eye, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import {
 	useNotificationStats,
 	useNotificationTrend,
 	useNotificationsReadReport,
 	type TrendPoint,
 } from '@/hooks/use-notifications';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
+import { PageError, DataTable } from '@autional/ui/antd';
 import {
 	LineChart,
 	Line,

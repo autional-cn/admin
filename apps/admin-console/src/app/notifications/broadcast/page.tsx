@@ -5,11 +5,11 @@ import { Card, Form, Input, Select, Button, Row, Col } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 import { useBroadcastNotification } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
-import type { BroadcastNotificationResponse } from '@autional-cn/shared/generated/types';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import type { BroadcastNotificationResponse } from '@autional/shared/generated/types';
+import { ConsolePageHeader } from '@autional/ui';
 
 const { TextArea } = Input;
 const { Option } = Select;

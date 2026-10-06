@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, Button, Typography, List } from 'antd';
 import { Book, Link2, Plug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { ConsolePageHeader } from '@autional/ui';
 import { DOCS_BASE } from '@/lib/docs';
 
 const { Title, Paragraph } = Typography;

@@ -1,5 +1,5 @@
-import { PageError } from '@autional-cn/ui/antd';
-import { classifyQueryState, isRetryableError, type QueryStateInput } from '@autional-cn/shared';
+import { PageError } from '@autional/ui/antd';
+import { classifyQueryState, isRetryableError, type QueryStateInput } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 
 /**

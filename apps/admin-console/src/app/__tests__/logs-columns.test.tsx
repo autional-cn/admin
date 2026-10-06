@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import LogsPage from '../logs/page';
 
 const LOGS_URL = '/identity/api/v1/auth/me/audit-logs';

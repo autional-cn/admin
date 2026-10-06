@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 import { Tag, Button, Modal, Form, Input, Select, Card, Space } from 'antd';
 import { message } from '@/lib/antd-app';
 
 import { useWalletDisputes, useResolveDispute, type Dispute } from '@/hooks/use-wallets';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 // W1-03（A-370+A-372）：裁决契约键 resolution/remark（旧 result/reason 错配）；
 // 选项值域 = 服务端裁决词表 resolved/rejected（旧 approved/partial 幽灵值被 oneof 拒）；

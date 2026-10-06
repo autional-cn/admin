@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { Card, Row, Col, Statistic, Space, Button } from 'antd';
 import { Search } from 'lucide-react';
 import { useBillingRevenue, type RevenueItem } from '@/hooks/use-billing-admin';
-import { PageError, DataTable, DateRangeFilter } from '@autional-cn/ui/antd';
-import type { DateRangeValue } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable, DateRangeFilter } from '@autional/ui/antd';
+import type { DateRangeValue } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 
 /** 该页的筛选口径（收敛前是 `Record<string, unknown>`）。 */
 type RevenueFilters = {

@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import NhiPolicyPage from '../page';
 
 vi.mock('@/lib/antd-app', () => ({

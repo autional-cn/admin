@@ -8,7 +8,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup, configure } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import BillingPage from '../page';
 
 const { confirmMock } = vi.hoisted(() => ({ confirmMock: vi.fn() }));
@@ -18,8 +18,8 @@ vi.mock('@/lib/antd-app', () => ({
 	modal: { confirm: confirmMock },
 }));
 
-vi.mock('@autional-cn/shared', async (importOriginal) => ({
-	...(await importOriginal<typeof import('@autional-cn/shared')>()),
+vi.mock('@autional/shared', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@autional/shared')>()),
 	useCurrentTenantId: () => TENANT,
 }));
 

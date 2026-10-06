@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 import { Form, InputNumber, Select, Button, Card, Spin, Switch, Space, Empty } from 'antd';
 import { message, modal } from '@/lib/antd-app';
@@ -14,8 +14,8 @@ import {
 } from '@/hooks/use-wallet-admin';
 import { useApplications } from '@/hooks/use-applications';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 // W1-05（A-381/A-382）：表单字段与后端 WalletPolicyUpdateRequest（16 指针字段）逐一对齐。
 // 币种在表单里是数组（Select tags），加载时 CSV→数组、提交时数组→CSV（AC-B3-W1-05-3）。

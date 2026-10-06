@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
-import { useAuthStore } from '@autional-cn/shared';
+import { useAuthStore } from '@autional/shared';
 import SettingsPage from '../page';
 import { message } from '@/lib/antd-app';
 import {
@@ -23,7 +23,7 @@ import {
 	cancelEmailChange,
 	updateMyAvatar,
 } from '@/lib/api.generated';
-import { PublicAuthConfigByAuthConfig } from '@autional-cn/shared/generated/api';
+import { PublicAuthConfigByAuthConfig } from '@autional/shared/generated/api';
 
 vi.mock('@/lib/antd-app', () => ({
 	message: { success: vi.fn(), error: vi.fn() },
@@ -38,8 +38,8 @@ vi.mock('@/lib/api.generated', () => ({
 	updateMyAvatar: vi.fn(),
 }));
 
-vi.mock('@autional-cn/shared/generated/api', async (importOriginal) => {
-	const actual = await importOriginal<typeof import('@autional-cn/shared/generated/api')>();
+vi.mock('@autional/shared/generated/api', async (importOriginal) => {
+	const actual = await importOriginal<typeof import('@autional/shared/generated/api')>();
 	return { ...actual, PublicAuthConfigByAuthConfig: vi.fn() };
 });
 

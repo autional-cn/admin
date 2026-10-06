@@ -4,15 +4,15 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Input, Button, Typography, Space, Spin, Descriptions } from 'antd';
-import { Result } from '@autional-cn/ui';
+import { Result } from '@autional/ui';
 import {
 	CheckCircle2,
 	Link2,
 	Search,
 	XCircle,
 } from 'lucide-react';
-import { apiClient, API_PATHS, extractItem, usePageTitle } from '@autional-cn/shared';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { apiClient, API_PATHS, extractItem, usePageTitle } from '@autional/shared';
+import { ConsolePageHeader } from '@autional/ui';
 import { message } from '@/lib/antd-app';
 
 const { Text } = Typography;

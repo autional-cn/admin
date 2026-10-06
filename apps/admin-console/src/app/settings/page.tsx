@@ -11,8 +11,8 @@ import {
 	ShieldCheck,
 	User,
 } from 'lucide-react';
-import { useAuthStore, processPasswordForTransmission, usePageTitle } from '@autional-cn/shared';
-import { PublicAuthConfigByAuthConfig } from '@autional-cn/shared/generated/api';
+import { useAuthStore, processPasswordForTransmission, usePageTitle } from '@autional/shared';
+import { PublicAuthConfigByAuthConfig } from '@autional/shared/generated/api';
 // W2-04（A-437）：保存资料改走 self 自助三通道（旧 updateUser 走 admin 端点恒 61002205）。
 import {
 	changePassword,
@@ -23,8 +23,8 @@ import {
 	updateMyAvatar,
 } from '@/lib/api.generated';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 const PREFERENCE_KEYS = {

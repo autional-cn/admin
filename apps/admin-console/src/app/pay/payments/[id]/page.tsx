@@ -11,9 +11,9 @@ import {
 	type PaymentItem,
 	type Receipt,
 } from '@/hooks/use-pay';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader, SectionCard } from '@autional-cn/ui';
-import { useTenantSlug, usePageTitle } from '@autional-cn/shared';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader, SectionCard } from '@autional/ui';
+import { useTenantSlug, usePageTitle } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
 

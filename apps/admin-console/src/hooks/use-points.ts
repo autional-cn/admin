@@ -1,7 +1,7 @@
 'use client';
 
-import { extractList, extractListResult } from '@autional-cn/shared';
-import type { ListResult } from '@autional-cn/shared';
+import { extractList, extractListResult } from '@autional/shared';
+import type { ListResult } from '@autional/shared';
 import { queryKeys } from '@/lib/query-keys';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -16,14 +16,14 @@ import {
 	transferPoints,
 	exchangePoints,
 } from '@/lib/api.generated';
-import * as Generated from '@autional-cn/shared/generated/api';
+import * as Generated from '@autional/shared/generated/api';
 import type {
 	FreezePointsRequest,
 	UnfreezePointsRequest,
 	ExpirePointsRequest,
 	TransferPointsRequest as GenTransferPointsRequest,
 	ExchangePointsRequest as GenExchangePointsRequest,
-} from '@autional-cn/shared/generated/types';
+} from '@autional/shared/generated/types';
 
 export interface PointRule {
 	id: string;

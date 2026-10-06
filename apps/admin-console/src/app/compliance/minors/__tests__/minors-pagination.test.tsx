@@ -12,7 +12,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup } from '@testing-library/react';
-import { apiClient, useAuthStore } from '@autional-cn/shared';
+import { apiClient, useAuthStore } from '@autional/shared';
 import MinorsProtectionPage from '../page';
 
 // antd v6 命令式 API 桩化（仓内既有模式）：错误分支可被真实驱动（本文件不触发错误路径，

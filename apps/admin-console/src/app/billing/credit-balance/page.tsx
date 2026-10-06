@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { Tag, Button, Input, Space, Card, Descriptions, Spin, Select } from 'antd';
 import { Search } from 'lucide-react';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 
 // A-434：wire decimal 为字符串（dto.go:1146/:1156 decimal.Decimal → `"balance":"0"`）；
 // 旧 number 型致 `.toLocaleString()` 恒等空转（String.prototype 规范行为）→ Number 转换后本地化。

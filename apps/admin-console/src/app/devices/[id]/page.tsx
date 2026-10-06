@@ -7,12 +7,12 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { Button, Tag, Modal, Form, Input, Skeleton, Descriptions } from 'antd';
 import { ArrowLeft, Pencil } from 'lucide-react';
-import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional-cn/shared';
+import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
-import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional-cn/ui';
+import { ConsolePageHeader, EmptyState, ErrorState, SectionCard, StatusBadge } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient, API_PATHS, extractItem } from '@autional-cn/shared';
-import { adminIotsByIots } from '@autional-cn/shared/generated/api';
+import { apiClient, API_PATHS, extractItem } from '@autional/shared';
+import { adminIotsByIots } from '@autional/shared/generated/api';
 import { message } from '@/lib/antd-app';
 import { handleApiError } from '@/lib/error-handler';
 import { queryKeys } from '@/lib/query-keys';
@@ -20,7 +20,7 @@ import { useOwnerDisplay } from '@/hooks/use-owner-display';
 import { DEVICE_STATUS_VARIANT, statusVariantOf, retryUnlessNotFound } from '@/lib/nhi';
 
 import { useTranslation } from 'react-i18next';
-import type { DeviceInfo } from '@autional-cn/shared/generated/types';
+import type { DeviceInfo } from '@autional/shared/generated/types';
 
 // W1b（A-89）：owner_principal_id 为 additive 增量键（generated 快照未含）→ 局部增强类型。
 type DeviceRecord = DeviceInfo & { ownerPrincipalId?: string };

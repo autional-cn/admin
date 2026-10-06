@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useCurrentTenantId, usePageTitle } from '@autional-cn/shared';
+import { useCurrentTenantId, usePageTitle } from '@autional/shared';
 import { Button, Form, Input, Select, Tag, Space, Popconfirm } from 'antd';
 import { message } from '@/lib/antd-app';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
@@ -15,10 +15,10 @@ import {
 	type Channel,
 } from '@/hooks/use-pay';
 import { handleApiError } from '@/lib/error-handler';
-// A-338③：Modal 走 DS 包装（@autional-cn/ui/antd）——关闭按钮 aria-label 本地化
+// A-338③：Modal 走 DS 包装（@autional/ui/antd）——关闭按钮 aria-label 本地化
 // （rc-dialog 写死英文 "Close"，仅 closable 的 aria-* 可覆盖；包装内已注入）。
-import { PageError, DataTable, Modal } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable, Modal } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 export default function PayChannelsPage() {
 	const { t, i18n } = useTranslation();

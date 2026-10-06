@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import { message } from '@/lib/antd-app';
 import RetentionPolicyPage from '../page';
 

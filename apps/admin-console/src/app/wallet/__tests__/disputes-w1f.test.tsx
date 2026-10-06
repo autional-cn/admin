@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup, configure } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import WalletDisputesPage from '../disputes/page';
 
 vi.mock('@/lib/antd-app', () => ({
@@ -14,8 +14,8 @@ vi.mock('@/lib/antd-app', () => ({
 	modal: { confirm: vi.fn() },
 }));
 
-vi.mock('@autional-cn/shared', async (importOriginal) => ({
-	...(await importOriginal<typeof import('@autional-cn/shared')>()),
+vi.mock('@autional/shared', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@autional/shared')>()),
 	useCurrentTenantId: () => 'tnt_w1f_dispute01',
 }));
 

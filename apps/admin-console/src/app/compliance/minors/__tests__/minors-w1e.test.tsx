@@ -11,7 +11,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup, configure } from '@testing-library/react';
-import { apiClient, useAuthStore } from '@autional-cn/shared';
+import { apiClient, useAuthStore } from '@autional/shared';
 
 // 全量门并行负载下，antd 动画/首渲染可超测试库默认 1000ms 异步超时 → 放宽（防假红）
 configure({ asyncUtilTimeout: 5000 });

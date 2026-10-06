@@ -4,7 +4,7 @@
 //   恢复即红：任何输入框/按钮控件回归（哪怕接线了也要经 A-70 BFF 路由就绪后再评估）即失败。
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import TracesPage from '../traces/page';
 
 let originalAdapter: unknown;

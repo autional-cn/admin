@@ -6,7 +6,7 @@ import { message } from '@/lib/antd-app';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { fromPageResult, toPageParams, usePageTitle } from '@autional-cn/shared';
+import { fromPageResult, toPageParams, usePageTitle } from '@autional/shared';
 import { queryKeys } from '@/lib/query-keys';
 import { getCommunicationProviders } from '@/lib/api.generated';
 import {
@@ -15,8 +15,8 @@ import {
 	useDeleteCommunicationProvider,
 } from '@/hooks/use-communication';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 
 const { TextArea } = Input;
 

@@ -13,10 +13,10 @@ import {
 	type SubscriptionItem,
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { PageError, DataTable } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError, DataTable } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@autional-cn/shared';
+import { usePageTitle } from '@autional/shared';
 
 // A-405：状态标签/配色单点（表格与详情弹窗共用，杜绝详情裸显英文原文）
 const SUBSCRIPTION_STATUS_COLORS: Record<string, string> = {

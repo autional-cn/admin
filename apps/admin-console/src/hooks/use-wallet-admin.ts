@@ -1,12 +1,12 @@
 'use client';
 
-import { extractList, extractListResult, extractItem } from '@autional-cn/shared';
-import type { ListResult } from '@autional-cn/shared';
+import { extractList, extractListResult, extractItem } from '@autional/shared';
+import type { ListResult } from '@autional/shared';
 import { retryUnlessNotFound } from '@/lib/nhi';
 import { queryKeys } from '@/lib/query-keys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as Generated from '@autional-cn/shared/generated/api';
-import type { CreateWalletRequest, CreateCouponRequest } from '@autional-cn/shared/generated/types';
+import * as Generated from '@autional/shared/generated/api';
+import type { CreateWalletRequest, CreateCouponRequest } from '@autional/shared/generated/types';
 import {
 	updateWallet,
 	deleteWallet,

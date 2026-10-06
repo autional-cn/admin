@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup, act, configure } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import BroadcastPage from '../broadcast/page';
 import { message, modal } from '@/lib/antd-app';
 

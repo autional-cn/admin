@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useCurrentTenantId } from '@autional-cn/shared';
+import { useCurrentTenantId } from '@autional/shared';
 import { Tree, Card, Button, Space, Tag, Modal, Form, Input, Empty, Typography } from 'antd';
 import { message, modal } from '@/lib/antd-app';
 import { Network, Pencil, Plus, Trash2 } from 'lucide-react';
@@ -14,8 +14,8 @@ import {
 } from '@/hooks/use-departments';
 
 import { handleApiError } from '@/lib/error-handler';
-import { PageError } from '@autional-cn/ui/antd';
-import { ConsolePageHeader } from '@autional-cn/ui';
+import { PageError } from '@autional/ui/antd';
+import { ConsolePageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { createDepartmentSchema } from '@/lib/validators';
 

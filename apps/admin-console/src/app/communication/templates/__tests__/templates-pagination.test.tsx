@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, cleanup, configure } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import CommunicationTemplatesPage from '../page';
 import { message } from '@/lib/antd-app';
 

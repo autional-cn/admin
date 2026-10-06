@@ -21,7 +21,7 @@ import { MemoryRouter } from 'react-router';
 // 全量门并行负载下，antd 动画/首渲染可超测试库默认 1000ms 异步超时 → 放宽（防假红）
 configure({ asyncUtilTimeout: 5000 });
 import { message as antdMessage } from 'antd';
-import { apiClient } from '@autional-cn/shared';
+import { apiClient } from '@autional/shared';
 import { message } from '@/lib/antd-app';
 import CompliancePolicyPage from '../page';
 
