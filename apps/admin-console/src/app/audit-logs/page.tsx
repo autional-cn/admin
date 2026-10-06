@@ -623,7 +623,7 @@ export default function AuditLogsPage() {
 									{t('audit.detail.metadata')}
 								</Col>
 								<Col span={16}>
-									<pre className="bg-neutral-50 p-3 rounded text-xs overflow-auto">
+									<pre className="bg-neutral-50 p-3 rounded-xs text-xs overflow-auto">
 										{JSON.stringify(currentRecord.metadata, null, 2)}
 									</pre>
 								</Col>
@@ -956,7 +956,7 @@ export default function AuditLogsPage() {
 						{merkleData.proofPath ? (
 							<div>
 								<div className="text-neutral-600 mb-2">{t('audit.merkle.proofPath')}</div>
-								<pre className="bg-neutral-50 p-3 rounded text-xs overflow-auto">
+								<pre className="bg-neutral-50 p-3 rounded-xs text-xs overflow-auto">
 									{JSON.stringify(merkleData.proofPath, null, 2)}
 								</pre>
 							</div>
@@ -1004,7 +1004,7 @@ export default function AuditLogsPage() {
 								</Col>
 								<Col span={16}>
 									<Paragraph
-										className="break-all font-mono text-xs bg-neutral-50 p-3 rounded"
+										className="break-all font-mono text-xs bg-neutral-50 p-3 rounded-xs"
 										copyable
 									>
 										{verifyReport.message}

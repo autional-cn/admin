@@ -156,7 +156,7 @@ export default function ApplicationsPage() {
 			key: 'clientId',
 			render: (v: string, record: AppRecord) => (
 				<Space size="small">
-					<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded">{v || record.code}</code>
+					<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded-xs">{v || record.code}</code>
 					<Tooltip title={t('applications.copy')}>
 						<Button
 							type="text"

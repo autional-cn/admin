@@ -178,7 +178,7 @@ export default function DataClassificationPage() {
 									return (
 										<div
 											key={level.key}
-											className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded"
+											className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded-xs"
 										>
 											<span>{displayLabel}</span>
 											<Tag color={displayColor}>{t(level.labelKey)}</Tag>

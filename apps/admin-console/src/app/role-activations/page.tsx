@@ -79,7 +79,7 @@ export default function RoleActivationsPage() {
 			key: 'userId',
 			width: 200,
 			render: (v: string) => (
-				<code className="text-xs bg-neutral-200 px-1 rounded">{truncate(v)}</code>
+				<code className="text-xs bg-neutral-200 px-1 rounded-xs">{truncate(v)}</code>
 			),
 		},
 		{
@@ -88,7 +88,7 @@ export default function RoleActivationsPage() {
 			key: 'roleId',
 			width: 200,
 			render: (v: string) => (
-				<code className="text-xs bg-neutral-200 px-1 rounded">{truncate(v)}</code>
+				<code className="text-xs bg-neutral-200 px-1 rounded-xs">{truncate(v)}</code>
 			),
 		},
 		{

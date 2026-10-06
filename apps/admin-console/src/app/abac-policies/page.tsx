@@ -135,7 +135,7 @@ export default function AbacPoliciesPage() {
 			render: (v: string) => (
 				<code
 					title={v}
-					className="text-xs bg-neutral-200 px-2 py-1 rounded max-w-48 inline-block truncate"
+					className="text-xs bg-neutral-200 px-2 py-1 rounded-xs max-w-48 inline-block truncate"
 				>
 					{v}
 				</code>

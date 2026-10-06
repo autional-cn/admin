@@ -620,7 +620,7 @@ export default function AuditAnomaliesPage() {
 									</Descriptions>
 								)}
 								{timelineData.context && (
-									<div className="mb-4 p-3 bg-neutral-50 dark:bg-neutral-900 rounded text-sm">
+									<div className="mb-4 p-3 bg-neutral-50 dark:bg-neutral-900 rounded-xs text-sm">
 										<div className="font-medium mb-1">{t('auditAnomalies.contextSummary')}</div>
 										<Row gutter={16}>
 											<Col span={8}>
@@ -655,7 +655,7 @@ export default function AuditAnomaliesPage() {
 											{timelineData.loginSessions.map((s, i) => (
 												<div
 													key={s.fingerprint || i}
-													className="p-2 rounded bg-neutral-50 dark:bg-neutral-900 text-sm"
+													className="p-2 rounded-xs bg-neutral-50 dark:bg-neutral-900 text-sm"
 												>
 													<div className="text-xs text-neutral-600">
 														{formatTs(s.firstSeen)} – {formatTs(s.lastSeen)} ·{' '}
@@ -722,7 +722,7 @@ export default function AuditAnomaliesPage() {
 								{relatedData.items.map((item: any) => (
 									<div
 										key={item.id}
-										className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded hover:bg-neutral-50 hover:bg-neutral-900 cursor-pointer transition-colors"
+										className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 border rounded-xs hover:bg-neutral-50 hover:bg-neutral-900 cursor-pointer transition-colors"
 										onClick={() => openDetail(item)}
 									>
 										<div className="flex items-center gap-3 min-w-0">

@@ -472,7 +472,7 @@ export default function RolesPage() {
 									{permissions.map((perm) => (
 										<div
 											key={perm.id}
-											className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 hover:bg-neutral-50"
+											className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xs border border-neutral-200 px-3 py-2 hover:bg-neutral-50"
 										>
 											<div className="flex-1 min-w-0 mr-4">
 												<div className="font-medium text-sm">{perm.name}</div>

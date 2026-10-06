@@ -137,7 +137,7 @@ export default function OAuthClientsPage() {
 			key: 'clientId',
 			render: (v: string) => (
 				<Space size="small">
-					<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded">{v}</code>
+					<code className="text-xs bg-neutral-200 px-1.5 py-0.5 rounded-xs">{v}</code>
 					<Button
 						type="text"
 						size="small"

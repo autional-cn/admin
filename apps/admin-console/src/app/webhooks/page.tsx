@@ -338,11 +338,11 @@ export default function WebhooksPage() {
 										{typeof log.attempt === 'number' &&
 											` · ${t('webhooks.attemptCount', { count: log.attempt })}`}
 									</div>
-									<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
+									<div className="mt-2 bg-neutral-50 p-2 rounded-xs text-xs">
 										<div className="font-medium">{t('webhooks.request')}</div>
 										<pre className="whitespace-pre-wrap break-all">{log.payload || '-'}</pre>
 									</div>
-									<div className="mt-2 bg-neutral-50 p-2 rounded text-xs">
+									<div className="mt-2 bg-neutral-50 p-2 rounded-xs text-xs">
 										<div className="font-medium">{t('webhooks.response')}</div>
 										<pre className="whitespace-pre-wrap break-all">{log.response || '-'}</pre>
 									</div>

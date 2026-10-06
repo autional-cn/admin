@@ -62,7 +62,7 @@ export default function SdkPage() {
 									<div>
 										<div>{t(sdk.desc)}</div>
 										{sdk.install && (
-											<pre className="mt-2 rounded bg-neutral-100 px-2 py-1 text-xs overflow-x-auto">
+											<pre className="mt-2 rounded-xs bg-neutral-100 px-2 py-1 text-xs overflow-x-auto">
 												{sdk.install}
 											</pre>
 										)}
