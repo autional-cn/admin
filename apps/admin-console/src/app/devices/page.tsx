@@ -13,7 +13,7 @@ import {
 	fromPageResult,
 } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
-import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
+import { AppPageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { DeviceInfo } from '@autional/shared/generated/types';
 import {
@@ -243,7 +243,7 @@ export default function DevicesPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('devices.title')}
 				description={t('devices.subtitle')}
 				actions={

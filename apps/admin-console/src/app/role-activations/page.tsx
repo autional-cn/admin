@@ -10,7 +10,7 @@ import type { RoleActivation } from '@/hooks/use-role-activations';
 import { handleApiError } from '@/lib/error-handler';
 import { usePageTitle } from '@autional/shared';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // A-141f（TASK-AB2-17 / ADR-B2-03）：后端创建即 Active（枚举仅三态，见 pim/role_activation.go:13-15），
 // 本页为「激活记录」视图，无审批流；未知状态兜底原值透出（防存量脏数据吞行）。
@@ -146,7 +146,7 @@ export default function RoleActivationsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('roleActivations.title')} />
+			<AppPageHeader title={t('roleActivations.title')} />
 
 			{error && (
 				<PageError message={t('roleActivations.loadError')} retry={refetch} className="mb-4" />

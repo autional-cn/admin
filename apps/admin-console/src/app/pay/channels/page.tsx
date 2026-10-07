@@ -18,7 +18,7 @@ import { handleApiError } from '@/lib/error-handler';
 // A-338③：Modal 走 DS 包装（@autional/ui/antd）——关闭按钮 aria-label 本地化
 // （rc-dialog 写死英文 "Close"，仅 closable 的 aria-* 可覆盖；包装内已注入）。
 import { PageError, DataTable, Modal } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 export default function PayChannelsPage() {
 	const { t, i18n } = useTranslation();
@@ -145,7 +145,7 @@ export default function PayChannelsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('payChannels.title')}
 				actions={
 					<>

@@ -13,7 +13,7 @@ import {
 } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // W1-02（A-365+A-367）：数据源改接 GET /admin/wallets/withdrawals（withdrawal_requests 真源，
 // 旧交易端点 type=withdraw 列表与审批对象（提现申请实体）错位）；撤 bankAccount 列（响应无此字段）；
@@ -138,7 +138,7 @@ export default function WalletWithdrawalsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('walletWithdrawals.title')} />
+			<AppPageHeader title={t('walletWithdrawals.title')} />
 
 			{error && (
 				<PageError message={t('walletWithdrawals.loadError')} retry={refetch} className="mb-4" />

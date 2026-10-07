@@ -30,7 +30,7 @@ import {
 	adminAuditArchivePost,
 	adminAuditLogs,
 } from '@autional/shared/generated/api';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { usePageTitle } from '@autional/shared';
 import { useTranslation } from 'react-i18next';
 
@@ -150,7 +150,7 @@ export default function RetentionPolicyPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('auditRetention.title')}
 				actions={
 					<>

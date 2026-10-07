@@ -11,7 +11,7 @@ import { PageError } from '@autional/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
 import { extractItem, useCurrentTenantId } from '@autional/shared';
 import type { AuthPolicyResponse, UpdateAuthPolicyRequest } from '@autional/shared/generated/types';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 type MFAMode = 'required' | 'optional' | 'disabled';
@@ -127,7 +127,7 @@ export default function MFAPolicyPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('mfa.title')} />
+			<AppPageHeader title={t('mfa.title')} />
 			{/* A-99：GET 失败独立文案（旧复用 mfa.saveFailed「保存失败」→ 误导为保存动作出错） */}
 			{error && <PageError message={t('mfa.loadFailed')} retry={refetch} className="mb-4" />}
 			<Card loading={isLoading}>

@@ -22,7 +22,7 @@ import { useAlerts } from '@/hooks/use-audit-alerts';
 import { useAnnouncements, type AnnouncementRecord } from '@/hooks/use-announcements';
 import { useTenantSummary } from '@/hooks/use-dashboard-summary';
 import { classifyQueryState, type QueryState } from '@autional/shared';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { QueryStateFallback } from '@/components/common/QueryStateFallback';
 
 const DashboardPage = memo(function DashboardPage() {
@@ -148,7 +148,7 @@ const DashboardPage = memo(function DashboardPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('dashboard.title')}
 				actions={
 					<>

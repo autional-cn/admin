@@ -9,7 +9,7 @@ import { queryKeys } from '@/lib/query-keys';
 import { getMyAuditLogs } from '@/lib/api.generated';
 import { fromPageResult, toPageParams } from '@autional/shared';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader, StatusBadge } from '@autional/ui';
+import { AppPageHeader, StatusBadge } from '@autional/ui';
 
 /** /auth/me/audit-logs 行契约（service-identity dto.AuditLogResponse 实读，经拦截器深 camel 化）。 */
 interface AuditLogItem {
@@ -100,7 +100,7 @@ export default function LogsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('logs.title')}
 				actions={
 					<>

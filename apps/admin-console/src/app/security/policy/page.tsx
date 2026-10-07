@@ -10,7 +10,7 @@ import { queryKeys } from '@/lib/query-keys';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
 import { extractItem, useCurrentTenantId, usePageTitle } from '@autional/shared';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 /** 后端 GET 返回的嵌套结构（apiClient 响应已转 camelCase；flat 键与 nested 键并存）。
@@ -141,7 +141,7 @@ export default function SecurityPolicyPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('securityPolicy.title')} />
+			<AppPageHeader title={t('securityPolicy.title')} />
 			{/* A-131：GET 失败显示错误态（旧实现 error 未解构 → 空白表单被当现状，据空白保存） */}
 			{error && (
 				<PageError message={t('securityPolicy.loadError')} retry={refetch} className="mb-4" />

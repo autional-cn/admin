@@ -13,7 +13,7 @@ import {
 	fromPageResult,
 } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
-import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
+import { AppPageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
 	adminAgents,
@@ -226,7 +226,7 @@ export default function AgentsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('agents.title')}
 				description={t('agents.subtitle')}
 				actions={

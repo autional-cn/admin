@@ -7,7 +7,7 @@ import { usePageTitle } from '@autional/shared';
 import { message } from '@/lib/antd-app';
 import { useAdjustWalletBalance } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // W1-01（A-363）：payload 与 AdjustBalanceRequest{amount*,type*,reason*} 逐键对齐——
 // type 为必选控件（值域 deposit=增加 / withdraw=扣减，与服务端 switch 一致）；
@@ -58,7 +58,7 @@ export default function WalletAdjustPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('walletAdjust.title')} />
+			<AppPageHeader title={t('walletAdjust.title')} />
 			{adjustResult && (
 				<Alert
 					type="success"

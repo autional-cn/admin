@@ -14,7 +14,7 @@ import {
 } from '@/hooks/use-global-variables';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 const { TextArea } = Input;
 
@@ -152,7 +152,7 @@ export default function GlobalVariablesPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('notifications.globalVariables.title')}
 				actions={
 					<>

@@ -5,7 +5,7 @@ import { Tag, Button, Input, Space, Card, Descriptions, Spin, Select } from 'ant
 import { Search } from 'lucide-react';
 import { useCreditBalance, useCreditTransactions } from '@/hooks/use-billing-admin';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@autional/shared';
 
@@ -117,7 +117,7 @@ export default function BillingCreditBalancePage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('creditBalance.title')} />
+			<AppPageHeader title={t('creditBalance.title')} />
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<div className="flex gap-2 items-end">

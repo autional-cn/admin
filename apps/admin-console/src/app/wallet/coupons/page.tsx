@@ -17,7 +17,7 @@ import {
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
 import type { CreateCouponRequest } from '@autional/shared/generated/types';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // W1-04（A-376）：表单键与 CreateCouponRequest/UpdateCouponRequest 逐一对齐——
 // min_spend（string）/ expires_at（RFC3339）/ valid_from（RFC3339）/ usage_limit（int>=1）；
@@ -190,7 +190,7 @@ export default function WalletCouponsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('walletCoupons.title')}
 				actions={
 					<>

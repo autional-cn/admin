@@ -15,7 +15,7 @@ import {
 
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { createDepartmentSchema } from '@/lib/validators';
 
@@ -120,7 +120,7 @@ export default function DepartmentsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('departments.title')}
 				actions={
 					<>

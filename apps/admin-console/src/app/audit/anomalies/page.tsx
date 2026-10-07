@@ -19,7 +19,7 @@ import { handleApiError } from '@/lib/error-handler';
 import { DataTable, Drawer, PageError } from '@autional/ui/antd';
 import type { DataTablePagination } from '@autional/ui/antd';
 import { useIsAuditRestricted, AuditStatsOnly, extractItem, usePageTitle } from '@autional/shared';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { useOwnerDisplay } from '@/hooks/use-owner-display';
 
@@ -355,7 +355,7 @@ export default function AuditAnomaliesPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('auditAnomalies.title')}
 				actions={
 					<>

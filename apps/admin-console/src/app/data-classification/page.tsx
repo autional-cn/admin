@@ -13,7 +13,7 @@ import type { ClassificationEntry } from '@/hooks/use-data-classification';
 import { usePageTitle, useCurrentTenantIdOr } from '@autional/shared';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -98,7 +98,7 @@ export default function DataClassificationPage() {
 				<PageError message={t('dataClassification.loadError')} retry={refetch} className="mb-4" />
 			)}
 
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('dataClassification.title')}
 				actions={
 					<>

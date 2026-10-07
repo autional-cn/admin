@@ -6,7 +6,7 @@ import { Button, Space, Modal, Form, Input, Select, Popconfirm, Skeleton } from 
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { usePageTitle, useTenantSlug, useCurrentTenantId } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
-import { ConsolePageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
+import { AppPageHeader, EmptyState, ErrorState, StatusBadge } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { extractItem, extractList } from '@autional/shared';
 import type { RobotInfo } from '@autional/shared/generated/types';
@@ -192,7 +192,7 @@ export default function RobotsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('robots.title')}
 				description={t('robots.subtitle')}
 				actions={

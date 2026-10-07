@@ -12,7 +12,7 @@ import { PageError } from '@autional/ui/antd';
 import { queryKeys } from '@/lib/query-keys';
 import { useTranslation } from 'react-i18next';
 import type { PasswordPolicyResponse } from '@autional/shared/generated/types';
-import { Alert, ConsolePageHeader } from '@autional/ui';
+import { Alert, AppPageHeader } from '@autional/ui';
 import { useTenantSlug } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
 
@@ -80,7 +80,7 @@ export default function PasswordPolicyPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('passwordPolicy.title')} />
+			<AppPageHeader title={t('passwordPolicy.title')} />
 			{/* A-119：主从口径 —— 本页与「认证配置」页共用同一密码策略（同写路径），主面为认证配置 */}
 			<Alert
 				variant="info"

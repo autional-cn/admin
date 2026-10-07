@@ -12,7 +12,7 @@ import {
 	XCircle,
 } from 'lucide-react';
 import { apiClient, API_PATHS, extractItem, usePageTitle } from '@autional/shared';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { message } from '@/lib/antd-app';
 
 const { Text } = Typography;
@@ -60,8 +60,8 @@ export default function WalletEventsPage() {
 
 	return (
 		<div className="space-y-6">
-			{/* A-393①：标题层级对齐（旧 Title level={3}=H3 手工页头，其余 7 页均 ConsolePageHeader=H1） */}
-			<ConsolePageHeader title={t('walletEvents.title')} description={t('walletEvents.description')} />
+			{/* A-393①：标题层级对齐（旧 Title level={3}=H3 手工页头，其余 7 页均 AppPageHeader=H1） */}
+			<AppPageHeader title={t('walletEvents.title')} description={t('walletEvents.description')} />
 
 			<Card>
 				<Space.Compact className="w-full max-w-[500px]">

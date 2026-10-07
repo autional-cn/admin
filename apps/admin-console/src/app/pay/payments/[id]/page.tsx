@@ -12,7 +12,7 @@ import {
 	type Receipt,
 } from '@/hooks/use-pay';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader, SectionCard } from '@autional/ui';
+import { AppPageHeader, SectionCard } from '@autional/ui';
 import { useTenantSlug, usePageTitle } from '@autional/shared';
 import { buildNavHref } from '@/lib/nav';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ export default function PayPaymentDetailPage() {
 			>
 				{t('paymentDetail.backToList')}
 			</Button>
-			<ConsolePageHeader title={t('paymentDetail.title')} />
+			<AppPageHeader title={t('paymentDetail.title')} />
 		</>
 	);
 

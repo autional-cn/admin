@@ -5,7 +5,7 @@ import { Card, Row, Col, Button, Typography } from 'antd';
 import { Book, Code, Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTenantSlug } from '@autional/shared';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { buildNavHref } from '@/lib/nav';
 import { DOCS_BASE } from '@/lib/docs';
 
@@ -29,7 +29,7 @@ export default function SdkPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('sdks.title')} description={t('sdks.description')} />
+			<AppPageHeader title={t('sdks.title')} description={t('sdks.description')} />
 
 			<div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
 				<Text type="secondary">{t('sdks.apiVersion')}</Text>

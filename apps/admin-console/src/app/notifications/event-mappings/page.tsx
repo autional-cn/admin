@@ -18,7 +18,7 @@ import {
 import { useAvailableNotificationTemplates } from '@/hooks/use-notifications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 const { Option } = Select;
 
@@ -208,7 +208,7 @@ export default function EventMappingsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('notifications.eventMappings.title')}
 				actions={
 					<>

@@ -6,7 +6,7 @@ import { Download } from 'lucide-react';
 import { useTaxExport, type TaxExportItem } from '@/hooks/use-billing-admin';
 import { PageError, DataTable, DateRangeFilter } from '@autional/ui/antd';
 import type { DateRangeValue } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@autional/shared';
 
@@ -76,7 +76,7 @@ export default function BillingTaxExportPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('taxExport.title')} />
+			<AppPageHeader title={t('taxExport.title')} />
 
 			{error && <PageError message={t('taxExport.loadError')} retry={refetch} className="mb-4" />}
 

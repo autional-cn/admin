@@ -6,7 +6,7 @@ import { message } from '@/lib/antd-app';
 import { useDunningSettings, useUpdateDunningSettings } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { usePageTitle } from '@autional/shared';
 
 import { Input } from 'antd';
@@ -51,7 +51,7 @@ export default function BillingDunningPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('dunning.title')} />
+			<AppPageHeader title={t('dunning.title')} />
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<div className="flex gap-2 items-end">

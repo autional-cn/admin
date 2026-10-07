@@ -14,7 +14,7 @@ import {
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@autional/shared';
 
@@ -192,7 +192,7 @@ export default function BillingAlertsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('billingAlerts.title')}
 				actions={
 					<>

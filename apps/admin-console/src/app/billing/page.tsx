@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { handleApiError } from '@/lib/error-handler';
 import { useTranslation } from 'react-i18next';
 import {
@@ -930,7 +930,7 @@ export default function BillingPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('billing.title')}
 				actions={
 					<>

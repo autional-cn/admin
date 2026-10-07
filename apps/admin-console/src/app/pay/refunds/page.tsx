@@ -7,7 +7,7 @@ import { Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePayRefunds, type RefundRecord } from '@/hooks/use-pay';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 const statusTagColor: Record<string, string> = {
 	pending: 'processing',
@@ -96,7 +96,7 @@ export default function PayRefundsPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('payRefunds.title')} />
+			<AppPageHeader title={t('payRefunds.title')} />
 
 			{error && <PageError message={t('payRefunds.loadError')} retry={refetch} className="mb-4" />}
 

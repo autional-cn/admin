@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Form, InputNumber, Select, Button, Skeleton, Typography } from 'antd';
 import { Save } from 'lucide-react';
 import { usePageTitle } from '@autional/shared';
-import { ConsolePageHeader, ErrorState, SectionCard } from '@autional/ui';
+import { AppPageHeader, ErrorState, SectionCard } from '@autional/ui';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { extractItem } from '@autional/shared';
 import { adminPoliciesNhi, adminPoliciesNhiPut } from '@autional/shared/generated/api';
@@ -102,7 +102,7 @@ export default function NhiPolicyPage() {
 	return (
 		<div>
 			<div className="mb-6">
-				<ConsolePageHeader title={t('nhiPolicy.title')} description={t('nhiPolicy.subtitle')} />
+				<AppPageHeader title={t('nhiPolicy.title')} description={t('nhiPolicy.subtitle')} />
 			</div>
 
 			<Form

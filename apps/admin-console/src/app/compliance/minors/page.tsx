@@ -16,7 +16,7 @@ import { message } from '@/lib/antd-app';
 
 import { apiClient, API_PATHS, fromPageResult, toPageParams, useCurrentTenantId } from '@autional/shared';
 import { adminUsers } from '@autional/shared/generated/api';
-import { ConsolePageHeader, SectionCard } from '@autional/ui';
+import { AppPageHeader, SectionCard } from '@autional/ui';
 import dayjs from 'dayjs';
 
 // TASK-AB1-27（RC-5 契约收敛）：契约键直读（响应拦截器已 snake→camel），禁止 snake 直读。
@@ -273,11 +273,11 @@ export default function MinorsProtectionPage() {
 		},
 	];
 
-	if (loading) return <Spin size="large" className="block mx-auto my-24" />;
+	if (loading) return <Spin size="large" className="block mx-auto my-20" />;
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('compliance.minors.title')} description={t('compliance.minors.subtitle')} />
+			<AppPageHeader title={t('compliance.minors.title')} description={t('compliance.minors.subtitle')} />
 
 			{/* 配置不可知时统计卡整体退场：绝不呈现伪 0（「0 分钟/关闭」= 把失败伪装成未配置）。 */}
 			{!configError && (

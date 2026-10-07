@@ -9,7 +9,7 @@ import { message } from '@/lib/antd-app';
 import { useWalletDisputes, useResolveDispute, type Dispute } from '@/hooks/use-wallets';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // W1-03（A-370+A-372）：裁决契约键 resolution/remark（旧 result/reason 错配）；
 // 选项值域 = 服务端裁决词表 resolved/rejected（旧 approved/partial 幽灵值被 oneof 拒）；
@@ -112,7 +112,7 @@ export default function WalletDisputesPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('walletDisputes.title')} />
+			<AppPageHeader title={t('walletDisputes.title')} />
 
 			{error && (
 				<PageError message={t('walletDisputes.loadError')} retry={refetch} className="mb-4" />

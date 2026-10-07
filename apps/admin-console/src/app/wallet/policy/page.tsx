@@ -15,7 +15,7 @@ import {
 import { useApplications } from '@/hooks/use-applications';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // W1-05（A-381/A-382）：表单字段与后端 WalletPolicyUpdateRequest（16 指针字段）逐一对齐。
 // 币种在表单里是数组（Select tags），加载时 CSV→数组、提交时数组→CSV（AC-B3-W1-05-3）。
@@ -84,7 +84,7 @@ export default function WalletPolicyPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader title={t('walletPolicy.title')} />
+			<AppPageHeader title={t('walletPolicy.title')} />
 
 			<Card size="small" className="mb-4 max-w-xs">
 				<Form.Item label={t('walletPolicy.appId')} className="mb-0">

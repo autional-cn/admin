@@ -18,7 +18,7 @@ import {
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
 import type { CreateWalletRequest } from '@autional/shared/generated/types';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 
 // A-362①：币符按钱包币种（USD → $，其余默认 ¥；旧实现硬编码 ¥ 而创建弹窗币种可选 USD）
 const currencySymbol = (currency?: string) => (currency === 'USD' ? '$' : '¥');
@@ -171,7 +171,7 @@ export default function WalletListPage() {
 
 	return (
 		<div>
-			<ConsolePageHeader
+			<AppPageHeader
 				title={t('walletList.title')}
 				actions={
 					<>

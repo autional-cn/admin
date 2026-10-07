@@ -22,7 +22,7 @@ import { queryKeys } from '@/lib/query-keys';
 // wire 锚：service-identity/internal/handler/risk_config_handler.go:26-35（json tenant_id/elevated_threshold/
 // signal_weights/...）；权重 service-identity/internal/domain/risk_config.go:31-46（json ip_unknown 等）。
 import type { RiskConfigResponse, SignalWeights } from '@autional/shared/generated/types';
-import { ConsolePageHeader } from '@autional/ui';
+import { AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
@@ -95,7 +95,7 @@ export default function RiskConfigPage() {
 
 	return (
 		<div style={{ maxWidth: 800 }}>
-			<ConsolePageHeader title={t('riskConfig.title')} description={t('riskConfig.subtitle')} />
+			<AppPageHeader title={t('riskConfig.title')} description={t('riskConfig.subtitle')} />
 
 			<Form form={form} layout="vertical" initialValues={config}>
 				<Card title={t('riskConfig.levelThresholdCard')} style={{ marginBottom: 16 }}>
