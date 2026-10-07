@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import {
-	Alert,
 	Button,
 	Modal,
 	Form,
@@ -24,7 +23,7 @@ import {
 } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError, DataTable } from '@autional/ui/antd';
-import { AppPageHeader } from '@autional/ui';
+import { Alert, AppPageHeader } from '@autional/ui';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@autional/shared';
 import { createPlanSchema } from '@/lib/validators';
@@ -233,10 +232,10 @@ export default function BillingPlansPage() {
 			>
 				<Form form={form} layout="vertical" onFinish={handleSave}>
 					{editing && (
+						// 第 63 轮补：antd Alert → 设计系统 Alert（图标由 variant 自带，原来是 showIcon）
 						<Alert
-							type="info"
-							showIcon
-							message={t('plans2.form.editHint')}
+							variant="info"
+							title={t('plans2.form.editHint')}
 							className="mb-4"
 						/>
 					)}

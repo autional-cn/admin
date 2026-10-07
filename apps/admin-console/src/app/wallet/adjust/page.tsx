@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Form, Input, InputNumber, Button, Card, Select } from 'antd';
+import { Form, Input, InputNumber, Button, Card, Select } from 'antd';
 import { usePageTitle } from '@autional/shared';
 import { message } from '@/lib/antd-app';
 import { useAdjustWalletBalance } from '@/hooks/use-wallet-admin';
 import { handleApiError } from '@/lib/error-handler';
-import { AppPageHeader } from '@autional/ui';
+import { Alert, AppPageHeader } from '@autional/ui';
 
 // W1-01（A-363）：payload 与 AdjustBalanceRequest{amount*,type*,reason*} 逐键对齐——
 // type 为必选控件（值域 deposit=增加 / withdraw=扣减，与服务端 switch 一致）；
@@ -60,18 +60,21 @@ export default function WalletAdjustPage() {
 		<div>
 			<AppPageHeader title={t('walletAdjust.title')} />
 			{adjustResult && (
+				// 第 63 轮补：antd Alert → 设计系统 Alert（同一语义只有一种长相；L22 的题面已腐 —— 
+				// 复查时发现这里又新写了 antd 的 Alert）。antd 的 message/description 对应 DS 的 title/children；
+				// 图标由 variant 自带（原来是 showIcon）；closable 在 DS 里是**受控**的，关闭动作走 onClose。
 				<Alert
-					type="success"
-					showIcon
+					variant="success"
+					title={t('walletAdjust.success')}
 					closable
+					onClose={() => setAdjustResult(null)}
 					className="mb-4 max-w-lg"
-					message={t('walletAdjust.success')}
-					description={t('walletAdjust.successBalance', {
+				>
+					{t('walletAdjust.successBalance', {
 						balance: adjustResult.balance,
 						currency: adjustResult.currency ?? '',
 					})}
-					onClose={() => setAdjustResult(null)}
-				/>
+				</Alert>
 			)}
 			<Card className="max-w-lg">
 				<Form form={form} layout="vertical" onFinish={handleAdjust}>

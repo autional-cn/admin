@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Alert, Form, InputNumber, Select, Button, Card, Spin, Switch } from 'antd';
+import { Form, InputNumber, Select, Button, Card, Spin, Switch } from 'antd';
 import { message } from '@/lib/antd-app';
 import { useDunningSettings, useUpdateDunningSettings } from '@/hooks/use-billing-admin';
 import { handleApiError } from '@/lib/error-handler';
 import { PageError } from '@autional/ui/antd';
-import { AppPageHeader } from '@autional/ui';
+import { Alert, AppPageHeader } from '@autional/ui';
 import { usePageTitle } from '@autional/shared';
 
 import { Input } from 'antd';
@@ -82,11 +82,11 @@ export default function BillingDunningPage() {
 			) : (
 				<Card className="max-w-lg">
 					{settings && !settings.status && (
+						// 第 63 轮补：antd Alert → 设计系统 Alert（图标由 variant 自带，原来是 showIcon）
 						<Alert
-							type="info"
-							showIcon
+							variant="info"
 							// A-417②：未配置语义（空记录 status 为空 → 不再以 0/0 伪装已配置）
-							message={t('dunning.notConfigured')}
+							title={t('dunning.notConfigured')}
 							className="mb-4"
 						/>
 					)}
