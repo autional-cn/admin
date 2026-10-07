@@ -219,7 +219,7 @@ const DashboardPage = memo(function DashboardPage() {
 						<Statistic
 							title={t('dashboard.apiKeys')}
 							value={summary.apiKeysCount}
-							prefix={<KeyRound size="1em" className="text-purple-500" />}
+							prefix={<KeyRound size="1em" className="text-chart-7" />}
 						/>
 					</Col>
 					<Col xs={12} sm={8} md={4}>
