@@ -273,7 +273,7 @@ export default function MinorsProtectionPage() {
 		},
 	];
 
-	if (loading) return <Spin size="large" className="block mx-auto my-[100px]" />;
+	if (loading) return <Spin size="large" className="block mx-auto my-24" />;
 
 	return (
 		<div>
