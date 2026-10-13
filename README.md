@@ -1,3 +1,5 @@
+> **本仓库已归档**（只读）：源码与后续开发已迁移至 [github.com/autional/admin](https://github.com/autional/admin)；线上服务见 [admin.autional.cn](https://admin.autional.cn)。
+
 # Autional 管理控制台
 
 **域名**：[admin.autional.cn](https://admin.autional.cn)
